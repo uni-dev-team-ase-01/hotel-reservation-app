@@ -12,8 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reservations', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+    $table->id();
+    $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+    $table->date('check_in_date');
+    $table->date('check_out_date');
+    $table->enum('status', ['confirmed', 'cancelled', 'checked_in', 'checked_out', 'no_show'])->default('confirmed');
+    $table->integer('number_of_guests');
+    $table->string('cancellation_reason')->nullable();
+    $table->date('cancellation_date')->nullable();
+    $table->string('confirmation_number')->unique();
+    $table->boolean('auto_cancelled')->default(false);
+    $table->boolean('no_show_billed')->default(false);
+    $table->timestamps();
         });
     }
 
