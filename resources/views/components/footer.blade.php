@@ -8,7 +8,7 @@ Footer START -->
 			<!-- Widget 1 START -->
 			<div class="col-lg-3">
 				<!-- logo -->
-				<a href="index.html">
+				<a href="/">
 					<img class="h-40px" src="assets/images/logo-light.svg" alt="logo">
 				</a>
 				<p class="my-3 text-body-secondary">Departure defective arranging rapturous did believe him all had supported.</p>
