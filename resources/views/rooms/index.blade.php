@@ -940,13 +940,6 @@ Hotel list END -->
 </main>
 <!-- **************** MAIN CONTENT END **************** -->
 
-@if (Route::is('rooms.*') || Route::currentRouteName() == 'rooms')
-    <!-- Vendors for rooms -->
-    <script src="{{ asset('assets/vendor/flatpickr/js/flatpickr.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/choices/js/choices.min.js') }}"></script>
-    <script src="{{ asset('assets/vendor/tiny-slider/tiny-slider.js') }}"></script>
-    <script src="{{ asset('assets/vendor/nouislider/nouislider.min.js') }}"></script>
-@endif
 
 
 @endsection

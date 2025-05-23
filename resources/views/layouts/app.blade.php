@@ -83,7 +83,7 @@
     <!-- Theme CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
-@if (Route::is('rooms.*') || Route::currentRouteName() == 'rooms')
+@if (Route::is('rooms.*') || Route::currentRouteName() === 'rooms' || Route::currentRouteName() === 'home')
     <!-- rooms CSS -->
     <link rel="stylesheet" href="{{ asset('assets/vendor/font-awesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.css') }}">
@@ -112,9 +112,13 @@
 
     <!-- ThemeFunctions -->
     <script src="{{ asset('assets/js/functions.js') }}"></script>
-    @if (Route::is('rooms.*') || Route::currentRouteName() == 'rooms')
-    <!-- rooms CSS -->
 
+@if (Route::is('rooms.*') || Route::currentRouteName() == 'rooms' || Route::currentRouteName() == 'home')
+    <!-- Vendors for rooms -->
+    <script src="{{ asset('assets/vendor/flatpickr/js/flatpickr.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/choices/js/choices.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/tiny-slider/tiny-slider.js') }}"></script>
+    <script src="{{ asset('assets/vendor/nouislider/nouislider.min.js') }}"></script>
 @endif
 
 
