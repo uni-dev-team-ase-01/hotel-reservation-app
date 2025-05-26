@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hotel_services', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+    $table->id();
+    $table->foreignId('hotel_id')->constrained()->onDelete('cascade');
+    $table->foreignId('services_id')->constrained('services')->onDelete('cascade');
+    $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
+    $table->double('charge');
+    $table->timestamps();
         });
     }
 
