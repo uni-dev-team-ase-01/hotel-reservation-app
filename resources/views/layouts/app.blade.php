@@ -162,9 +162,9 @@
 
     <body>
         <main>
-            <x-header />
+            <x-customer.header />
             @yield("content")
-            <x-footer />
+            <x-customer.footer />
         </main>
 
         <!-- Back to top -->

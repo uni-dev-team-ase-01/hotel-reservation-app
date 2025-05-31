@@ -10,7 +10,7 @@ Footer START -->
                 <a href="/">
                     <img
                         class="h-40px"
-                        src="assets/images/logo-light.svg"
+                        src="{{ asset("assets/images/logo-light.svg") }}"
                         alt="logo"
                     />
                 </a>
@@ -306,7 +306,7 @@ Footer START -->
                     <li class="list-inline-item">
                         <a href="#">
                             <img
-                                src="assets/images/element/paypal.svg"
+                                src="{{ asset("assets/images/element/paypal.svg") }}"
                                 class="h-30px"
                                 alt=""
                             />
@@ -315,7 +315,7 @@ Footer START -->
                     <li class="list-inline-item">
                         <a href="#">
                             <img
-                                src="assets/images/element/visa.svg"
+                                src="{{ asset("assets/images/element/visa.svg") }}"
                                 class="h-30px"
                                 alt=""
                             />
@@ -324,7 +324,7 @@ Footer START -->
                     <li class="list-inline-item">
                         <a href="#">
                             <img
-                                src="assets/images/element/mastercard.svg"
+                                src="{{ asset("assets/images/element/mastercard.svg") }}"
                                 class="h-30px"
                                 alt=""
                             />
@@ -333,7 +333,7 @@ Footer START -->
                     <li class="list-inline-item">
                         <a href="#">
                             <img
-                                src="assets/images/element/expresscard.svg"
+                                src="{{ asset("assets/images/element/expresscard.svg") }}"
                                 class="h-30px"
                                 alt=""
                             />
