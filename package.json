@@ -9,14 +9,16 @@
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
         "@tailwindcss/vite": "^4.0.0",
+        "autoprefixer": "^10.4.21",
         "axios": "^1.8.2",
         "bootstrap": "^5.2.3",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^1.2.0",
+        "postcss": "^8.5.4",
         "prettier": "^3.5.3",
         "prettier-plugin-blade": "^2.1.21",
         "sass": "^1.56.1",
-        "tailwindcss": "^4.0.0",
+        "tailwindcss": "^4.1.8",
         "vite": "^6.2.4"
     }
 }

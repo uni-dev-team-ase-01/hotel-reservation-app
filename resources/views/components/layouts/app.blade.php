@@ -221,9 +221,9 @@
 
     <body>
         <main>
-            <x-header />
+            <x-customer.header />
             {{ $slot }}
-            <x-footer />
+            <x-customer.footer />
         </main>
 
         <div class="back-top"></div>
