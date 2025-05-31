@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -17,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use TomatoPHP\FilamentUsers\FilamentUsersPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -38,7 +40,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                \App\Filament\Resources\HotelResource\Widgets\BasicOverview::class,
                 Widgets\AccountWidget::class,
+            ])
+            ->resources([
+                config('filament-logger.activity_resource'),
+            ])
+            ->plugins([
+                FilamentUsersPlugin::make(),
+                FilamentSpatieRolesPermissionsPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

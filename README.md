@@ -42,3 +42,8 @@ Auth
 - Assign `customer` role to user on registration
 - Restrict customers access to admin panel
 - Restrict admin access to customer panel
+
+Filament
+- Added laravel permission plugin
+- Added users plugin
+- 
