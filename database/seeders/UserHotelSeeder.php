@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\UserHotel;
-use App\Models\User;
 use App\Models\Hotel;
+use App\Models\User;
+use App\Models\UserHotel;
+use Illuminate\Database\Seeder;
 
 class UserHotelSeeder extends Seeder
 {

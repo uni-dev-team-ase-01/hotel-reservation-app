@@ -1,45 +1,49 @@
 <?php
 
-namespace App\Filament\Resources\HotelResource\RelationManagers;
+namespace App\Filament\Resources\RoomResource\RelationManagers;
 
-use App\Filament\Resources\RoomResource;
+use App\Enum\RateType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class RoomsRelationManager extends RelationManager
+class RatesRelationManager extends RelationManager
 {
-    protected static string $relationship = 'rooms';
+    protected static string $relationship = 'rates';
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('hotel_id')
+                // Forms\Components\Select::make('room_id')
+                //     ->relationship('room', 'id')
+                //     ->required(),
+                Forms\Components\Select::make('rate_type')
                     ->required()
-                    ->maxLength(255),
+                    ->options(collect(RateType::cases())->mapWithKeys(fn ($case) => [
+                        $case->value => $case->getLabel(),
+                    ])),
+                Forms\Components\TextInput::make('amount')
+                    ->required()
+                    ->numeric(),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('room_number')
+            ->recordTitleAttribute('room_rates')
             ->columns([
-                Tables\Columns\TextColumn::make('room_number')
-                    ->label('Room Number')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('room_type')
-                    ->badge()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('occupancy')
+                Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\TextColumn::make('room.room_number')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('images')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('rate_type'),
+                Tables\Columns\TextColumn::make('amount')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -58,10 +62,6 @@ class RoomsRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('view_room')
-                    ->label('View Room')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn ($record) => RoomResource::getUrl('view', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\UserRoleType;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -13,11 +14,11 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            'super-admin',
-            'customer',
-            'travel-company',
-            'hotel-manager',
-            'hotel-clerk',
+            UserRoleType::SUPER_ADMIN->value,
+            UserRoleType::CUSTOMER->value,
+            UserRoleType::TRAVEL_COMPANY->value,
+            UserRoleType::HOTEL_MANAGER->value,
+            UserRoleType::HOTEL_CLERK->value,
         ];
 
         foreach ($roles as $role) {

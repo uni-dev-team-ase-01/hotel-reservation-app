@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enum\ReservationStatus;
+use App\Enum\UserRoleType;
 use App\Filament\Resources\ReservationResource\Pages;
 use App\Filament\Resources\ReservationResource\RelationManagers\BillsRelationManager;
 use App\Filament\Resources\ReservationResource\RelationManagers\ReservationRoomsRelationManager;
@@ -12,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReservationResource extends Resource
 {
@@ -32,6 +34,17 @@ class ReservationResource extends Resource
                         fn ($query) => $query->whereHas('roles', function ($q) {
                             $q->where('name', 'customer');
                         })
+                    )
+                    ->searchable(),
+                Forms\Components\Select::make('hotel_id')
+                    ->label('Hotel')
+                    ->required()
+                    ->relationship(
+                        'hotel',
+                        'name',
+                        // fn ($query) => $query->whereHas('roles', function ($q) {
+                        //     $q->where('name', 'customer');
+                        // })
                     )
                     ->searchable(),
                 Forms\Components\DatePicker::make('check_in_date')
@@ -64,7 +77,8 @@ class ReservationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('hotel.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('check_in_date')
                     ->date()
@@ -127,5 +141,21 @@ class ReservationResource extends Resource
             'view' => Pages\ViewReservation::route('/{record}'),
             'edit' => Pages\EditReservation::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
+
+        if ($user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value])) {
+            $assignedHotelIds = $user->userHotels->pluck('hotel_id');
+
+            return parent::getEloquentQuery()
+                ->whereIn('hotel_id', $assignedHotelIds);
+        } elseif ($user->hasRole(UserRoleType::SUPER_ADMIN->value)) {
+            return parent::getEloquentQuery();
+        }
+
+        return parent::getEloquentQuery()->whereRaw('1 = 0');
     }
 }

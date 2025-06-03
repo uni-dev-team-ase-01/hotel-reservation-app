@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Hotel;
+use Illuminate\Database\Seeder;
 
 class HotelSeeder extends Seeder
 {

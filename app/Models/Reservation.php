@@ -9,6 +9,7 @@ class Reservation extends Model
 {
     protected $fillable = [
         'user_id',
+        'hotel_id',
         'check_in_date',
         'check_out_date',
         'status',
@@ -31,6 +32,11 @@ class Reservation extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getUserNameAttribute()
+    {
+        return $this->user ? $this->user->name : 'No User Assigned';
     }
 
     public function reservationRooms(): HasMany
@@ -57,5 +63,15 @@ class Reservation extends Model
     public function getNightsAttribute()
     {
         return $this->check_in_date->diffInDays($this->check_out_date);
+    }
+
+    public function hotel()
+    {
+        return $this->belongsTo(Hotel::class, 'hotel_id');
+    }
+
+    public function getHotelNameAttribute()
+    {
+        return $this->hotel ? $this->hotel->name : 'No Hotel Assigned';
     }
 }

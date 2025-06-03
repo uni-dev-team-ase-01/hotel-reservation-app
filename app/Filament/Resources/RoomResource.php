@@ -3,13 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Enum\RoomType;
+use App\Enum\UserRoleType;
 use App\Filament\Resources\RoomResource\Pages;
+use App\Filament\Resources\RoomResource\RelationManagers\RatesRelationManager;
+use App\Models\Hotel;
 use App\Models\Room;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RoomResource extends Resource
 {
@@ -19,13 +23,33 @@ class RoomResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $user = auth()->user();
+        $isHotelStaff = $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+        $userHotels = $isHotelStaff ? $user->userHotels->pluck('hotel_id') : collect();
+
         return $form
             ->schema([
                 Forms\Components\Select::make('hotel_id')
                     ->label('Hotel')
-                    ->required()
                     ->relationship('hotel', 'name')
-                    ->searchable(),
+                    ->options(function () use ($isHotelStaff, $userHotels) {
+                        if ($isHotelStaff) {
+                            return Hotel::whereIn('id', $userHotels)->pluck('name', 'id');
+                        }
+
+                        return Hotel::pluck('name', 'id');
+                    })
+                    ->default(function () use ($isHotelStaff, $userHotels) {
+                        if ($isHotelStaff && $userHotels->count() === 1) {
+                            return $userHotels->first();
+                        }
+
+                        return null;
+                    })
+                    ->required()
+                    ->searchable()
+                    ->disabled($isHotelStaff && $userHotels->count() === 1)
+                    ->dehydrated(),
                 Forms\Components\TextInput::make('room_number')
                     ->required()
                     ->maxLength(255),
@@ -88,7 +112,7 @@ class RoomResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RatesRelationManager::class,
         ];
     }
 
@@ -100,5 +124,21 @@ class RoomResource extends Resource
             'view' => Pages\ViewRoom::route('/{record}'),
             'edit' => Pages\EditRoom::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
+
+        if ($user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value])) {
+            $assignedHotelIds = $user->userHotels->pluck('hotel_id');
+
+            return parent::getEloquentQuery()
+                ->whereIn('hotel_id', $assignedHotelIds);
+        } elseif ($user->hasRole(UserRoleType::SUPER_ADMIN->value)) {
+            return parent::getEloquentQuery();
+        }
+
+        return parent::getEloquentQuery()->whereRaw('1 = 0');
     }
 }

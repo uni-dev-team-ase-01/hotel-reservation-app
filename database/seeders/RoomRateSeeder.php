@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\RoomRate;
 use App\Models\Room;
+use App\Models\RoomRate;
+use Illuminate\Database\Seeder;
 
 class RoomRateSeeder extends Seeder
 {

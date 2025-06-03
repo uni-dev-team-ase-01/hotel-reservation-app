@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\BillService;
 use App\Models\Bill;
+use App\Models\BillService;
 use App\Models\Service;
+use Illuminate\Database\Seeder;
 
 class BillServiceSeeder extends Seeder
 {

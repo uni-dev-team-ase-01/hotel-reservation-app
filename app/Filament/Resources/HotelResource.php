@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\UserRoleType;
 use App\Filament\Resources\HotelResource\Pages;
 use App\Filament\Resources\HotelResource\RelationManagers\HotelServicesRelationManager;
 use App\Filament\Resources\HotelResource\RelationManagers\RoomsRelationManager;
@@ -12,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class HotelResource extends Resource
 {
@@ -97,5 +99,21 @@ class HotelResource extends Resource
             'view' => Pages\ViewHotel::route('/{record}'),
             'edit' => Pages\EditHotel::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
+
+        if ($user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value])) {
+            $assignedHotelIds = $user->userHotels->pluck('hotel_id');
+
+            return parent::getEloquentQuery()
+                ->whereIn('id', $assignedHotelIds);
+        } elseif ($user->hasRole(UserRoleType::SUPER_ADMIN->value)) {
+            return parent::getEloquentQuery();
+        }
+
+        return parent::getEloquentQuery()->whereRaw('1 = 0');
     }
 }

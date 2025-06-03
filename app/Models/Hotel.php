@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Hotel extends Model
 {
     protected $fillable = [
-         'name',
+        'name',
         'description',
         'star_rating',
         'images',
@@ -45,5 +45,10 @@ class Hotel extends Model
     public function userHotels()
     {
         return $this->hasMany(UserHotel::class);
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class, 'hotel_id');
     }
 }

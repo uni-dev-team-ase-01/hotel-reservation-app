@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Bill;
 use App\Models\Reservation;
+use Illuminate\Database\Seeder;
 
 class BillSeeder extends Seeder
 {

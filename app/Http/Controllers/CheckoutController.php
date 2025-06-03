@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Reservation;
 use App\Models\Room;
+use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         return view('checkout');
     }
 
-    public function process(Request $request) {
+    public function process(Request $request)
+    {
         $reservation = Reservation::find($request->reservation_id);
 
-        if (!$reservation) {
-            return "Reservation not found.";
+        if (! $reservation) {
+            return 'Reservation not found.';
         }
 
         // 1. Calculate number of nights
         $checkIn = new \DateTime($reservation->check_in_date);
-        $checkOut = new \DateTime(); // Today
+        $checkOut = new \DateTime; // Today
         $nights = $checkIn->diff($checkOut)->days;
 
         // 2. Calculate room rate
