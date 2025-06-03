@@ -21,13 +21,13 @@ Footer START -->
                 <p class="mb-2">
                     <a href="#" class="text-body-secondary text-primary-hover">
                         <i class="bi bi-telephone me-2"></i>
-                        +1234 568 963
+                        +94911 123 456
                     </a>
                 </p>
                 <p class="mb-0">
                     <a href="#" class="text-body-secondary text-primary-hover">
                         <i class="bi bi-envelope me-2"></i>
-                        example@gmail.com
+                        booking@gmail.com
                     </a>
                 </p>
             </div>
@@ -43,7 +43,7 @@ Footer START -->
                             <li class="nav-item">
                                 <a
                                     class="nav-link text-body-secondary"
-                                    href="#"
+                                    href="/about"
                                 >
                                     About us
                                 </a>
@@ -59,17 +59,9 @@ Footer START -->
                             <li class="nav-item">
                                 <a
                                     class="nav-link text-body-secondary"
-                                    href="#"
+                                    href="/travel-agent"
                                 >
-                                    News and Blog
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Meet a Team
+                                    Join Us as Travel Agent
                                 </a>
                             </li>
                         </ul>
@@ -82,7 +74,7 @@ Footer START -->
                             <li class="nav-item">
                                 <a
                                     class="nav-link text-body-secondary"
-                                    href="#"
+                                    href="/register"
                                 >
                                     Sign up
                                 </a>
@@ -90,7 +82,7 @@ Footer START -->
                             <li class="nav-item">
                                 <a
                                     class="nav-link text-body-secondary"
-                                    href="#"
+                                    href="/login"
                                 >
                                     Sign in
                                 </a>
@@ -98,31 +90,7 @@ Footer START -->
                             <li class="nav-item">
                                 <a
                                     class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Privacy Policy
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Terms
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Cookie
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
+                                    href="/contact"
                                 >
                                     Support
                                 </a>
@@ -139,7 +107,7 @@ Footer START -->
                                     class="nav-link text-body-secondary"
                                     href="#"
                                 >
-                                    India
+                                    Galle
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -147,7 +115,7 @@ Footer START -->
                                     class="nav-link text-body-secondary"
                                     href="#"
                                 >
-                                    California
+                                    Kandy
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -155,7 +123,7 @@ Footer START -->
                                     class="nav-link text-body-secondary"
                                     href="#"
                                 >
-                                    Indonesia
+                                    Nuwara Eliya
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -163,7 +131,7 @@ Footer START -->
                                     class="nav-link text-body-secondary"
                                     href="#"
                                 >
-                                    Canada
+                                    Dabulla
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -171,7 +139,7 @@ Footer START -->
                                     class="nav-link text-body-secondary"
                                     href="#"
                                 >
-                                    Malaysia
+                                    Jaffna
                                 </a>
                             </li>
                         </ul>
@@ -228,74 +196,7 @@ Footer START -->
         <!-- Row END -->
 
         <!-- Tops Links -->
-        <div class="row mt-5">
-            <h5 class="mb-2 text-white">Top Links</h5>
-            <ul class="list-inline text-primary-hover lh-lg">
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Flights</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Hotels</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Tours</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Cabs</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">About</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Contact us</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Blogs</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Services</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Detail page</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Services</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Policy</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Testimonials</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Newsletters</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Podcasts</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Protests</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">NewsCyber</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Education</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Sports</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Tech and Auto</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Opinion</a>
-                </li>
-                <li class="list-inline-item">
-                    <a href="#" class="text-body-secondary">Share Market</a>
-                </li>
-            </ul>
-        </div>
+
 
         <!-- Payment and card -->
         <div class="row g-4 justify-content-between mt-0 mt-md-2">
@@ -390,21 +291,13 @@ Footer START -->
                 >
                     <!-- copyright text -->
                     <div class="text-body-secondary text-primary-hover">
-                        Copyrights ©2023 Booking. Build by
-                        <a href="#" class="text-body-secondary">StackBros</a>
+                        Copyrights 2025 Booking. Build by
+                        <a href="#" class="text-body-secondary">ESoft Devs</a>
                         .
                     </div>
                     <!-- copyright links-->
                     <div class="nav mt-2 mt-lg-0">
                         <ul class="list-inline text-primary-hover mx-auto mb-0">
-                            <li class="list-inline-item me-0">
-                                <a
-                                    class="nav-link text-body-secondary py-1"
-                                    href="#"
-                                >
-                                    Privacy policy
-                                </a>
-                            </li>
                             <li class="list-inline-item me-0">
                                 <a
                                     class="nav-link text-body-secondary py-1"
