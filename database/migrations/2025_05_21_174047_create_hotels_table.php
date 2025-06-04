@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,7 +18,9 @@ return new class extends Migration
             $table->integer('star_rating');
             $table->string('images')->nullable();
             $table->string('website')->nullable();
+            $table->string('type')->nullable();
             $table->boolean('active')->default(true);
+            $table->string('district');
             $table->timestamps();
         });
     }
