@@ -215,12 +215,14 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <script>
-const PAGE_SIZE = 5; // <-- Show 5 hotels per page
+const PAGE_SIZE = 5; 
 let allHotels = [];
 let filteredHotels = [];
 let currentPage = 1;
 
 function renderPagination(current, total) {
+window.scrollTo(0, 0);
+
 	const pagination = document.getElementById('pagination');
 	if (!pagination) return;
 	pagination.innerHTML = '';
@@ -260,7 +262,7 @@ function renderPagination(current, total) {
 			pagination.appendChild(li);
 		}
 	};
-	// Prev
+
 	const prevLi = document.createElement('li');
 	prevLi.className = `page-item mb-0${current === 1 ? ' disabled' : ''}`;
 	prevLi.innerHTML = `<a class="page-link" href="#"><i class="fa-solid fa-angle-left"></i></a>`;
@@ -272,7 +274,7 @@ function renderPagination(current, total) {
 
 	pages.forEach(p => addPage(p, current === p));
 
-	// Next
+
 	const nextLi = document.createElement('li');
 	nextLi.className = `page-item mb-0${current === total ? ' disabled' : ''}`;
 	nextLi.innerHTML = `<a class="page-link" href="#"><i class="fa-solid fa-angle-right"></i></a>`;
@@ -292,8 +294,7 @@ function renderHotels(hotels, page = 1) {
 			<div class="card shadow p-2 mb-3">
 				<div class="row g-0">
 					<div class="col-md-5 position-relative">
-						<img src="assets/images/category/hotel/4by3/04.jpg" 
-							 class="img-fluid rounded-start" alt="No hotels available" />
+					
 					</div>
 					<div class="col-md-7">
 						<div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
