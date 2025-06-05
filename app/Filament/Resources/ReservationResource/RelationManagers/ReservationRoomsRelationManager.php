@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ReservationResource\RelationManagers;
 
+use App\Filament\Resources\RoomResource;
 use App\Models\Room;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -91,6 +92,15 @@ class ReservationRoomsRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->label('Remove Room'),
+                Tables\Actions\Action::make('view_room')
+                    ->label('View Room')
+                    ->icon('heroicon-o-eye')
+                    ->url(
+                        fn ($record) => $record->room_id
+                            ? RoomResource::getUrl('view', ['record' => $record->room_id])
+                            : null
+                    )
+                    ->visible(fn ($record) => $record->room_id !== null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

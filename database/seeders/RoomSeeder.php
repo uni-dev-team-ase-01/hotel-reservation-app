@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\RoomType;
 use App\Models\Hotel;
 use App\Models\Room;
 use Illuminate\Database\Seeder;
@@ -17,7 +18,7 @@ class RoomSeeder extends Seeder
             [
                 'hotel_id' => $hotel->id,
                 'room_number' => '101',
-                'room_type' => 'Deluxe',
+                'room_type' => RoomType::SINGLE->value,
                 'occupancy' => 2,
                 'location' => '1st Floor',
                 'images' => null,
@@ -25,7 +26,7 @@ class RoomSeeder extends Seeder
             [
                 'hotel_id' => $hotel->id,
                 'room_number' => '102',
-                'room_type' => 'Standard',
+                'room_type' => RoomType::FAMILY->value,
                 'occupancy' => 1,
                 'location' => '1st Floor',
                 'images' => null,

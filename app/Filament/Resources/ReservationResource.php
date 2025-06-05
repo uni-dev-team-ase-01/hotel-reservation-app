@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use App\Enum\ReservationStatus;
 use App\Enum\UserRoleType;
 use App\Filament\Resources\ReservationResource\Pages;
 use App\Filament\Resources\ReservationResource\RelationManagers\BillsRelationManager;
 use App\Filament\Resources\ReservationResource\RelationManagers\ReservationRoomsRelationManager;
+use App\Models\Hotel;
 use App\Models\Reservation;
+use App\Models\Room;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -19,55 +21,160 @@ class ReservationResource extends Resource
 {
     protected static ?string $model = Reservation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('User')
-                    ->required()
-                    ->relationship(
-                        'user',
-                        'name',
-                        fn ($query) => $query->whereHas('roles', function ($q) {
-                            $q->where('name', 'customer');
-                        })
-                    )
-                    ->searchable(),
                 Forms\Components\Select::make('hotel_id')
                     ->label('Hotel')
+                    ->options(Hotel::where('active', true)->pluck('name', 'id'))
                     ->required()
-                    ->relationship(
-                        'hotel',
-                        'name',
-                        // fn ($query) => $query->whereHas('roles', function ($q) {
-                        //     $q->where('name', 'customer');
-                        // })
-                    )
-                    ->searchable(),
-                Forms\Components\DatePicker::make('check_in_date')
+                    ->searchable()
+                    ->live()
+                    ->default(function () {
+                        $hotelId = request()->query('hotel_id');
+                        if ($hotelId && Hotel::where('id', $hotelId)->exists()) {
+                            return $hotelId;
+                        }
+
+                        return null;
+                    })
+                    ->afterStateUpdated(fn (Forms\Set $set) => $set('rooms', [])),
+
+                Forms\Components\Select::make('user_id')
+                    ->label('Customer')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->default(function () {
+                        $user_id = request()->query('user_id');
+                        if (
+                            $user_id && User::where('id', $user_id)
+                            // ->where('active', true)
+                                ->exists()
+                        ) {
+                            return $user_id;
+                        }
+
+                        return null;
+                    })
                     ->required(),
-                Forms\Components\DatePicker::make('check_out_date')
-                    ->required(),
-                Forms\Components\Select::make('status')
+
+                Forms\Components\DateTimePicker::make('check_in_date')
+                    ->label('Check-in Date')
                     ->required()
-                    ->options(collect(ReservationStatus::cases())->mapWithKeys(fn ($case) => [
-                        $case->value => $case->getLabel(),
-                    ])),
+                    ->minDate(now())
+                    ->live()
+                    ->seconds(false)
+                    ->displayFormat('M j, Y H:i')
+                    ->format('Y-m-d H:i:s')
+                    ->native(false)
+                    ->default(function () {
+                        $check_in = request()->query('check_in');
+                        if ($check_in) {
+                            return $check_in;
+                        }
+
+                        return null;
+                    }),
+
+                Forms\Components\DateTimePicker::make('check_out_date')
+                    ->label('Check-out Date')
+                    ->required()
+                    ->live()
+                    ->seconds(false)
+                    ->displayFormat('M j, Y H:i')
+                    ->format('Y-m-d H:i:s')
+                    // ->timezone('UTC')
+                    ->native(false)
+                    ->default(function () {
+                        $check_out = request()->query('check_out');
+                        if ($check_out) {
+                            return $check_out;
+                        }
+
+                        return null;
+                    })
+                    ->afterStateUpdated(fn (Forms\Set $set) => $set('rooms', [])),
+
+                // Forms\Components\DatePicker::make('check_out_date')
+                //     ->label('Check-out Date')
+                //     ->required()
+                //     ->after('check_in_date')
+                //     ->live()
+                //     ->default(function () {
+                //         $check_out = request()->query('check_out');
+                //         if ($check_out) {
+                //             return $check_out;
+                //         }
+                //         return null;
+                //     })
+                //     ->afterStateUpdated(fn(Forms\Set $set) => $set('rooms', [])),
+
                 Forms\Components\TextInput::make('number_of_guests')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('cancellation_reason')
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('cancellation_date'),
-                Forms\Components\TextInput::make('confirmation_number')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('auto_cancelled')
+                    ->label('Number of Guests')
+                    ->numeric()
+                    ->default(1)
+                    ->minValue(1)
+                    ->default(function () {
+                        $guests = request()->query('guests');
+                        if ($guests) {
+                            return $guests;
+                        }
+
+                        return null;
+                    })
                     ->required(),
-                Forms\Components\Toggle::make('no_show_billed')
+
+                Forms\Components\Select::make('rooms')
+                    ->label('Rooms')
+                    ->multiple()
+                    ->relationship('rooms', 'room_number')
+                    ->options(function (Forms\Get $get) {
+                        $hotelId = $get('hotel_id');
+                        $checkIn = $get('check_in_date');
+                        $checkOut = $get('check_out_date');
+
+                        if (! $hotelId || ! $checkIn || ! $checkOut) {
+                            return [];
+                        }
+
+                        return Room::availableForDates($checkIn, $checkOut, $hotelId)
+                            ->pluck('room_number', 'id');
+                    })
+                    ->default(function () {
+                        $rooms = request()->query('rooms');
+                        if (is_array($rooms)) {
+                            $roomIds = array_map('intval', $rooms);
+
+                            $validRoomIds = Room::whereIn('id', $roomIds)->pluck('id')->toArray();
+
+                            return $validRoomIds;
+                        }
+
+                        return [];
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'confirmed' => 'Confirmed',
+                        'checked_in' => 'Checked In',
+                        'checked_out' => 'Checked Out',
+                        'cancelled' => 'Cancelled',
+                        'no_show' => 'No Show',
+                    ])
+                    ->default('pending')
+                    ->required(),
+
+                Forms\Components\TextInput::make('confirmation_number')
+                    ->label('Confirmation Number')
+                    ->default(fn () => 'RES-'.strtoupper(uniqid()))
                     ->required(),
             ]);
     }
@@ -76,52 +183,61 @@ class ReservationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('hotel.name')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('check_in_date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('check_out_date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->badge(),
-                Tables\Columns\TextColumn::make('number_of_guests')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('cancellation_reason')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('cancellation_date')
-                    ->date()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('confirmation_number')
+                    ->label('Confirmation #')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('auto_cancelled')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('no_show_billed')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Customer')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('hotel.name')
+                    ->label('Hotel')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('rooms_count')
+                    ->label('Rooms')
+                    ->counts('rooms')
+                    ->alignCenter(),
+
+                Tables\Columns\TextColumn::make('check_in_date')
+                    ->label('Check-in')
+                    ->date()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('check_out_date')
+                    ->label('Check-out')
+                    ->date()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('number_of_guests')
+                    ->label('Guests')
+                    ->alignCenter(),
+
+                Tables\Columns\BadgeColumn::make('status')
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'confirmed',
+                        'info' => 'checked_in',
+                        'success' => 'checked_out',
+                        'danger' => 'cancelled',
+                        'danger' => 'no_show',
+                    ]),
             ])
             ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'confirmed' => 'Confirmed',
+                        'checked_in' => 'Checked In',
+                        'checked_out' => 'Checked Out',
+                        'cancelled' => 'Cancelled',
+                        'no_show' => 'No Show',
+                    ]),
+
+                Tables\Filters\SelectFilter::make('hotel_id')
+                    ->label('Hotel')
+                    ->relationship('hotel', 'name'),
             ]);
     }
 

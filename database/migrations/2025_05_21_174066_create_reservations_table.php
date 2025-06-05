@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->date('check_in_date');
-            $table->date('check_out_date');
-            $table->enum('status', ['confirmed', 'cancelled', 'checked_in', 'checked_out', 'no_show'])->default('confirmed');
+            $table->dateTime('check_in_date');
+            $table->dateTime('check_out_date');
+            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'checked_in', 'checked_out', 'no_show'])->default('pending');
             $table->integer('number_of_guests');
             $table->string('cancellation_reason')->nullable();
-            $table->date('cancellation_date')->nullable();
+            $table->datetime('cancellation_date')->nullable();
             $table->string('confirmation_number')->unique();
             $table->boolean('auto_cancelled')->default(false);
             $table->boolean('no_show_billed')->default(false);

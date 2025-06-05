@@ -12,6 +12,6 @@ class CustomFilamentLogoutResponse implements LogoutResponseContract
     {
         Auth::guard('admin')->logout();
 
-        return redirect('/admin/login');
+        return redirect('/dashboard/login');
     }
 }

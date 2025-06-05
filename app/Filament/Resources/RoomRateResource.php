@@ -17,14 +17,14 @@ class RoomRateResource extends Resource
 
     protected static ?string $navigationGroup = 'Hotel Settings';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-scale';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('room_id')
-                    ->relationship('room', 'id')
+                    ->relationship('room', 'room_number')
                     ->required(),
                 Forms\Components\Select::make('rate_type')
                     ->required()
@@ -43,6 +43,8 @@ class RoomRateResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('room.id')
                     ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('room.hotel.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rate_type'),
                 Tables\Columns\TextColumn::make('amount')

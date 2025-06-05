@@ -22,9 +22,9 @@ class Reservation extends Model
     ];
 
     protected $casts = [
-        'check_in_date' => 'date',
-        'check_out_date' => 'date',
-        'cancellation_date' => 'date',
+        'check_in_date' => 'datetime',
+        'check_out_date' => 'datetime',
+        'cancellation_date' => 'datetime',
         'auto_cancelled' => 'boolean',
         'no_show_billed' => 'boolean',
     ];

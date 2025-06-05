@@ -69,6 +69,10 @@ class UserHotelsRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->label('Remove Assignment'),
+                // Tables\Actions\Action::make('view_user')
+                //     ->label('View User')
+                //     ->icon('heroicon-o-eye')
+                //     ->url(fn($record) => UserResource::getUrl('view', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

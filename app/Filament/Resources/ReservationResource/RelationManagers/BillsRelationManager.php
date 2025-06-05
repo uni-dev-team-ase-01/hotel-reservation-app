@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ReservationResource\RelationManagers;
 
 use App\Enum\PaymentStatus;
+use App\Filament\Resources\BillResource;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -155,6 +156,10 @@ class BillsRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('view_bill')
+                    ->label('View Bill')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn ($record) => BillResource::getUrl('view', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -1,31 +1,22 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\BillResource\RelationManagers;
 
 use App\Enum\PaymentMethod;
-use App\Filament\Resources\PaymentResource\Pages;
-use App\Models\Payment;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class PaymentResource extends Resource
+class PaymentsRelationManager extends RelationManager
 {
-    protected static ?string $model = Payment::class;
+    protected static string $relationship = 'payments';
 
-    protected static ?string $navigationGroup = 'Financial';
-
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('bill_id')
-                    ->relationship('bill', 'id')
-                    ->required(),
                 Forms\Components\Select::make('method')
                     ->required()
                     ->options(collect(PaymentMethod::cases())->mapWithKeys(fn ($case) => [
@@ -39,13 +30,12 @@ class PaymentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('id')
             ->columns([
-                Tables\Columns\TextColumn::make('bill.id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('method'),
                 Tables\Columns\TextColumn::make('amount')
                     ->numeric()
@@ -65,31 +55,17 @@ class PaymentResource extends Resource
             ->filters([
                 //
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListPayments::route('/'),
-            'create' => Pages\CreatePayment::route('/create'),
-            'view' => Pages\ViewPayment::route('/{record}'),
-            'edit' => Pages\EditPayment::route('/{record}/edit'),
-        ];
     }
 }

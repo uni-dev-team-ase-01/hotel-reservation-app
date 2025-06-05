@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enum\PaymentStatus;
 use App\Filament\Resources\BillResource\Pages;
+use App\Filament\Resources\BillResource\RelationManagers\PaymentsRelationManager;
 use App\Models\Bill;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ class BillResource extends Resource
 
     protected static ?string $navigationGroup = 'Financial';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-receipt-percent';
 
     public static function form(Form $form): Form
     {
@@ -96,7 +97,7 @@ class BillResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PaymentsRelationManager::class,
         ];
     }
 

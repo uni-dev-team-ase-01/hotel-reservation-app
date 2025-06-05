@@ -24,9 +24,9 @@ class ReservationSeeder extends Seeder
                 'hotel_id' => $hotel->id,
                 'check_in_date' => now()->addDays($index + 1)->toDateString(),
                 'check_out_date' => now()->addDays($index + 3)->toDateString(),
-                'status' => 'confirmed',
+                'status' => 'pending',
                 'number_of_guests' => 2,
-                'confirmation_number' => 'CONF'.rand(100000, 999999),
+                'confirmation_number' => 'RES-'.strtoupper(uniqid()),
                 'auto_cancelled' => false,
                 'no_show_billed' => false,
             ];
