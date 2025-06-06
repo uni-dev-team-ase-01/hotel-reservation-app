@@ -284,7 +284,7 @@
                             </a>
                         </li> --}}
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="/customer/profile">
                                 <i class="bi bi-gear fa-fw me-2"></i>
                                 Settings
                             </a>

@@ -153,13 +153,13 @@ class BillsRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('view_bill')
-                    ->label('View Bill')
+                    ->label('View Full Bill')
                     ->icon('heroicon-o-eye')
                     ->url(fn ($record) => BillResource::getUrl('view', ['record' => $record])),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

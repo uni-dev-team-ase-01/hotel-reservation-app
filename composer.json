@@ -16,6 +16,7 @@
         "livewire/volt": "^1.7",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-permission": "^6.18",
+        "stripe/stripe-php": "^17.3",
         "tomatophp/filament-users": "^2.0",
         "z3d0x/filament-logger": "^0.8.0"
     },
