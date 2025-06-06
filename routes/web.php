@@ -43,6 +43,5 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 // });
 
 Route::apiResource('api/hotels', HotelController::class);
-
 Route::get('/travel-agent', [TravelCompanyController::class, 'index']);
 Route::post('/travel-agent/submit', [TravelCompanyController::class, 'store'])->name('travel-agent.submit');

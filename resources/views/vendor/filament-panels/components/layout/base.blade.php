@@ -1,15 +1,12 @@
 @props([
-    'livewire' => null,
+    "livewire" => null,
 ])
 
 <!DOCTYPE html>
 <html
-    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    dir="{{ __('filament-panels::layout.direction') ?? 'ltr' }}"
-    @class([
-        'fi min-h-screen',
-        'dark' => filament()->hasDarkModeForced(),
-    ])
+    lang="{{ str_replace("_", "-", app()->getLocale()) }}"
+    dir="{{ __("filament-panels::layout.direction") ?? "ltr" }}"
+    @class(["fi min-h-screen", "dark" => filament()->hasDarkModeForced()])
 >
     <head>
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::HEAD_START, scopes: $livewire->getRenderHookScopes()) }}
@@ -22,10 +19,12 @@
             <link rel="icon" href="{{ $favicon }}" />
         @endif
 
+        {{-- format-ignore-start --}}
         @php
             $title = trim(strip_tags(($livewire ?? null)?->getTitle() ?? ''));
             $brandName = trim(strip_tags(filament()->getBrandName()));
         @endphp
+        {{-- format-ignore-end --}}
 
         <title>
             {{ filled($title) ? "{$title} - " : null }} {{ $brandName }}
@@ -67,22 +66,22 @@
             }
         </style>
 
-        @stack('styles')
+        @stack("styles")
 
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::STYLES_AFTER, scopes: $livewire->getRenderHookScopes()) }}
 
         @if (! filament()->hasDarkMode())
             <script>
-                localStorage.setItem('theme', 'light')
+                localStorage.setItem('theme', 'light');
             </script>
         @elseif (filament()->hasDarkModeForced())
             <script>
-                localStorage.setItem('theme', 'dark')
+                localStorage.setItem('theme', 'dark');
             </script>
         @else
             <script>
                 const loadDarkMode = () => {
-                    window.theme = localStorage.getItem('theme') ?? @js(filament()->getDefaultThemeMode()->value)
+                    window.theme = localStorage.getItem('theme') ?? @js(filament()->getDefaultThemeMode()->value);
 
                     if (
                         window.theme === 'dark' ||
@@ -90,13 +89,13 @@
                             window.matchMedia('(prefers-color-scheme: dark)')
                                 .matches)
                     ) {
-                        document.documentElement.classList.add('dark')
+                        document.documentElement.classList.add('dark');
                     }
-                }
+                };
 
-                loadDarkMode()
+                loadDarkMode();
 
-                document.addEventListener('livewire:navigated', loadDarkMode)
+                document.addEventListener('livewire:navigated', loadDarkMode);
             </script>
         @endif
 
@@ -122,21 +121,21 @@
 
         @filamentScripts(withCore: true)
 
-        @if (filament()->hasBroadcasting() && config('filament.broadcasting.echo'))
+        @if (filament()->hasBroadcasting() && config("filament.broadcasting.echo"))
             <script data-navigate-once>
-                window.Echo = new window.EchoFactory(@js(config('filament.broadcasting.echo')))
+                window.Echo = new window.EchoFactory(@js(config("filament.broadcasting.echo")));
 
-                window.dispatchEvent(new CustomEvent('EchoLoaded'))
+                window.dispatchEvent(new CustomEvent('EchoLoaded'));
             </script>
         @endif
 
-        @if (filament()->hasDarkMode() && (! filament()->hasDarkModeForced()))
+        @if (filament()->hasDarkMode() && ! filament()->hasDarkModeForced())
             <script>
-                loadDarkMode()
+                loadDarkMode();
             </script>
         @endif
 
-        @stack('scripts')
+        @stack("scripts")
 
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SCRIPTS_AFTER, scopes: $livewire->getRenderHookScopes()) }}
 

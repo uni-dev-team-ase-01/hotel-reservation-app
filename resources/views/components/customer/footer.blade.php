@@ -6,7 +6,7 @@ Footer START -->
         <div class="footer-circle-1"></div>
         <div class="footer-circle-2"></div>
     </div>
-    
+
     <div class="footer-container">
         <!-- Row START -->
         <div class="footer-row">
@@ -20,9 +20,11 @@ Footer START -->
                     />
                 </a>
                 <p class="footer-description">
-                    Your gateway to unforgettable travel experiences. Discover amazing destinations and create memories that last a lifetime.
+                    Your gateway to unforgettable travel experiences. Discover
+                    amazing destinations and create memories that last a
+                    lifetime.
                 </p>
-                
+
                 <!-- Contact Info with Icons -->
                 <div class="footer-contact">
                     <div class="footer-contact-item">
@@ -37,7 +39,10 @@ Footer START -->
                         <div class="footer-contact-icon">
                             <i class="bi bi-envelope"></i>
                         </div>
-                        <a href="mailto:booking@gmail.com" class="footer-contact-link">
+                        <a
+                            href="mailto:booking@gmail.com"
+                            class="footer-contact-link"
+                        >
                             booking@gmail.com
                         </a>
                     </div>
@@ -57,10 +62,30 @@ Footer START -->
                             <h5>Quick Links</h5>
                         </div>
                         <ul class="footer-nav">
-                            <li><a href="/about"><i class="bi bi-chevron-right"></i>About us</a></li>
-                            <li><a href="/contact"><i class="bi bi-chevron-right"></i>Contact us</a></li>
-                            <li><a href="/register"><i class="bi bi-chevron-right"></i>Sign up</a></li>
-                            <li><a href="/login"><i class="bi bi-chevron-right"></i>Sign in</a></li>
+                            <li>
+                                <a href="/about">
+                                    <i class="bi bi-chevron-right"></i>
+                                    About us
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/contact">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Contact us
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/register">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Sign up
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/login">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Sign in
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -73,11 +98,36 @@ Footer START -->
                             <h5>Destinations</h5>
                         </div>
                         <ul class="footer-nav">
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Galle</a></li>
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Kandy</a></li>
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Nuwara Eliya</a></li>
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Dambulla</a></li>
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Jaffna</a></li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Galle
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Kandy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Nuwara Eliya
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Dambulla
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Jaffna
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -90,11 +140,25 @@ Footer START -->
                             <h5>Support</h5>
                         </div>
                         <ul class="footer-nav">
-                            <li><a href="/contact"><i class="bi bi-chevron-right"></i>Help Center</a></li>
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Terms & Conditions</a></li>
-                            <li><a href="#"><i class="bi bi-chevron-right"></i>Refund Policy</a></li>
+                            <li>
+                                <a href="/contact">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Help Center
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Terms & Conditions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="bi bi-chevron-right"></i>
+                                    Refund Policy
+                                </a>
+                            </li>
                         </ul>
-
                     </div>
                 </div>
             </div>
@@ -105,12 +169,16 @@ Footer START -->
         <!-- middle Row Start -->
         <div class="w-100">
             <!-- Featured CTA - Travel Agent -->
-            <div class="footer-cta-box d-flex justify-content-center align-items-center flex-column mx-auto">
+            <div
+                class="footer-cta-box d-flex justify-content-center align-items-center flex-column mx-auto"
+            >
                 <div class="footer-cta-header">
                     <i class="bi bi-star-fill"></i>
                     <h6>Special Opportunity</h6>
                 </div>
-                <p class="footer-cta-text">Join our network of travel professionals</p>
+                <p class="footer-cta-text">
+                    Join our network of travel professionals
+                </p>
                 <a href="/travel-agent" class="footer-cta-btn">
                     <i class="bi bi-person-plus"></i>
                     Become a Travel Agent
@@ -131,16 +199,28 @@ Footer START -->
                 </div>
                 <div class="footer-payment-methods">
                     <div class="footer-payment-card">
-                        <img src="{{ asset("assets/images/element/paypal.svg") }}" alt="PayPal" />
+                        <img
+                            src="{{ asset("assets/images/element/paypal.svg") }}"
+                            alt="PayPal"
+                        />
                     </div>
                     <div class="footer-payment-card">
-                        <img src="{{ asset("assets/images/element/visa.svg") }}" alt="Visa" />
+                        <img
+                            src="{{ asset("assets/images/element/visa.svg") }}"
+                            alt="Visa"
+                        />
                     </div>
                     <div class="footer-payment-card">
-                        <img src="{{ asset("assets/images/element/mastercard.svg") }}" alt="Mastercard" />
+                        <img
+                            src="{{ asset("assets/images/element/mastercard.svg") }}"
+                            alt="Mastercard"
+                        />
                     </div>
                     <div class="footer-payment-card">
-                        <img src="{{ asset("assets/images/element/expresscard.svg") }}" alt="Express" />
+                        <img
+                            src="{{ asset("assets/images/element/expresscard.svg") }}"
+                            alt="Express"
+                        />
                     </div>
                 </div>
             </div>
@@ -175,9 +255,10 @@ Footer START -->
             <div class="footer-copyright-content">
                 <div class="footer-copyright-text">
                     <i class="bi bi-c-circle"></i>
-                    2025 Booking Platform. Crafted with 
+                    2025 Booking Platform. Crafted with
                     <i class="bi bi-heart-fill"></i>
-                    by <a href="#">ESoft Devs</a>
+                    by
+                    <a href="#">ESoft Devs</a>
                 </div>
                 <div class="footer-copyright-tagline">
                     <i class="bi bi-globe"></i>
