@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -52,3 +53,6 @@ class Hotel extends Model
         return $this->hasMany(Reservation::class, 'hotel_id');
     }
 }
+
+
+// Migration for SHould Add Address

@@ -1,193 +1,100 @@
 <!-- =======================
 Footer START -->
-<footer class="bg-dark pt-5">
-    <div class="container">
+<footer class="footer-main">
+    <!-- Background decoration -->
+    <div class="footer-bg-decoration">
+        <div class="footer-circle-1"></div>
+        <div class="footer-circle-2"></div>
+    </div>
+    
+    <div class="footer-container">
         <!-- Row START -->
-        <div class="row g-4">
+        <div class="footer-row">
             <!-- Widget 1 START -->
-            <div class="col-lg-3">
+            <div class="footer-col-main">
                 <!-- logo -->
-                <a href="/">
+                <a href="/" class="footer-logo">
                     <img
-                        class="h-40px"
                         src="{{ asset("assets/images/logo-light.svg") }}"
                         alt="logo"
                     />
                 </a>
-                <p class="my-3 text-body-secondary">
-                    Departure defective arranging rapturous did believe him all
-                    had supported.
+                <p class="footer-description">
+                    Your gateway to unforgettable travel experiences. Discover amazing destinations and create memories that last a lifetime.
                 </p>
-                <p class="mb-2">
-                    <a href="#" class="text-body-secondary text-primary-hover">
-                        <i class="bi bi-telephone me-2"></i>
-                        +94911 123 456
-                    </a>
-                </p>
-                <p class="mb-0">
-                    <a href="#" class="text-body-secondary text-primary-hover">
-                        <i class="bi bi-envelope me-2"></i>
-                        booking@gmail.com
-                    </a>
-                </p>
+                
+                <!-- Contact Info with Icons -->
+                <div class="footer-contact">
+                    <div class="footer-contact-item">
+                        <div class="footer-contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <a href="tel:+94911123456" class="footer-contact-link">
+                            +94911 123 456
+                        </a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <div class="footer-contact-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <a href="mailto:booking@gmail.com" class="footer-contact-link">
+                            booking@gmail.com
+                        </a>
+                    </div>
+                </div>
             </div>
             <!-- Widget 1 END -->
 
             <!-- Widget 2 START -->
-            <div class="col-lg-8 ms-auto">
-                <div class="row g-4">
-                    <!-- Link block -->
-                    <div class="col-6 col-md-3">
-                        <h5 class="text-white mb-2 mb-md-4">Page</h5>
-                        <ul class="nav flex-column text-primary-hover">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="/about"
-                                >
-                                    About us
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Contact us
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="/travel-agent"
-                                >
-                                    Join Us as Travel Agent
-                                </a>
-                            </li>
+            <div class="footer-col-links">
+                <div class="footer-links-row">
+                    <!-- Quick Links -->
+                    <div class="footer-links-col">
+                        <div class="footer-section-header">
+                            <div class="footer-section-icon">
+                                <i class="bi bi-link-45deg"></i>
+                            </div>
+                            <h5>Quick Links</h5>
+                        </div>
+                        <ul class="footer-nav">
+                            <li><a href="/about"><i class="bi bi-chevron-right"></i>About us</a></li>
+                            <li><a href="/contact"><i class="bi bi-chevron-right"></i>Contact us</a></li>
+                            <li><a href="/register"><i class="bi bi-chevron-right"></i>Sign up</a></li>
+                            <li><a href="/login"><i class="bi bi-chevron-right"></i>Sign in</a></li>
                         </ul>
                     </div>
 
-                    <!-- Link block -->
-                    <div class="col-6 col-md-3">
-                        <h5 class="text-white mb-2 mb-md-4">Link</h5>
-                        <ul class="nav flex-column text-primary-hover">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="/register"
-                                >
-                                    Sign up
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="/login"
-                                >
-                                    Sign in
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="/contact"
-                                >
-                                    Support
-                                </a>
-                            </li>
+                    <!-- Popular Destinations -->
+                    <div class="footer-links-col">
+                        <div class="footer-section-header">
+                            <div class="footer-section-icon">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <h5>Destinations</h5>
+                        </div>
+                        <ul class="footer-nav">
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Galle</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Kandy</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Nuwara Eliya</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Dambulla</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Jaffna</a></li>
                         </ul>
                     </div>
 
-                    <!-- Link block -->
-                    <div class="col-6 col-md-3">
-                        <h5 class="text-white mb-2 mb-md-4">Global Site</h5>
-                        <ul class="nav flex-column text-primary-hover">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Galle
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Kandy
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Nuwara Eliya
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Dabulla
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    Jaffna
-                                </a>
-                            </li>
+                    <!-- Support & Newsletter -->
+                    <div class="footer-links-col">
+                        <div class="footer-section-header">
+                            <div class="footer-section-icon">
+                                <i class="bi bi-headset"></i>
+                            </div>
+                            <h5>Support</h5>
+                        </div>
+                        <ul class="footer-nav">
+                            <li><a href="/contact"><i class="bi bi-chevron-right"></i>Help Center</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Terms & Conditions</a></li>
+                            <li><a href="#"><i class="bi bi-chevron-right"></i>Refund Policy</a></li>
                         </ul>
-                    </div>
 
-                    <!-- Link block -->
-                    <div class="col-6 col-md-3">
-                        <h5 class="text-white mb-2 mb-md-4">Booking</h5>
-                        <ul class="nav flex-column text-primary-hover">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    <i class="fa-solid fa-hotel me-2"></i>
-                                    Hotel
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    <i class="fa-solid fa-plane me-2"></i>
-                                    Flight
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    <i
-                                        class="fa-solid fa-globe-americas me-2"
-                                    ></i>
-                                    Tour
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link text-body-secondary"
-                                    href="#"
-                                >
-                                    <i class="fa-solid fa-car me-2"></i>
-                                    Cabs
-                                </a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -195,128 +102,90 @@ Footer START -->
         </div>
         <!-- Row END -->
 
-        <!-- Tops Links -->
+        <!-- middle Row Start -->
+        <div class="w-100">
+            <!-- Featured CTA - Travel Agent -->
+            <div class="footer-cta-box d-flex justify-content-center align-items-center flex-column mx-auto">
+                <div class="footer-cta-header">
+                    <i class="bi bi-star-fill"></i>
+                    <h6>Special Opportunity</h6>
+                </div>
+                <p class="footer-cta-text">Join our network of travel professionals</p>
+                <a href="/travel-agent" class="footer-cta-btn">
+                    <i class="bi bi-person-plus"></i>
+                    Become a Travel Agent
+                </a>
+            </div>
+        </div>
+        <!-- middle Row End -->
 
-        <!-- Payment and card -->
-        <div class="row g-4 justify-content-between mt-0 mt-md-2">
-            <!-- Payment card -->
-            <div class="col-sm-7 col-md-6 col-lg-4">
-                <h5 class="text-white mb-2">Payment & Security</h5>
-                <ul class="list-inline mb-0 mt-3">
-                    <li class="list-inline-item">
-                        <a href="#">
-                            <img
-                                src="{{ asset("assets/images/element/paypal.svg") }}"
-                                class="h-30px"
-                                alt=""
-                            />
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="#">
-                            <img
-                                src="{{ asset("assets/images/element/visa.svg") }}"
-                                class="h-30px"
-                                alt=""
-                            />
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="#">
-                            <img
-                                src="{{ asset("assets/images/element/mastercard.svg") }}"
-                                class="h-30px"
-                                alt=""
-                            />
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="#">
-                            <img
-                                src="{{ asset("assets/images/element/expresscard.svg") }}"
-                                class="h-30px"
-                                alt=""
-                            />
-                        </a>
-                    </li>
-                </ul>
+        <!-- Payment and Social Media -->
+        <div class="footer-bottom-section">
+            <!-- Payment Methods -->
+            <div class="footer-payment">
+                <div class="footer-payment-header">
+                    <div class="footer-payment-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h6>Secure Payments</h6>
+                </div>
+                <div class="footer-payment-methods">
+                    <div class="footer-payment-card">
+                        <img src="{{ asset("assets/images/element/paypal.svg") }}" alt="PayPal" />
+                    </div>
+                    <div class="footer-payment-card">
+                        <img src="{{ asset("assets/images/element/visa.svg") }}" alt="Visa" />
+                    </div>
+                    <div class="footer-payment-card">
+                        <img src="{{ asset("assets/images/element/mastercard.svg") }}" alt="Mastercard" />
+                    </div>
+                    <div class="footer-payment-card">
+                        <img src="{{ asset("assets/images/element/expresscard.svg") }}" alt="Express" />
+                    </div>
+                </div>
             </div>
 
-            <!-- Social media icon -->
-            <div class="col-sm-5 col-md-6 col-lg-3 text-sm-end">
-                <h5 class="text-white mb-2">Follow us on</h5>
-                <ul class="list-inline mb-0 mt-3">
-                    <li class="list-inline-item">
-                        <a class="btn btn-sm px-2 bg-facebook mb-0" href="#">
-                            <i class="fab fa-fw fa-facebook-f"></i>
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a
-                            class="btn btn-sm shadow px-2 bg-instagram mb-0"
-                            href="#"
-                        >
-                            <i class="fab fa-fw fa-instagram"></i>
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a
-                            class="btn btn-sm shadow px-2 bg-twitter mb-0"
-                            href="#"
-                        >
-                            <i class="fab fa-fw fa-twitter"></i>
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a
-                            class="btn btn-sm shadow px-2 bg-linkedin mb-0"
-                            href="#"
-                        >
-                            <i class="fab fa-fw fa-linkedin-in"></i>
-                        </a>
-                    </li>
-                </ul>
+            <!-- Social Media -->
+            <div class="footer-social">
+                <div class="footer-social-header">
+                    <div class="footer-social-icon">
+                        <i class="bi bi-share"></i>
+                    </div>
+                    <h6>Follow Us</h6>
+                </div>
+                <div class="footer-social-links">
+                    <a href="#" class="footer-social-btn facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="footer-social-btn instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="footer-social-btn twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="footer-social-btn linkedin">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- Divider -->
-        <hr class="mt-4 mb-0" />
-
-        <!-- Bottom footer -->
-        <div class="row">
-            <div class="container">
-                <div
-                    class="d-lg-flex justify-content-between align-items-center py-3 text-center text-lg-start"
-                >
-                    <!-- copyright text -->
-                    <div class="text-body-secondary text-primary-hover">
-                        Copyrights 2025 Booking. Build by
-                        <a href="#" class="text-body-secondary">ESoft Devs</a>
-                        .
-                    </div>
-                    <!-- copyright links-->
-                    <div class="nav mt-2 mt-lg-0">
-                        <ul class="list-inline text-primary-hover mx-auto mb-0">
-                            <li class="list-inline-item me-0">
-                                <a
-                                    class="nav-link text-body-secondary py-1"
-                                    href="#"
-                                >
-                                    Terms and conditions
-                                </a>
-                            </li>
-                            <li class="list-inline-item me-0">
-                                <a
-                                    class="nav-link text-body-secondary py-1 pe-0"
-                                    href="#"
-                                >
-                                    Refund policy
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+        <!-- Bottom Copyright -->
+        <div class="footer-copyright">
+            <div class="footer-copyright-content">
+                <div class="footer-copyright-text">
+                    <i class="bi bi-c-circle"></i>
+                    2025 Booking Platform. Crafted with 
+                    <i class="bi bi-heart-fill"></i>
+                    by <a href="#">ESoft Devs</a>
+                </div>
+                <div class="footer-copyright-tagline">
+                    <i class="bi bi-globe"></i>
+                    Making travel dreams come true since 2025
                 </div>
             </div>
         </div>
     </div>
 </footer>
+
+<!-- Footer END -->

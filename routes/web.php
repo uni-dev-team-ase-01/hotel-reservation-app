@@ -40,3 +40,6 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 // Route::middleware(['auth', 'role:travel-company'])->group(function () {
 //     Volt::route('/travel/dashboard', 'travel.dashboard')->name('travel.dashboard');
 // });
+
+Route::apiResource('api/hotels', HotelController::class);
+

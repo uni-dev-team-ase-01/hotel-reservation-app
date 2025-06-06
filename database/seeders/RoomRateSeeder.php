@@ -10,16 +10,17 @@ class RoomRateSeeder extends Seeder
 {
     public function run()
     {
+        $rooms = Room::all();
 
-        $room = Room::first();
+        foreach ($rooms as $room) {
+            $rates = [
+                ['room_id' => $room->id, 'rate_type' => 'daily', 'amount' => 100.00],
+                ['room_id' => $room->id, 'rate_type' => 'weekly', 'amount' => 600.00],
+            ];
 
-        $rates = [
-            ['room_id' => $room->id, 'rate_type' => 'daily', 'amount' => 100.00],
-            ['room_id' => $room->id, 'rate_type' => 'weekly', 'amount' => 600.00],
-        ];
-
-        foreach ($rates as $rate) {
-            RoomRate::create($rate);
+            foreach ($rates as $rate) {
+                RoomRate::create($rate);
+            }
         }
     }
 }

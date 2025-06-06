@@ -144,66 +144,60 @@
         </section>
     </main>
 @endsection
-
 @push("scripts")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/min/tiny-slider.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const hotelId = @json($hotel->id);
-            const urlParams = new URLSearchParams(window.location.search);
-            const checkIn = urlParams.get('check_in');
-            const checkOut = urlParams.get('check_out');
-            const rooms = parseInt(urlParams.get('rooms')) || 1;
-            const adults = urlParams.get('adults') || 2;
-            const children = urlParams.get('children') || 0;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/min/tiny-slider.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const hotelId = @json($hotel->id);
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkIn = urlParams.get('check_in');
+    const checkOut = urlParams.get('check_out');
+    const adults = urlParams.get('adults') || 2;
+    const children = urlParams.get('children') || 0;
 
-            document.getElementById('checkin-display').textContent = checkIn
-                ? checkIn
-                : '-';
-            document.getElementById('checkout-display').textContent = checkOut
-                ? checkOut
-                : '-';
+    document.getElementById('checkin-display').textContent = checkIn ?? '-';
+    document.getElementById('checkout-display').textContent = checkOut ?? '-';
 
-            const roomsList = document.getElementById('rooms-list');
-            const roomsLoading = document.getElementById('rooms-loading');
-            const priceSummary = document.getElementById('price-summary');
-            const continueBtn = document.getElementById('continue-booking-btn');
+    const roomsList = document.getElementById('rooms-list');
+    const roomsLoading = document.getElementById('rooms-loading');
+    const priceSummary = document.getElementById('price-summary');
+    const continueBtn = document.getElementById('continue-booking-btn');
 
-            let selectedRooms = [];
+    let selectedRooms = [];
 
-            async function fetchAvailableRooms() {
-                roomsLoading.style.display = '';
-                roomsList.innerHTML = '';
-                let url = `/hotel/${hotelId}/available-rooms`;
-                let queryArr = [];
-                if (checkIn && checkOut) {
-                    queryArr.push(`check_in=${encodeURIComponent(checkIn)}`);
-                    queryArr.push(`check_out=${encodeURIComponent(checkOut)}`);
-                }
-                if (rooms) queryArr.push(`rooms=${encodeURIComponent(rooms)}`);
-                if (adults)
-                    queryArr.push(`adults=${encodeURIComponent(adults)}`);
-                if (children)
-                    queryArr.push(`children=${encodeURIComponent(children)}`);
-                if (queryArr.length) url += `?${queryArr.join('&')}`;
+    async function fetchAvailableRooms() {
+        roomsLoading.style.display = '';
+        roomsList.innerHTML = '';
 
-                try {
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    roomsLoading.style.display = 'none';
-                    const roomData = data.data || [];
-                    if (!roomData.length) {
-                        roomsList.innerHTML = `<div class="alert alert-warning mb-0">No rooms available for the selected dates.</div>`;
-                        return;
-                    }
-                    roomsList.innerHTML = '';
-                    roomData.forEach((room) => {
-                        const card = document.createElement('div');
-                        card.className =
-                            'card border bg-transparent p-3 mb-3 room-selection-card';
-                        card.dataset.roomId = room.id;
-                        card.dataset.roomRate = room.daily_rate ?? 0;
-                        card.innerHTML = `
+        let url = `/hotel/${hotelId}/available-rooms`;
+        const queryParams = [];
+        if (checkIn) queryParams.push(`check_in=${checkIn}`);
+        if (checkOut) queryParams.push(`check_out=${checkOut}`);
+        if (adults) queryParams.push(`adults=${adults}`);
+        if (children) queryParams.push(`children=${children}`);
+        if (queryParams.length) url += `?${queryParams.join('&')}`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            roomsLoading.style.display = 'none';
+
+            const roomData = data.data || [];
+            if (roomData.length === 0) {
+                roomsList.innerHTML = `<div class="alert alert-warning">No rooms available.</div>`;
+                return;
+            }
+
+            selectedRooms = [];
+            updatePriceSummary();
+
+            roomData.forEach((room) => {
+                const card = document.createElement('div');
+                card.className = 'card border bg-transparent p-3 mb-3 room-selection-card';
+                card.dataset.roomId = room.id;
+                card.dataset.roomRate = room.daily_rate ?? 0;
+
+                card.innerHTML = `
                     <div class="row g-3 g-md-4">
                         <div class="col-md-4">
                             <img src="${room.image || '/assets/images/category/hotel/4by3/02.jpg'}" class="card-img" alt="">
@@ -229,97 +223,61 @@
                         </div>
                     </div>
                 `;
-                        roomsList.appendChild(card);
-                    });
 
-                    // Room selection logic
-                    selectedRooms = [];
+                roomsList.appendChild(card);
+            });
+
+            document.querySelectorAll('.select-room-toggle-btn').forEach(btn => {
+                btn.onclick = function () {
+                    const roomId = parseInt(this.dataset.roomId);
+                    const roomRate = parseFloat(this.dataset.roomRate);
+                    const card = this.closest('.room-selection-card');
+
+                    const index = selectedRooms.findIndex(r => r.id === roomId);
+                    if (index > -1) {
+                        selectedRooms.splice(index, 1);
+                        card.classList.remove('border-primary');
+                        this.classList.remove('btn-dark');
+                        this.classList.add('btn-outline-dark');
+                        this.textContent = 'Select';
+                    } else {
+                        selectedRooms.push({ id: roomId, rate: roomRate });
+                        card.classList.add('border-primary');
+                        this.classList.remove('btn-outline-dark');
+                        this.classList.add('btn-dark');
+                        this.textContent = 'Selected';
+                    }
+
                     updatePriceSummary();
+                };
+            });
+        } catch (error) {
+            roomsLoading.style.display = 'none';
+            roomsList.innerHTML = `<div class="alert alert-danger">Error loading rooms.</div>`;
+        }
+    }
 
-                    document
-                        .querySelectorAll('.select-room-toggle-btn')
-                        .forEach((btn) => {
-                            btn.onclick = function (e) {
-                                const roomId = parseInt(
-                                    this.getAttribute('data-room-id'),
-                                );
-                                const roomRate = parseFloat(
-                                    this.getAttribute('data-room-rate'),
-                                );
-                                const card = this.closest(
-                                    '.room-selection-card',
-                                );
-                                const alreadySelected = selectedRooms.find(
-                                    (r) => r.id === roomId,
-                                );
+    function updatePriceSummary() {
+        if (selectedRooms.length === 0) {
+            priceSummary.innerHTML = `<div class="alert alert-secondary">Select rooms to view price summary.</div>`;
+            continueBtn.style.display = 'none';
+            return;
+        }
 
-                                if (alreadySelected) {
-                                    // Deselect room
-                                    selectedRooms = selectedRooms.filter(
-                                        (r) => r.id !== roomId,
-                                    );
-                                    card.classList.remove('border-primary');
-                                    this.classList.remove('btn-dark');
-                                    this.classList.add('btn-outline-dark');
-                                    this.textContent = 'Select';
-                                } else {
-                                    if (selectedRooms.length < rooms) {
-                                        selectedRooms.push({
-                                            id: roomId,
-                                            rate: roomRate,
-                                        });
-                                        card.classList.add('border-primary');
-                                        this.classList.remove(
-                                            'btn-outline-dark',
-                                        );
-                                        this.classList.add('btn-dark');
-                                        this.textContent = 'Selected';
-                                    } else {
-                                        selectedRooms.push({
-                                            id: roomId,
-                                            rate: roomRate,
-                                        });
-                                        card.classList.add('border-primary');
-                                        this.classList.remove(
-                                            'btn-outline-dark',
-                                        );
-                                        this.classList.add('btn-dark');
-                                        this.textContent = 'Selected';
-                                        return;
-                                    }
-                                }
-                                updatePriceSummary();
-                            };
-                        });
-                } catch (error) {
-                    roomsLoading.style.display = 'none';
-                    roomsList.innerHTML = `<div class="alert alert-danger mb-0">An error occurred while loading rooms. Please try again later.</div>`;
-                }
-            }
-
-            function updatePriceSummary() {
-                if (selectedRooms.length === 0) {
-                    priceSummary.innerHTML = `<div class="alert alert-secondary mb-0">Please select up to ${rooms} room${rooms > 1 ? 's' : ''} to see the price summary.</div>`;
-                    continueBtn.style.display = 'none';
-                    continueBtn.href = '#';
-                    return;
-                }
-                let total = selectedRooms.reduce((sum, r) => sum + r.rate, 0);
-                let roomLines = selectedRooms
-                    .map(
-                        (r, i) =>
-                            `<li class="list-group-item px-2 d-flex justify-content-between">
-                <span class="h6 fw-light mb-0">Room ${i + 1} (ID: ${r.id}) Rate</span>
+        let total = selectedRooms.reduce((sum, r) => sum + r.rate, 0);
+        let roomDetails = selectedRooms.map((r, i) => `
+            <li class="list-group-item px-2 d-flex justify-content-between">
+                <span class="h6 fw-light mb-0">Room ${i + 1} (ID: ${r.id})</span>
                 <span class="h6 fw-light mb-0">$${r.rate}</span>
-            </li>`,
-                    )
-                    .join('');
-                priceSummary.innerHTML = `
+            </li>
+        `).join('');
+
+        priceSummary.innerHTML = `
             <ul class="list-group list-group-borderless mb-3">
-                ${roomLines}
+                ${roomDetails}
                 <li class="list-group-item px-2 d-flex justify-content-between">
-                    <span class="h6 fw-light mb-0">Occupancy</span>
-                    <span class="h6 fw-light mb-0">${adults} Adults, ${children} Children, ${rooms} Room(s)</span>
+                    <span class="h6 fw-light mb-0">Guests</span>
+                    <span class="h6 fw-light mb-0">${adults} Adults, ${children} Children</span>
                 </li>
                 <li class="list-group-item bg-light d-flex justify-content-between rounded-2 px-2 mt-2">
                     <span class="h5 fw-normal mb-0 ps-1">Total</span>
@@ -327,34 +285,25 @@
                 </li>
             </ul>
         `;
-                continueBtn.style.display =
-                    selectedRooms.length === rooms ? '' : 'none';
-                if (selectedRooms.length === rooms) {
-                    const selectedRoomIds = selectedRooms
-                        .map((r) => r.id)
-                        .join(',');
-                    continueBtn.href = `/hotel/${hotelId}/rooms/${selectedRoomIds}/book?check_in=${encodeURIComponent(checkIn)}&check_out=${encodeURIComponent(checkOut)}&rooms=${encodeURIComponent(rooms)}&adults=${encodeURIComponent(adults)}&children=${encodeURIComponent(children)}`;
-                } else {
-                    continueBtn.href = '#';
-                }
-            }
 
-            fetchAvailableRooms();
+        continueBtn.style.display = '';
+        const selectedRoomIds = selectedRooms.map(r => r.id).join(',');
+        continueBtn.href = `/hotel/${hotelId}/rooms/${selectedRoomIds}/book?check_in=${checkIn}&check_out=${checkOut}&adults=${adults}&children=${children}`;
+    }
 
-            // Tiny-slider for images
-            if (
-                window.tns &&
-                document.querySelector('#hotel-slider .tiny-slider-inner')
-            ) {
-                tns({
-                    container: '#hotel-slider .tiny-slider-inner',
-                    items: 1,
-                    slideBy: 1,
-                    autoplay: false,
-                    controls: true,
-                    nav: false,
-                });
-            }
+    fetchAvailableRooms();
+
+    // Hotel image slider
+    if (window.tns && document.querySelector('#hotel-slider .tiny-slider-inner')) {
+        tns({
+            container: '#hotel-slider .tiny-slider-inner',
+            items: 1,
+            slideBy: 1,
+            autoplay: false,
+            controls: true,
+            nav: false,
         });
-    </script>
+    }
+});
+</script>
 @endpush
