@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\ReservationStatus;
 use App\Enum\UserRoleType;
 use App\Filament\Resources\ReservationResource\Pages;
 use App\Filament\Resources\ReservationResource\RelationManagers\BillsRelationManager;
@@ -214,26 +215,22 @@ class ReservationResource extends Resource
                     ->label('Guests')
                     ->alignCenter(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
                     ->colors([
-                        'warning' => 'pending',
-                        'success' => 'confirmed',
-                        'info' => 'checked_in',
-                        'success' => 'checked_out',
-                        'danger' => 'cancelled',
-                        'danger' => 'no_show',
+                        'warning' => ReservationStatus::PENDING->value,
+                        'success' => ReservationStatus::CONFIRMED->value,
+                        'info' => ReservationStatus::CHECKED_IN->value,
+                        'success' => ReservationStatus::CHECKED_OUT->value,
+                        'danger' => ReservationStatus::CANCELLED->value,
+                        'danger' => ReservationStatus::NO_SHOW->value,
                     ]),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'checked_in' => 'Checked In',
-                        'checked_out' => 'Checked Out',
-                        'cancelled' => 'Cancelled',
-                        'no_show' => 'No Show',
-                    ]),
+                    ->options(collect(ReservationStatus::cases())->mapWithKeys(fn ($case) => [
+                        $case->value => $case->getLabel(),
+                    ])),
 
                 Tables\Filters\SelectFilter::make('hotel_id')
                     ->label('Hotel')

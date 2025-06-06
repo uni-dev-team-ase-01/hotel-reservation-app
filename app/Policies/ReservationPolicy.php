@@ -17,6 +17,7 @@ class ReservationPolicy
             UserRoleType::HOTEL_CLERK->value,
             UserRoleType::HOTEL_MANAGER->value,
             UserRoleType::SUPER_ADMIN->value,
+            UserRoleType::CUSTOMER->value,
         ]);
     }
 
@@ -31,6 +32,10 @@ class ReservationPolicy
 
         if ($user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value])) {
             return $user->userHotels->pluck('hotel_id')->contains($reservation->hotel_id);
+        }
+
+        if ($user->hasRole(UserRoleType::CUSTOMER->value)) {
+            return $reservation->user_id === $user->id;
         }
 
         return false;
@@ -53,7 +58,11 @@ class ReservationPolicy
      */
     public function update(User $user, Reservation $reservation): bool
     {
-        return $this->view($user, $reservation);
+        return $user->hasAnyRole([
+            UserRoleType::HOTEL_CLERK->value,
+            UserRoleType::HOTEL_MANAGER->value,
+            UserRoleType::SUPER_ADMIN->value,
+        ]);
     }
 
     /**
@@ -61,7 +70,11 @@ class ReservationPolicy
      */
     public function delete(User $user, Reservation $reservation): bool
     {
-        return $this->view($user, $reservation);
+        return $user->hasAnyRole([
+            UserRoleType::HOTEL_CLERK->value,
+            UserRoleType::HOTEL_MANAGER->value,
+            UserRoleType::SUPER_ADMIN->value,
+        ]);
     }
 
     /**
@@ -69,7 +82,11 @@ class ReservationPolicy
      */
     public function restore(User $user, Reservation $reservation): bool
     {
-        return $this->view($user, $reservation);
+        return $user->hasAnyRole([
+            UserRoleType::HOTEL_CLERK->value,
+            UserRoleType::HOTEL_MANAGER->value,
+            UserRoleType::SUPER_ADMIN->value,
+        ]);
     }
 
     /**
@@ -77,6 +94,10 @@ class ReservationPolicy
      */
     public function forceDelete(User $user, Reservation $reservation): bool
     {
-        return $this->view($user, $reservation);
+        return $user->hasAnyRole([
+            UserRoleType::HOTEL_CLERK->value,
+            UserRoleType::HOTEL_MANAGER->value,
+            UserRoleType::SUPER_ADMIN->value,
+        ]);
     }
 }

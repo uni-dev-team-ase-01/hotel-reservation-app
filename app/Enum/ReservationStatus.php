@@ -4,6 +4,7 @@ namespace App\Enum;
 
 enum ReservationStatus: string
 {
+    case PENDING = 'pending';
     case CONFIRMED = 'confirmed';
     case CANCELLED = 'cancelled';
     case CHECKED_IN = 'checked_in';
@@ -13,6 +14,7 @@ enum ReservationStatus: string
     public function getLabel(): string
     {
         return match ($this) {
+            self::PENDING => 'Pending',
             self::CONFIRMED => 'Confirmed',
             self::CANCELLED => 'Cancelled',
             self::CHECKED_IN => 'Checked In',
