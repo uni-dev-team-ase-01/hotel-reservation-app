@@ -3,10 +3,9 @@
 namespace Database\Seeders;
 
 use App\Enum\RoomType;
-use Illuminate\Database\Seeder;
-use App\Models\Room;
 use App\Models\Hotel;
-
+use App\Models\Room;
+use Illuminate\Database\Seeder;
 
 class RoomSeeder extends Seeder
 {
@@ -27,17 +26,17 @@ class RoomSeeder extends Seeder
 
             for ($i = 1; $i <= $roomCount; $i++) {
                 Room::create([
-                    'hotel_id'    => $hotel->id,
+                    'hotel_id' => $hotel->id,
                     'room_number' => str_pad($i, 3, '0', STR_PAD_LEFT),
-                    'room_type'   => $roomTypes[($i - 1) % count($roomTypes)],
-                    'occupancy'   => match ($roomTypes[($i - 1) % count($roomTypes)]) {
+                    'room_type' => $roomTypes[($i - 1) % count($roomTypes)],
+                    'occupancy' => match ($roomTypes[($i - 1) % count($roomTypes)]) {
                         RoomType::SINGLE->value => 1,
                         RoomType::DOUBLE->value => 2,
                         RoomType::FAMILY->value => 4,
                         default => 1,
                     },
-                    'location'    => ($i <= 4) ? '1st Floor' : (($i <= 7) ? '2nd Floor' : '3rd Floor'),
-                    'images'      => null,
+                    'location' => ($i <= 4) ? '1st Floor' : (($i <= 7) ? '2nd Floor' : '3rd Floor'),
+                    'images' => null,
                 ]);
             }
         }

@@ -15,7 +15,7 @@
     $logoStyles = "height: {$brandLogoHeight}";
 @endphp
 
-@capture($content, $logo, ($isDarkMode = false))
+@capture($content, $logo, $isDarkMode)
     @if ($logo instanceof \Illuminate\Contracts\Support\Htmlable)
         <div
             {{
@@ -50,8 +50,8 @@
     @endif
 @endcapture
 
-{{ $content($brandLogo) }}
+{{ $content($brandLogo, false) }}
 
 @if ($hasDarkModeBrandLogo)
-    {{ $content($darkModeBrandLogo, isDarkMode: true) }}
+    {{ $content($darkModeBrandLogo, true) }}
 @endif

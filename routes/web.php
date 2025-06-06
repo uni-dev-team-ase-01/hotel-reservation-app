@@ -42,4 +42,3 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 // });
 
 Route::apiResource('api/hotels', HotelController::class);
-
