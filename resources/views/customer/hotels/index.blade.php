@@ -5,18 +5,15 @@
 @section("content")
     <main>
         <!-- =======================
-				Main Banner START -->
+                        Main Banner START -->
         <section class="pt-0">
             <div class="container">
-                <div
-                    class="rounded-3 p-3 p-sm-5"
-                    style="
-                        background-image: url(assets/images/bg/05.jpg);
-                        background-position: center center;
-                        background-repeat: no-repeat;
-                        background-size: cover;
-                    "
-                >
+                <div class="rounded-3 p-3 p-sm-5" style="
+                                background-image: url(assets/images/bg/05.jpg);
+                                background-position: center center;
+                                background-repeat: no-repeat;
+                                background-size: cover;
+                            ">
                     <div class="row my-2 my-xl-5">
                         <div class="col-md-8 mx-auto">
                             <h1 class="text-center text-white">
@@ -24,27 +21,18 @@
                             </h1>
                         </div>
                     </div>
-                    <form
-                        class="bg-mode shadow rounded-3 position-relative p-4 pe-md-5 pb-5 pb-md-4 mb-4"
-                        id="search-form"
-                    >
+                    <form class="bg-mode shadow rounded-3 position-relative p-4 pe-md-5 pb-5 pb-md-4 mb-4" id="search-form">
                         <div class="row g-4 align-items-center">
                             <!-- Location -->
                             <div class="col-lg-4">
-                                <div
-                                    class="form-control-border form-control-transparent form-fs-md d-flex"
-                                >
+                                <div class="form-control-border form-control-transparent form-fs-md d-flex">
                                     <i class="bi bi-geo-alt fs-3 me-2 mt-2"></i>
                                     <div class="flex-grow-1">
                                         <label class="form-label">
                                             Location
                                         </label>
-                                        <select
-                                            class="form-select js-choice"
-                                            data-search-enabled="true"
-                                            id="location-select"
-                                            name="location"
-                                        >
+                                        <select class="form-select js-choice" data-search-enabled="true"
+                                            id="location-select" name="location">
                                             <option value="">
                                                 Select location
                                             </option>
@@ -55,55 +43,31 @@
                             <!-- Check in -->
                             <div class="col-lg-4">
                                 <div class="d-flex">
-                                    <i
-                                        class="bi bi-calendar fs-3 me-2 mt-2"
-                                    ></i>
-                                    <div
-                                        class="form-control-border form-control-transparent form-fs-md"
-                                    >
+                                    <i class="bi bi-calendar fs-3 me-2 mt-2"></i>
+                                    <div class="form-control-border form-control-transparent form-fs-md">
                                         <label class="form-label">
                                             Check in - out
                                         </label>
-                                        <input
-                                            type="text"
-                                            class="form-control flatpickr"
-                                            data-mode="range"
-                                            placeholder="Select date"
-                                            id="checkinout"
-                                            name="date_range"
-                                        />
+                                        <input type="text" class="form-control flatpickr" data-mode="range"
+                                            placeholder="Select date" id="checkinout" name="date_range" />
                                     </div>
                                 </div>
                             </div>
                             <!-- Guests & rooms -->
                             <div class="col-lg-4">
-                                <div
-                                    class="form-control-border form-control-transparent form-fs-md d-flex"
-                                >
+                                <div class="form-control-border form-control-transparent form-fs-md d-flex">
                                     <i class="bi bi-person fs-3 me-2 mt-2"></i>
                                     <div class="w-100">
                                         <label class="form-label">
                                             Guests & rooms
                                         </label>
-                                        <div
-                                            class="dropdown guest-selector me-2"
-                                        >
-                                            <input
-                                                type="text"
-                                                class="form-guest-selector form-control selection-result"
-                                                value="2 Guests 1 Room"
-                                                id="dropdownGuest"
-                                                data-bs-auto-close="outside"
-                                                data-bs-toggle="dropdown"
-                                                readonly
-                                            />
-                                            <ul
-                                                class="dropdown-menu guest-selector-dropdown"
-                                                aria-labelledby="dropdownGuest"
-                                            >
-                                                <li
-                                                    class="d-flex justify-content-between"
-                                                >
+                                        <div class="dropdown guest-selector me-2">
+                                            <input type="text" class="form-guest-selector form-control selection-result"
+                                                value="2 Guests 1 Room" id="dropdownGuest" data-bs-auto-close="outside"
+                                                data-bs-toggle="dropdown" readonly />
+                                            <ul class="dropdown-menu guest-selector-dropdown"
+                                                aria-labelledby="dropdownGuest">
+                                                <li class="d-flex justify-content-between">
                                                     <div>
                                                         <h6 class="mb-0">
                                                             Adults
@@ -112,38 +76,20 @@
                                                             Ages 13 or above
                                                         </small>
                                                     </div>
-                                                    <div
-                                                        class="hstack gap-1 align-items-center"
-                                                    >
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-link adult-remove p-0 mb-0"
-                                                        >
-                                                            <i
-                                                                class="bi bi-dash-circle fs-5 fa-fw"
-                                                            ></i>
+                                                    <div class="hstack gap-1 align-items-center">
+                                                        <button type="button" class="btn btn-link adult-remove p-0 mb-0">
+                                                            <i class="bi bi-dash-circle fs-5 fa-fw"></i>
                                                         </button>
-                                                        <h6
-                                                            class="guest-selector-count mb-0 adults"
-                                                        >
+                                                        <h6 class="guest-selector-count mb-0 adults">
                                                             2
                                                         </h6>
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-link adult-add p-0 mb-0"
-                                                        >
-                                                            <i
-                                                                class="bi bi-plus-circle fs-5 fa-fw"
-                                                            ></i>
+                                                        <button type="button" class="btn btn-link adult-add p-0 mb-0">
+                                                            <i class="bi bi-plus-circle fs-5 fa-fw"></i>
                                                         </button>
                                                     </div>
                                                 </li>
-                                                <li
-                                                    class="dropdown-divider"
-                                                ></li>
-                                                <li
-                                                    class="d-flex justify-content-between"
-                                                >
+                                                <li class="dropdown-divider"></li>
+                                                <li class="d-flex justify-content-between">
                                                     <div>
                                                         <h6 class="mb-0">
                                                             Child
@@ -152,38 +98,20 @@
                                                             Ages 13 below
                                                         </small>
                                                     </div>
-                                                    <div
-                                                        class="hstack gap-1 align-items-center"
-                                                    >
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-link child-remove p-0 mb-0"
-                                                        >
-                                                            <i
-                                                                class="bi bi-dash-circle fs-5 fa-fw"
-                                                            ></i>
+                                                    <div class="hstack gap-1 align-items-center">
+                                                        <button type="button" class="btn btn-link child-remove p-0 mb-0">
+                                                            <i class="bi bi-dash-circle fs-5 fa-fw"></i>
                                                         </button>
-                                                        <h6
-                                                            class="guest-selector-count mb-0 child"
-                                                        >
+                                                        <h6 class="guest-selector-count mb-0 child">
                                                             0
                                                         </h6>
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-link child-add p-0 mb-0"
-                                                        >
-                                                            <i
-                                                                class="bi bi-plus-circle fs-5 fa-fw"
-                                                            ></i>
+                                                        <button type="button" class="btn btn-link child-add p-0 mb-0">
+                                                            <i class="bi bi-plus-circle fs-5 fa-fw"></i>
                                                         </button>
                                                     </div>
                                                 </li>
-                                                <li
-                                                    class="dropdown-divider"
-                                                ></li>
-                                                <li
-                                                    class="d-flex justify-content-between"
-                                                >
+                                                <li class="dropdown-divider"></li>
+                                                <li class="d-flex justify-content-between">
                                                     <div>
                                                         <h6 class="mb-0">
                                                             Rooms
@@ -192,62 +120,29 @@
                                                             Max room 8
                                                         </small>
                                                     </div>
-                                                    <div
-                                                        class="hstack gap-1 align-items-center"
-                                                    >
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-link room-remove p-0 mb-0"
-                                                        >
-                                                            <i
-                                                                class="bi bi-dash-circle fs-5 fa-fw"
-                                                            ></i>
+                                                    <div class="hstack gap-1 align-items-center">
+                                                        <button type="button" class="btn btn-link room-remove p-0 mb-0">
+                                                            <i class="bi bi-dash-circle fs-5 fa-fw"></i>
                                                         </button>
-                                                        <h6
-                                                            class="guest-selector-count mb-0 rooms"
-                                                        >
+                                                        <h6 class="guest-selector-count mb-0 rooms">
                                                             1
                                                         </h6>
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-link room-add p-0 mb-0"
-                                                        >
-                                                            <i
-                                                                class="bi bi-plus-circle fs-5 fa-fw"
-                                                            ></i>
+                                                        <button type="button" class="btn btn-link room-add p-0 mb-0">
+                                                            <i class="bi bi-plus-circle fs-5 fa-fw"></i>
                                                         </button>
                                                     </div>
                                                 </li>
                                             </ul>
-                                            <input
-                                                type="hidden"
-                                                name="adults"
-                                                id="adults-input"
-                                                value="2"
-                                            />
-                                            <input
-                                                type="hidden"
-                                                name="children"
-                                                id="children-input"
-                                                value="0"
-                                            />
-                                            <input
-                                                type="hidden"
-                                                name="rooms"
-                                                id="rooms-input"
-                                                value="1"
-                                            />
+                                            <input type="hidden" name="adults" id="adults-input" value="2" />
+                                            <input type="hidden" name="children" id="children-input" value="0" />
+                                            <input type="hidden" name="rooms" id="rooms-input" value="1" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="btn-position-md-middle">
-                            <button
-                                type="submit"
-                                class="icon-lg btn btn-round btn-primary mb-0"
-                                id="search-hotels"
-                            >
+                            <button type="submit" class="icon-lg btn btn-round btn-primary mb-0" id="search-hotels">
                                 <i class="bi bi-search fa-fw"></i>
                             </button>
                         </div>
@@ -256,94 +151,56 @@
             </div>
         </section>
         <!-- =======================
-				Main Banner END -->
+                        Main Banner END -->
 
         <!-- =======================
-				Hotel list START -->
+                        Hotel list START -->
         <section class="pt-0">
             <div class="container">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div
-                            class="hstack gap-3 justify-content-between justify-content-md-end"
-                        >
-                            <button
-                                class="btn btn-primary-soft btn-primary-check mb-0 d-xl-none"
-                                type="button"
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvasSidebar"
-                                aria-controls="offcanvasSidebar"
-                            >
+                        <div class="hstack gap-3 justify-content-between justify-content-md-end">
+                            <button class="btn btn-primary-soft btn-primary-check mb-0 d-xl-none" type="button"
+                                data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
+                                aria-controls="offcanvasSidebar">
                                 <i class="fa-solid fa-sliders-h me-1"></i>
                                 Show filters
                             </button>
-                            <ul
-                                class="nav nav-pills nav-pills-dark"
-                                id="tour-pills-tab"
-                                role="tablist"
-                            >
+                            <ul class="nav nav-pills nav-pills-dark" id="tour-pills-tab" role="tablist">
                                 <li class="nav-item">
-                                    <a
-                                        class="nav-link rounded-start rounded-0 mb-0 active"
-                                        href="#"
-                                    >
+                                    <a class="nav-link rounded-start rounded-0 mb-0 active" href="#">
                                         <i class="bi fa-fw bi-list-ul"></i>
                                     </a>
                                 </li>
                                 <!-- <li class="nav-item">
-											<a class="nav-link rounded-end rounded-0 mb-0" href="#"><i
-													class="bi fa-fw bi-grid-fill"></i></a>
-										</li> -->
+                                                    <a class="nav-link rounded-end rounded-0 mb-0" href="#"><i
+                                                            class="bi fa-fw bi-grid-fill"></i></a>
+                                                </li> -->
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <aside class="col-xl-4 col-xxl-3">
-                        <div
-                            class="offcanvas-xl offcanvas-end"
-                            tabindex="-1"
-                            id="offcanvasSidebar"
-                            aria-labelledby="offcanvasSidebarLabel"
-                        >
+                        <div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar"
+                            aria-labelledby="offcanvasSidebarLabel">
                             <div class="offcanvas-header">
-                                <h5
-                                    class="offcanvas-title"
-                                    id="offcanvasSidebarLabel"
-                                >
+                                <h5 class="offcanvas-title" id="offcanvasSidebarLabel">
                                     Advance Filters
                                 </h5>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="offcanvas"
-                                    data-bs-target="#offcanvasSidebar"
-                                    aria-label="Close"
-                                ></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                    data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
                             </div>
                             <div class="offcanvas-body flex-column p-3 p-xl-0">
                                 <form class="rounded-3 shadow" id="filter-form">
-                                    <div
-                                        class="card card-body rounded-0 rounded-top p-4"
-                                    >
+                                    <div class="card card-body rounded-0 rounded-top p-4">
                                         <h6 class="mb-2">Hotel Type</h6>
-                                        <div
-                                            class="col-12"
-                                            id="hotel-type-group"
-                                        >
+                                        <div class="col-12" id="hotel-type-group">
                                             @foreach (["All", "Hotel", "Apartment", "Resort", "Villa", "Lodge", "Guest House", "Cottage", "Beach Hut", "Farm house", "Luxury", "Budget"] as $i => $type)
                                                 <div class="form-check">
-                                                    <input
-                                                        class="form-check-input"
-                                                        type="checkbox"
-                                                        value="{{ $type }}"
-                                                        id="hotelType{{ $i + 1 }}"
-                                                        name="hotel_type[]"
-                                                    />
-                                                    <label
-                                                        class="form-check-label"
-                                                        for="hotelType{{ $i + 1 }}"
-                                                    >
+                                                    <input class="form-check-input" type="checkbox" value="{{ $type }}"
+                                                        id="hotelType{{ $i + 1 }}" name="hotel_type[]" />
+                                                    <label class="form-check-label" for="hotelType{{ $i + 1 }}">
                                                         {{ $type }}
                                                     </label>
                                                 </div>
@@ -355,24 +212,13 @@
                                         <h6 class="mb-2">Rating Star</h6>
                                         <ul class="list-inline mb-0 g-3">
                                             @foreach ([1, 2, 3, 4, 5] as $s)
-                                                <li
-                                                    class="list-inline-item mb-0"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        class="btn-check"
-                                                        id="btn-check-star{{ $s }}"
-                                                        name="star_rating[]"
-                                                        value="{{ $s }}"
-                                                    />
-                                                    <label
-                                                        class="btn btn-sm btn-light btn-primary-soft-check"
-                                                        for="btn-check-star{{ $s }}"
-                                                    >
+                                                <li class="list-inline-item mb-0">
+                                                    <input type="checkbox" class="btn-check" id="btn-check-star{{ $s }}"
+                                                        name="star_rating[]" value="{{ $s }}" />
+                                                    <label class="btn btn-sm btn-light btn-primary-soft-check"
+                                                        for="btn-check-star{{ $s }}">
                                                         {{ $s }}
-                                                        <i
-                                                            class="bi bi-star-fill"
-                                                        ></i>
+                                                        <i class="bi bi-star-fill"></i>
                                                     </label>
                                                 </li>
                                             @endforeach
@@ -380,37 +226,21 @@
                                     </div>
                                 </form>
                             </div>
-                            <div
-                                class="d-flex justify-content-between p-2 p-xl-0 mt-xl-4"
-                            >
-                                <button
-                                    class="btn btn-link p-0 mb-0"
-                                    id="clear-filters"
-                                >
+                            <div class="d-flex justify-content-between p-2 p-xl-0 mt-xl-4">
+                                <button class="btn btn-link p-0 mb-0" id="clear-filters">
                                     Clear all
                                 </button>
-                                <button
-                                    class="btn btn-primary mb-0"
-                                    id="filter-hotels"
-                                >
+                                <button class="btn btn-primary mb-0" id="filter-hotels">
                                     Filter Result
                                 </button>
                             </div>
                         </div>
                     </aside>
                     <div class="col-xl-8 col-xxl-9">
-                        <div
-                            class="vstack gap-4"
-                            id="hotel-list-container"
-                        ></div>
-                        <nav
-                            class="d-flex justify-content-center mt-4"
-                            aria-label="navigation"
-                        >
-                            <ul
-                                class="pagination pagination-primary-soft d-inline-block d-md-flex rounded mb-0"
-                                id="pagination"
-                            ></ul>
+                        <div class="vstack gap-4" id="hotel-list-container"></div>
+                        <nav class="d-flex justify-content-center mt-4" aria-label="navigation">
+                            <ul class="pagination pagination-primary-soft d-inline-block d-md-flex rounded mb-0"
+                                id="pagination"></ul>
                         </nav>
                     </div>
                 </div>
@@ -421,26 +251,14 @@
 
 @push("scripts")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/min/tiny-slider.js"></script>
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/tiny-slider.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/tiny-slider.css" />
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
 
     <script>
         const PAGE_SIZE = 5;
@@ -572,17 +390,17 @@
             container.innerHTML = '';
             if (hotels.length === 0) {
                 container.innerHTML = `
-					<div class="card shadow p-2 mb-3">
-						<div class="row g-0">
-							<div class="col-md-5 position-relative"></div>
-							<div class="col-md-7">
-								<div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
-									<h5 class="card-title">No hotels available</h5>
-									<p class="card-text">Sorry, we couldn't find any hotels at the moment.</p>
-								</div>
-							</div>
-						</div>
-					</div>`;
+                            <div class="card shadow p-2 mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-5 position-relative"></div>
+                                    <div class="col-md-7">
+                                        <div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
+                                            <h5 class="card-title">No hotels available</h5>
+                                            <p class="card-text">Sorry, we couldn't find any hotels at the moment.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
                 renderPagination(1, 1);
                 return;
             }
@@ -614,27 +432,27 @@
                 let imgSliderHTML = '';
                 if (imgs.length > 1) {
                     imgSliderHTML = `<div class="tiny-slider arrow-round arrow-xs arrow-dark overflow-hidden rounded-2" id="${sliderId}">
-						<div class="tiny-slider-inner">
-							${imgs.map((img) => `<div><img src="${img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
-						</div>
-						</div>`;
+                                <div class="tiny-slider-inner">
+                                    ${imgs.map((img) => `<div><img src="${img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
+                                </div>
+                                </div>`;
                 } else {
                     imgSliderHTML = `<img src="${imgs[0]}" class="img-fluid rounded-start" alt="${hotel.name}">`;
                 }
 
                 const discountBadge = hotel.discount
                     ? `
-					<div class="position-absolute top-0 start-0 z-index-1 m-2">
-						<div class="badge text-bg-danger">${hotel.discount}% Off</div>
-					</div>`
+                            <div class="position-absolute top-0 start-0 z-index-1 m-2">
+                                <div class="badge text-bg-danger">${hotel.discount}% Off</div>
+                            </div>`
                     : '';
 
                 const amenitiesHTML = `
-					<li class="nav-item">Air Conditioning</li>
-					<li class="nav-item">Wifi</li>
-					<li class="nav-item">Kitchen</li>
-					<li class="nav-item">Pool</li>
-					`;
+                            <li class="nav-item">Air Conditioning</li>
+                            <li class="nav-item">Wifi</li>
+                            <li class="nav-item">Kitchen</li>
+                            <li class="nav-item">Pool</li>
+                            `;
 
                 let listGroup = '';
                 if (hotel.free_cancellation)
@@ -645,10 +463,10 @@
                     listGroup += `<li class="list-group-item d-flex text-success p-0"><i class="bi bi-patch-check-fill me-2"></i>Free Breakfast</li>`;
 
                 const priceHTML = `
-					<div class="d-flex align-items-center">
-						${hotel.original_price ? `<span class="text-decoration-line-through mb-0">$${hotel.original_price}</span>` : ''}
-					</div>
-					`;
+                            <div class="d-flex align-items-center">
+                                ${hotel.original_price ? `<span class="text-decoration-line-through mb-0">$${hotel.original_price}</span>` : ''}
+                            </div>
+                            `;
 
                 // --- Select Room Button logic: check for check-in/out dates ---
                 const checkinout =
@@ -663,57 +481,57 @@
                 // Button will be handled with JS for toast warning if dates are missing
 
                 const cardHTML = `
-					<div class="card shadow p-2 mb-3">
-						<div class="row g-0">
-							<div class="col-md-5 position-relative">
-								${discountBadge}
-								${imgSliderHTML}
-							</div>
-							<div class="col-md-7">
-								<div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
-									<div class="d-flex justify-content-between align-items-center">
-										<ul class="list-inline mb-0">${starsHTML}</ul>
-										<ul class="list-inline mb-0 z-index-2">
-											<li class="list-inline-item">
-												<a href="#" class="btn btn-sm btn-round btn-light">
-													<i class="fa-solid fa-fw fa-heart"></i>
-												</a>
-											</li>
-											<li class="list-inline-item dropdown">
-												<a href="#" class="btn btn-sm btn-round btn-light" role="button"
-													data-bs-toggle="dropdown" aria-expanded="false">
-													<i class="fa-solid fa-fw fa-share-alt"></i>
-												</a>
-												<ul class="dropdown-menu dropdown-menu-end min-w-auto shadow rounded">
-													<li><a class="dropdown-item" href="#"><i class="fab fa-twitter-square me-2"></i>Twitter</a></li>
-													<li><a class="dropdown-item" href="#"><i class="fab fa-facebook-square me-2"></i>Facebook</a></li>
-													<li><a class="dropdown-item" href="#"><i class="fab fa-linkedin me-2"></i>LinkedIn</a></li>
-													<li><a class="dropdown-item" href="#"><i class="fa-solid fa-copy me-2"></i>Copy link</a></li>
-												</ul>
-											</li>
-										</ul>
-									</div>
-									<h5 class="card-title mb-1">
-										<a href="${hotel.website || '#'}" target="_blank">${hotel.name}</a>
-									</h5>
-									<small><i class="bi bi-geo-alt me-2"></i>${hotel.address || 'Location not available'}</small>
-									<ul class="nav nav-divider mt-3">
-										${amenitiesHTML}
-									</ul>
-									<ul class="list-group list-group-borderless small mb-0 mt-2">
-										${listGroup}
-									</ul>
-									<div class="d-sm-flex justify-content-sm-between align-items-center mt-3 mt-md-auto">
-										${priceHTML}
-										<div class="mt-3 mt-sm-0">
-											<button class="btn btn-sm btn-dark mb-0 w-100 select-room-btn" data-hotel-id="${hotel.id}" data-query="${query}">View</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					`;
+                            <div class="card shadow p-2 mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-5 position-relative">
+                                        ${discountBadge}
+                                        ${imgSliderHTML}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <ul class="list-inline mb-0">${starsHTML}</ul>
+                                                <ul class="list-inline mb-0 z-index-2">
+                                                    <li class="list-inline-item">
+                                                        <a href="#" class="btn btn-sm btn-round btn-light">
+                                                            <i class="fa-solid fa-fw fa-heart"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li class="list-inline-item dropdown">
+                                                        <a href="#" class="btn btn-sm btn-round btn-light" role="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fa-solid fa-fw fa-share-alt"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu dropdown-menu-end min-w-auto shadow rounded">
+                                                            <li><a class="dropdown-item" href="#"><i class="fab fa-twitter-square me-2"></i>Twitter</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i class="fab fa-facebook-square me-2"></i>Facebook</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i class="fab fa-linkedin me-2"></i>LinkedIn</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-copy me-2"></i>Copy link</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <h5 class="card-title mb-1">
+                                                <a href="${hotel.website || '#'}" target="_blank">${hotel.name}</a>
+                                            </h5>
+                                            <small><i class="bi bi-geo-alt me-2"></i>${hotel.address || 'Location not available'}</small>
+                                            <ul class="nav nav-divider mt-3">
+                                                ${amenitiesHTML}
+                                            </ul>
+                                            <ul class="list-group list-group-borderless small mb-0 mt-2">
+                                                ${listGroup}
+                                            </ul>
+                                            <div class="d-sm-flex justify-content-sm-between align-items-center mt-3 mt-md-auto">
+                                                ${priceHTML}
+                                                <div class="mt-3 mt-sm-0">
+                                                    <button class="btn btn-sm btn-dark mb-0 w-100 select-room-btn" data-hotel-id="${hotel.id}" data-query="${query}">View</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
                 container.insertAdjacentHTML('beforeend', cardHTML);
 
                 if (imgs.length > 1 && window.tns) {
@@ -810,8 +628,8 @@
                     images: Array.isArray(hotel.images)
                         ? hotel.images
                         : typeof hotel.images === 'string' && hotel.images
-                          ? [hotel.images]
-                          : ['assets/images/category/hotel/4by3/04.jpg'],
+                            ? [hotel.images]
+                            : ['assets/images/category/hotel/4by3/04.jpg'],
                     price: hotel.price || '',
                     original_price: hotel.original_price || null,
                     discount: hotel.discount || null,
@@ -902,63 +720,63 @@
             // Attach event listeners if elements exist
             (document.querySelectorAll('.adult-add') || []).forEach(
                 (btn) =>
-                    (btn.onclick = () =>
-                        handleGuestRoomChange(
-                            '.guest-selector-count.adults',
-                            1,
-                            8,
-                            true,
-                        )),
+                (btn.onclick = () =>
+                    handleGuestRoomChange(
+                        '.guest-selector-count.adults',
+                        1,
+                        8,
+                        true,
+                    )),
             );
             (document.querySelectorAll('.adult-remove') || []).forEach(
                 (btn) =>
-                    (btn.onclick = () =>
-                        handleGuestRoomChange(
-                            '.guest-selector-count.adults',
-                            1,
-                            8,
-                            false,
-                        )),
+                (btn.onclick = () =>
+                    handleGuestRoomChange(
+                        '.guest-selector-count.adults',
+                        1,
+                        8,
+                        false,
+                    )),
             );
             (document.querySelectorAll('.child-add') || []).forEach(
                 (btn) =>
-                    (btn.onclick = () =>
-                        handleGuestRoomChange(
-                            '.guest-selector-count.child',
-                            0,
-                            8,
-                            true,
-                        )),
+                (btn.onclick = () =>
+                    handleGuestRoomChange(
+                        '.guest-selector-count.child',
+                        0,
+                        8,
+                        true,
+                    )),
             );
             (document.querySelectorAll('.child-remove') || []).forEach(
                 (btn) =>
-                    (btn.onclick = () =>
-                        handleGuestRoomChange(
-                            '.guest-selector-count.child',
-                            0,
-                            8,
-                            false,
-                        )),
+                (btn.onclick = () =>
+                    handleGuestRoomChange(
+                        '.guest-selector-count.child',
+                        0,
+                        8,
+                        false,
+                    )),
             );
             (document.querySelectorAll('.room-add') || []).forEach(
                 (btn) =>
-                    (btn.onclick = () =>
-                        handleGuestRoomChange(
-                            '.guest-selector-count.rooms',
-                            1,
-                            8,
-                            true,
-                        )),
+                (btn.onclick = () =>
+                    handleGuestRoomChange(
+                        '.guest-selector-count.rooms',
+                        1,
+                        8,
+                        true,
+                    )),
             );
             (document.querySelectorAll('.room-remove') || []).forEach(
                 (btn) =>
-                    (btn.onclick = () =>
-                        handleGuestRoomChange(
-                            '.guest-selector-count.rooms',
-                            1,
-                            8,
-                            false,
-                        )),
+                (btn.onclick = () =>
+                    handleGuestRoomChange(
+                        '.guest-selector-count.rooms',
+                        1,
+                        8,
+                        false,
+                    )),
             );
 
             // Clear filters
@@ -994,48 +812,54 @@
 
             // Search form
             const searchForm = document.getElementById('search-form');
-            if (searchForm) {
-                searchForm.onsubmit = function (e) {
-                    e.preventDefault();
-                    const dateRangeEl = document.getElementById('checkinout');
-                    const dateRange = dateRangeEl ? dateRangeEl.value : '';
-                    let check_in = '',
-                        check_out = '';
-                    if (dateRange && dateRange.includes(' to ')) {
-                        [check_in, check_out] = dateRange.split(' to ');
-                    } else if (dateRange) {
-                        check_in = check_out = dateRange;
+
+            function handleSearchFormSubmit(e) {
+                if (e) e.preventDefault();
+                const dateRangeEl = document.getElementById('checkinout');
+                const dateRange = dateRangeEl ? dateRangeEl.value : '';
+                let check_in = '', check_out = '';
+                if (dateRange && dateRange.includes(' to ')) {
+                    [check_in, check_out] = dateRange.split(' to ');
+                } else if (dateRange) {
+                    check_in = check_out = dateRange;
+                }
+                if (!check_in || !check_out) {
+                    if (typeof Toastify !== 'undefined') {
+                        Toastify({
+                            text: 'Please select both check-in and check-out dates.',
+                            duration: 3000,
+                            close: true,
+                            gravity: 'top',
+                            position: 'right',
+                            backgroundColor: '#d9534f',
+                        }).showToast();
+                    } else {
+                        alert('Please select both check-in and check-out dates.');
                     }
-                    if (!check_in || !check_out) {
-                        if (typeof Toastify !== 'undefined') {
-                            Toastify({
-                                text: 'Please select both check-in and check-out dates.',
-                                duration: 3000,
-                                close: true,
-                                gravity: 'top',
-                                position: 'right',
-                                backgroundColor: '#d9534f',
-                            }).showToast();
-                        } else {
-                            alert(
-                                'Please select both check-in and check-out dates.',
-                            );
-                        }
-                        return false;
-                    }
-                    const formData = new FormData(this);
-                    const params = {};
-                    for (const [key, val] of formData.entries()) {
-                        params[key] = val;
-                    }
-                    params.check_in = check_in;
-                    params.check_out = check_out;
-                    delete params.date_range;
-                    if (typeof fetchHotels !== 'undefined') fetchHotels(params);
                     return false;
-                };
+                }
+                const formData = new FormData(searchForm);
+                const params = {};
+                for (const [key, val] of formData.entries()) {
+                    params[key] = val;
+                }
+                params.check_in = check_in;
+                params.check_out = check_out;
+                delete params.date_range;
+                if (typeof fetchHotels !== 'undefined') fetchHotels(params);
+                return false;
             }
 
+            if (searchForm) {
+                searchForm.onsubmit = handleSearchFormSubmit;
+
+                // Submit on change for all form fields
+                Array.from(searchForm.elements).forEach(el => {
+                    if (el.tagName === "INPUT" || el.tagName === "SELECT") {
+                        el.addEventListener('change', handleSearchFormSubmit);
+                    }
+                });
+            }
             // Location select triggers search
             const locationSelect = document.getElementById('location-select');
             if (locationSelect) {

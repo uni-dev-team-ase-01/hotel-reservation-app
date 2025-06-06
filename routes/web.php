@@ -5,6 +5,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\TravelCompanyController;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
@@ -43,3 +44,5 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 Route::apiResource('api/hotels', HotelController::class);
 
+Route::get('/travel-agent', [TravelCompanyController::class, 'index']);
+Route::post('/travel-agent/submit', [TravelCompanyController::class, 'store'])->name('travel-agent.submit');
