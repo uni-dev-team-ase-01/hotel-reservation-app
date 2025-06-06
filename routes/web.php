@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
@@ -13,7 +14,14 @@ Route::get('/hotels', [HotelController::class, 'index'])->name('hotels');
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::get('/', 'index')->name('hotels');
     Route::get('/getHotels', 'getHotels')->name('hotels.get');
+    Route::get('/select-options', 'selectOptions');
+
 });
+
+Route::get('hotel/{hotel}/rooms', [RoomController::class, 'showRooms']);
+Route::get('hotel/{hotel}/available-rooms', [RoomController::class, 'availableRooms']);
+
+Route::get('hotel/search', [HotelController::class, 'search']);
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 

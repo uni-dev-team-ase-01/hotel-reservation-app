@@ -190,7 +190,7 @@
             <!-- Dark mode options END -->
 
             <!-- Search -->
-            <li class="nav-item dropdown nav-search me-1 me-sm-2">
+            <!-- <li class="nav-item dropdown nav-search me-1 me-sm-2">
                 <a
                     class="nav-link mb-0 py-0"
                     role="button"
@@ -219,7 +219,7 @@
                         </button>
                     </form>
                 </div>
-            </li>
+            </li> -->
 
             <!-- Sign In button -->
             @if (auth()->check() &&auth()->user()->isCustomer())
