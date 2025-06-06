@@ -3,38 +3,43 @@
 namespace Database\Seeders;
 
 use App\Enum\RoomType;
-use App\Models\Hotel;
-use App\Models\Room;
 use Illuminate\Database\Seeder;
+use App\Models\Room;
+use App\Models\Hotel;
+
 
 class RoomSeeder extends Seeder
 {
     public function run()
     {
+        $hotels = Hotel::all();
 
-        $hotel = Hotel::first();
+        if ($hotels->isEmpty()) {
+            return;
+        }
 
-        $rooms = [
-            [
-                'hotel_id' => $hotel->id,
-                'room_number' => '101',
-                'room_type' => RoomType::SINGLE->value,
-                'occupancy' => 2,
-                'location' => '1st Floor',
-                'images' => null,
-            ],
-            [
-                'hotel_id' => $hotel->id,
-                'room_number' => '102',
-                'room_type' => RoomType::FAMILY->value,
-                'occupancy' => 1,
-                'location' => '1st Floor',
-                'images' => null,
-            ],
-        ];
+        // Decide which hotel gets only 4 rooms (e.g., the first one by ID)
+        $firstHotel = $hotels->first();
 
-        foreach ($rooms as $room) {
-            Room::create($room);
+        foreach ($hotels as $hotel) {
+            $roomCount = ($hotel->id === $firstHotel->id) ? 4 : 9;
+            $roomTypes = [RoomType::SINGLE->value, RoomType::DOUBLE->value, RoomType::FAMILY->value];
+
+            for ($i = 1; $i <= $roomCount; $i++) {
+                Room::create([
+                    'hotel_id'    => $hotel->id,
+                    'room_number' => str_pad($i, 3, '0', STR_PAD_LEFT),
+                    'room_type'   => $roomTypes[($i - 1) % count($roomTypes)],
+                    'occupancy'   => match ($roomTypes[($i - 1) % count($roomTypes)]) {
+                        RoomType::SINGLE->value => 1,
+                        RoomType::DOUBLE->value => 2,
+                        RoomType::FAMILY->value => 4,
+                        default => 1,
+                    },
+                    'location'    => ($i <= 4) ? '1st Floor' : (($i <= 7) ? '2nd Floor' : '3rd Floor'),
+                    'images'      => null,
+                ]);
+            }
         }
     }
 }
