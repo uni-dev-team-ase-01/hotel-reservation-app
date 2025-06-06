@@ -8,42 +8,42 @@
             <script>
                 shouldPreventNavigation = () => {
                     if ($wire?.__instance?.effects?.redirect) {
-                        return
+                        return;
                     }
 
                     return (
                         window.jsMd5(
                             JSON.stringify($wire.data).replace(/\\/g, ''),
                         ) !== $wire.savedDataHash
-                    )
-                }
+                    );
+                };
 
                 const showUnsavedChangesAlert = () => {
-                    return confirm(@js(__('filament-panels::unsaved-changes-alert.body')))
-                }
+                    return confirm(@js(__("filament-panels::unsaved-changes-alert.body")));
+                };
 
                 document.addEventListener('livewire:navigate', (event) => {
                     if (typeof @this !== 'undefined') {
                         if (!shouldPreventNavigation()) {
-                            return
+                            return;
                         }
 
                         if (showUnsavedChangesAlert()) {
-                            return
+                            return;
                         }
 
-                        event.preventDefault()
+                        event.preventDefault();
                     }
-                })
+                });
 
                 window.addEventListener('beforeunload', (event) => {
                     if (!shouldPreventNavigation()) {
-                        return
+                        return;
                     }
 
-                    event.preventDefault()
-                    event.returnValue = true
-                })
+                    event.preventDefault();
+                    event.returnValue = true;
+                });
             </script>
         @endscript
     @else
@@ -56,12 +56,12 @@
                         ) === $wire.savedDataHash ||
                         $wire?.__instance?.effects?.redirect
                     ) {
-                        return
+                        return;
                     }
 
-                    event.preventDefault()
-                    event.returnValue = true
-                })
+                    event.preventDefault();
+                    event.returnValue = true;
+                });
             </script>
         @endscript
     @endif

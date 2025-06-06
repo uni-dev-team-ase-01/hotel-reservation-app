@@ -1,19 +1,19 @@
 @props([
-    'activeLocale' => null,
-    'activeManager',
-    'content' => null,
-    'contentTabLabel' => null,
-    'contentTabIcon' => null,
-    'contentTabPosition' => null,
-    'managers',
-    'ownerRecord',
-    'pageClass',
+    "activeLocale" => null,
+    "activeManager",
+    "content" => null,
+    "contentTabLabel" => null,
+    "contentTabIcon" => null,
+    "contentTabPosition" => null,
+    "managers",
+    "ownerRecord",
+    "pageClass",
 ])
 
 <div class="fi-resource-relation-managers flex flex-col gap-y-6">
     @php
         $activeManager = strval($activeManager);
-        $normalizeRelationManagerClass = function (string | Filament\Resources\RelationManagers\RelationManagerConfiguration $manager): string {
+        $normalizeRelationManagerClass = function (string|Filament\Resources\RelationManagers\RelationManagerConfiguration $manager): string {
             if ($manager instanceof \Filament\Resources\RelationManagers\RelationManagerConfiguration) {
                 return $manager->relationManager;
             }
@@ -22,15 +22,15 @@
         };
     @endphp
 
-    @if ((count($managers) > 1) || $content)
+    @if (count($managers) > 1 || $content)
         <x-filament::tabs>
             @php
                 $tabs = $managers;
 
                 if ($content) {
                     match ($contentTabPosition) {
-                        \Filament\Resources\Pages\ContentTabPosition::After => $tabs = array_merge($tabs, [null => null]),
-                        default => $tabs = array_replace([null => null], $tabs),
+                        \Filament\Resources\Pages\ContentTabPosition::After => ($tabs = array_merge($tabs, [null => null])),
+                        default => ($tabs = array_replace([null => null], $tabs)),
                     };
                 }
             @endphp
@@ -77,10 +77,10 @@
             class="flex flex-col gap-y-4"
         >
             @php
-                $managerLivewireProperties = ['ownerRecord' => $ownerRecord, 'pageClass' => $pageClass];
+                $managerLivewireProperties = ["ownerRecord" => $ownerRecord, "pageClass" => $pageClass];
 
                 if (filled($activeLocale)) {
-                    $managerLivewireProperties['activeLocale'] = $activeLocale;
+                    $managerLivewireProperties["activeLocale"] = $activeLocale;
                 }
             @endphp
 
@@ -92,8 +92,17 @@
 
                     @livewire(
                         $normalizedGroupedManagerClass,
-                        [...$managerLivewireProperties, ...(($groupedManager instanceof \Filament\Resources\RelationManagers\RelationManagerConfiguration) ? [...$groupedManager->relationManager::getDefaultProperties(), ...$groupedManager->getProperties()] : $groupedManager::getDefaultProperties())],
-                        key("{$normalizedGroupedManagerClass}-{$groupedManagerKey}"),
+                        [
+                            ...$managerLivewireProperties,
+                            ...$groupedManager instanceof
+                            \Filament\Resources\RelationManagers\RelationManagerConfiguration
+                                ? [
+                                    ...$groupedManager->relationManager::getDefaultProperties(),
+                                    ...$groupedManager->getProperties(),
+                                ]
+                                : $groupedManager::getDefaultProperties(),
+                        ],
+                        key("{$normalizedGroupedManagerClass}-{$groupedManagerKey}")
                     )
                 @endforeach
             @else
@@ -104,8 +113,17 @@
 
                 @livewire(
                     $normalizedManagerClass,
-                    [...$managerLivewireProperties, ...(($manager instanceof \Filament\Resources\RelationManagers\RelationManagerConfiguration) ? [...$manager->relationManager::getDefaultProperties(), ...$manager->getProperties()] : $manager::getDefaultProperties())],
-                    key($normalizedManagerClass),
+                    [
+                        ...$managerLivewireProperties,
+                        ...$manager instanceof
+                        \Filament\Resources\RelationManagers\RelationManagerConfiguration
+                            ? [
+                                ...$manager->relationManager::getDefaultProperties(),
+                                ...$manager->getProperties(),
+                            ]
+                            : $manager::getDefaultProperties(),
+                    ],
+                    key($normalizedManagerClass)
                 )
             @endif
         </div>

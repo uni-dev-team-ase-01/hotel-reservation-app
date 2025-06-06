@@ -1,7 +1,7 @@
 @props([
-    'actions',
-    'alignment' => null,
-    'fullWidth' => false,
+    "actions",
+    "alignment" => null,
+    "fullWidth" => false,
 ])
 
 @if (count($actions))

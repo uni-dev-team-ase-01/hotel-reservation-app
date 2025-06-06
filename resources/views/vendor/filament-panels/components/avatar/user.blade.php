@@ -1,5 +1,7 @@
 @props([
-    'user' => filament()->auth()->user(),
+    "user" => filament()
+        ->auth()
+        ->user(),
 ])
 
 <x-filament::avatar

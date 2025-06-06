@@ -1,12 +1,12 @@
 @props([
-    'navigation',
+    "navigation",
 ])
 
 <div
     {{
         $attributes->class([
-            'fi-topbar sticky top-0 z-20 overflow-x-clip',
-            'fi-topbar-with-navigation' => filament()->hasTopNavigation(),
+            "fi-topbar sticky top-0 z-20 overflow-x-clip",
+            "fi-topbar-with-navigation" => filament()->hasTopNavigation(),
         ])
     }}
 >
@@ -27,8 +27,10 @@
                 x-on:click="$store.sidebar.open()"
                 x-show="! $store.sidebar.isOpen"
                 @class([
-                    'fi-topbar-open-sidebar-btn',
-                    'lg:hidden' => (! filament()->isSidebarFullyCollapsibleOnDesktop()) || filament()->isSidebarCollapsibleOnDesktop(),
+                    "fi-topbar-open-sidebar-btn",
+                    "lg:hidden" =>
+                        ! filament()->isSidebarFullyCollapsibleOnDesktop() ||
+                        filament()->isSidebarCollapsibleOnDesktop(),
                 ])
             />
 
@@ -46,7 +48,7 @@
             />
         @endif
 
-        @if (filament()->hasTopNavigation() || (! filament()->hasNavigation()))
+        @if (filament()->hasTopNavigation() || ! filament()->hasNavigation())
             <div class="me-6 hidden lg:flex">
                 @if ($homeUrl = filament()->getHomeUrl())
                     <a {{ \Filament\Support\generate_href_html($homeUrl) }}>
@@ -84,10 +86,7 @@
 
                                     foreach ($group->getItems() as $item) {
                                         if ($childItems = $item->getChildItems()) {
-                                            $lists[] = [
-                                                $item,
-                                                ...$childItems,
-                                            ];
+                                            $lists[] = [$item, ...$childItems];
                                             $lists[] = [];
 
                                             continue;
@@ -169,9 +168,12 @@
 
             @if (filament()->auth()->check())
                 @if (filament()->hasDatabaseNotifications())
-                    @livewire(Filament\Livewire\DatabaseNotifications::class, [
-                        'lazy' => filament()->hasLazyLoadedDatabaseNotifications(),
-                    ])
+                    @livewire(
+                        Filament\Livewire\DatabaseNotifications::class,
+                        [
+                            "lazy" => filament()->hasLazyLoadedDatabaseNotifications(),
+                        ]
+                    )
                 @endif
 
                 <x-filament-panels::user-menu />

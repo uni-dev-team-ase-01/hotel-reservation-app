@@ -1,5 +1,5 @@
 @props([
-    'navigation',
+    "navigation",
 ])
 
 <x-filament::tabs
@@ -25,7 +25,7 @@
                     @foreach ($navigationGroup->getItems() as $navigationItem)
                         @php
                             $navigationItemIcon = $navigationItem->getIcon();
-                            $navigationItemIcon = $navigationItem->isActive() ? ($navigationItem->getActiveIcon() ?? $navigationItemIcon) : $navigationItemIcon;
+                            $navigationItemIcon = $navigationItem->isActive() ? $navigationItem->getActiveIcon() ?? $navigationItemIcon : $navigationItemIcon;
                         @endphp
 
                         <x-filament::dropdown.list.item
@@ -51,7 +51,7 @@
             @foreach ($navigationGroup->getItems() as $navigationItem)
                 @php
                     $navigationItemIcon = $navigationItem->getIcon();
-                    $navigationItemIcon = $navigationItem->isActive() ? ($navigationItem->getActiveIcon() ?? $navigationItemIcon) : $navigationItemIcon;
+                    $navigationItemIcon = $navigationItem->isActive() ? $navigationItem->getActiveIcon() ?? $navigationItemIcon : $navigationItemIcon;
                 @endphp
 
                 <x-filament::tabs.item

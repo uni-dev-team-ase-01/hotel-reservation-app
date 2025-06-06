@@ -1,5 +1,5 @@
 @props([
-    'tenant' => filament()->getTenant(),
+    "tenant" => filament()->getTenant(),
 ])
 
 <x-filament::avatar

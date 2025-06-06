@@ -1,8 +1,8 @@
 <x-filament-panels::page
     @class([
-        'fi-resource-edit-record-page',
-        'fi-resource-' . str_replace('/', '-', $this->getResource()::getSlug()),
-        'fi-resource-record-' . $record->getKey(),
+        "fi-resource-edit-record-page",
+        "fi-resource-" . str_replace("/", "-", $this->getResource()::getSlug()),
+        "fi-resource-record-" . $record->getKey(),
     ])
 >
     @capture($form)
@@ -25,7 +25,7 @@
         $hasCombinedRelationManagerTabsWithContent = $this->hasCombinedRelationManagerTabsWithContent();
     @endphp
 
-    @if ((! $hasCombinedRelationManagerTabsWithContent) || (! count($relationManagers)))
+    @if (! $hasCombinedRelationManagerTabsWithContent || ! count($relationManagers))
         {{ $form() }}
     @endif
 

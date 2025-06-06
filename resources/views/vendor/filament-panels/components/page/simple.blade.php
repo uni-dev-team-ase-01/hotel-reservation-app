@@ -1,9 +1,9 @@
 @props([
-    'heading' => null,
-    'subheading' => null,
+    "heading" => null,
+    "subheading" => null,
 ])
 
-<div {{ $attributes->class(['fi-simple-page']) }}>
+<div {{ $attributes->class(["fi-simple-page"]) }}>
     {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::SIMPLE_PAGE_START, scopes: $this->getRenderHookScopes()) }}
 
     <section class="grid auto-cols-fr gap-y-6">

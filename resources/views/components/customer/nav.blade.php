@@ -272,17 +272,22 @@
                         <!-- Links -->
                         <li><hr class="dropdown-divider" /></li>
                         <li>
-                            <a class="dropdown-item" href="/customer/reservations">
+                            <a
+                                class="dropdown-item"
+                                href="/customer/reservations"
+                            >
                                 <i class="bi bi-bookmark-check fa-fw me-2"></i>
                                 My Bookings
                             </a>
                         </li>
-                        {{-- <li>
+                        {{--
+                            <li>
                             <a class="dropdown-item" href="#">
-                                <i class="bi bi-heart fa-fw me-2"></i>
-                                My Wishlist
+                            <i class="bi bi-heart fa-fw me-2"></i>
+                            My Wishlist
                             </a>
-                        </li> --}}
+                            </li>
+                        --}}
                         <li>
                             <a class="dropdown-item" href="/customer/profile">
                                 <i class="bi bi-gear fa-fw me-2"></i>

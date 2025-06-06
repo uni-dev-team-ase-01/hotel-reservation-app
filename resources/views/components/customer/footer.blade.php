@@ -197,7 +197,6 @@ Footer START -->
 
         <!-- Tops Links -->
 
-
         <!-- Payment and card -->
         <div class="row g-4 justify-content-between mt-0 mt-md-2">
             <!-- Payment card -->

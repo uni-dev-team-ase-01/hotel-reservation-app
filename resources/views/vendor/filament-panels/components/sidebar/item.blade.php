@@ -1,19 +1,19 @@
 @props([
-    'active' => false,
-    'activeChildItems' => false,
-    'activeIcon' => null,
-    'badge' => null,
-    'badgeColor' => null,
-    'badgeTooltip' => null,
-    'childItems' => [],
-    'first' => false,
-    'grouped' => false,
-    'icon' => null,
-    'last' => false,
-    'shouldOpenUrlInNewTab' => false,
-    'sidebarCollapsible' => true,
-    'subGrouped' => false,
-    'url',
+    "active" => false,
+    "activeChildItems" => false,
+    "activeIcon" => null,
+    "badge" => null,
+    "badgeColor" => null,
+    "badgeTooltip" => null,
+    "childItems" => [],
+    "first" => false,
+    "grouped" => false,
+    "icon" => null,
+    "last" => false,
+    "shouldOpenUrlInNewTab" => false,
+    "sidebarCollapsible" => true,
+    "subGrouped" => false,
+    "url",
 ])
 
 @php
@@ -23,10 +23,10 @@
 <li
     {{
         $attributes->class([
-            'fi-sidebar-item',
+            "fi-sidebar-item",
             // @deprecated `fi-sidebar-item-active` has been replaced by `fi-active`.
-            'fi-active fi-sidebar-item-active' => $active,
-            'flex flex-col gap-y-1' => $active || $activeChildItems,
+            "fi-active fi-sidebar-item-active" => $active,
+            "flex flex-col gap-y-1" => $active || $activeChildItems,
         ])
     }}
 >
@@ -47,19 +47,21 @@
             x-tooltip.html="tooltip"
         @endif
         @class([
-            'fi-sidebar-item-button relative flex items-center justify-center gap-x-3 rounded-lg px-2 py-2 outline-none transition duration-75',
-            'hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5' => filled($url),
-            'bg-gray-100 dark:bg-white/5' => $active,
+            "fi-sidebar-item-button relative flex items-center justify-center gap-x-3 rounded-lg px-2 py-2 outline-none transition duration-75",
+            "hover:bg-gray-100 focus-visible:bg-gray-100 dark:hover:bg-white/5 dark:focus-visible:bg-white/5" => filled(
+                $url,
+            ),
+            "bg-gray-100 dark:bg-white/5" => $active,
         ])
     >
-        @if (filled($icon) && ((! $subGrouped) || $sidebarCollapsible))
+        @if (filled($icon) && (! $subGrouped || $sidebarCollapsible))
             <x-filament::icon
                 :icon="($active && $activeIcon) ? $activeIcon : $icon"
                 :x-show="($subGrouped && $sidebarCollapsible) ? '! $store.sidebar.isOpen' : false"
                 @class([
-                    'fi-sidebar-item-icon h-6 w-6',
-                    'text-gray-400 dark:text-gray-500' => ! $active,
-                    'text-primary-600 dark:text-primary-400' => $active,
+                    "fi-sidebar-item-icon h-6 w-6",
+                    "text-gray-400 dark:text-gray-500" => ! $active,
+                    "text-primary-600 dark:text-primary-400" => $active,
                 ])
             />
         @endif
@@ -85,9 +87,9 @@
 
                 <div
                     @class([
-                        'relative h-1.5 w-1.5 rounded-full',
-                        'bg-gray-400 dark:bg-gray-500' => ! $active,
-                        'bg-primary-600 dark:bg-primary-400' => $active,
+                        "relative h-1.5 w-1.5 rounded-full",
+                        "bg-gray-400 dark:bg-gray-500" => ! $active,
+                        "bg-primary-600 dark:bg-primary-400" => $active,
                     ])
                 ></div>
             </div>
@@ -101,9 +103,9 @@
                 x-transition:enter-end="opacity-100"
             @endif
             @class([
-                'fi-sidebar-item-label flex-1 truncate text-sm font-medium',
-                'text-gray-700 dark:text-gray-200' => ! $active,
-                'text-primary-600 dark:text-primary-400' => $active,
+                "fi-sidebar-item-label flex-1 truncate text-sm font-medium",
+                "text-gray-700 dark:text-gray-200" => ! $active,
+                "text-primary-600 dark:text-primary-400" => $active,
             ])
         >
             {{ $slot }}

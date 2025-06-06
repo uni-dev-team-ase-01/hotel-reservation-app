@@ -3,27 +3,45 @@
     $currentTenantName = filament()->getTenantName($currentTenant);
     $items = filament()->getTenantMenuItems();
 
-    $billingItem = $items['billing'] ?? null;
+    $billingItem = $items["billing"] ?? null;
     $billingItemUrl = $billingItem?->getUrl();
     $isBillingItemVisible = $billingItem?->isVisible() ?? true;
     $hasBillingItem = (filament()->hasTenantBilling() || filled($billingItemUrl)) && $isBillingItemVisible;
 
-    $registrationItem = $items['register'] ?? null;
+    $registrationItem = $items["register"] ?? null;
     $registrationItemUrl = $registrationItem?->getUrl();
     $isRegistrationItemVisible = $registrationItem?->isVisible() ?? true;
-    $hasRegistrationItem = ((filament()->hasTenantRegistration() && filament()->getTenantRegistrationPage()::canView()) || filled($registrationItemUrl)) && $isRegistrationItemVisible;
+    $hasRegistrationItem =
+        ((filament()->hasTenantRegistration() &&
+            filament()
+                ->getTenantRegistrationPage()
+                ::canView()) ||
+            filled($registrationItemUrl)) &&
+        $isRegistrationItemVisible;
 
-    $profileItem = $items['profile'] ?? null;
+    $profileItem = $items["profile"] ?? null;
     $profileItemUrl = $profileItem?->getUrl();
     $isProfileItemVisible = $profileItem?->isVisible() ?? true;
-    $hasProfileItem = ((filament()->hasTenantProfile() && filament()->getTenantProfilePage()::canView($currentTenant)) || filled($profileItemUrl)) && $isProfileItemVisible;
+    $hasProfileItem =
+        ((filament()->hasTenantProfile() &&
+            filament()
+                ->getTenantProfilePage()
+                ::canView($currentTenant)) ||
+            filled($profileItemUrl)) &&
+        $isProfileItemVisible;
 
-    $canSwitchTenants = count($tenants = array_filter(
-        filament()->getUserTenants(filament()->auth()->user()),
-        fn (\Illuminate\Database\Eloquent\Model $tenant): bool => ! $tenant->is($currentTenant),
-    ));
+    $canSwitchTenants = count(
+        $tenants = array_filter(
+            filament()->getUserTenants(
+                filament()
+                    ->auth()
+                    ->user(),
+            ),
+            fn (\Illuminate\Database\Eloquent\Model $tenant): bool => ! $tenant->is($currentTenant),
+        ),
+    );
 
-    $items = \Illuminate\Support\Arr::except($items, ['billing', 'profile', 'register']);
+    $items = \Illuminate\Support\Arr::except($items, ["billing", "profile", "register"]);
 @endphp
 
 {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::TENANT_MENU_BEFORE) }}
@@ -96,7 +114,7 @@
                     tag="a"
                     :target="($profileItem?->shouldOpenUrlInNewTab() ?? false) ? '_blank' : null"
                 >
-                    {{ $profileItem?->getLabel() ?? filament()->getTenantProfilePage()::getLabel() }}
+                    {{ $profileItem?->getLabel() ?? filament()->getTenantProfilePage() ::getLabel() }}
                 </x-filament::dropdown.list.item>
             @endif
 
@@ -108,7 +126,7 @@
                     tag="a"
                     :target="($billingItem?->shouldOpenUrlInNewTab() ?? false) ? '_blank' : null"
                 >
-                    {{ $billingItem?->getLabel() ?? __('filament-panels::layout.actions.billing.label') }}
+                    {{ $billingItem?->getLabel() ?? __("filament-panels::layout.actions.billing.label") }}
                 </x-filament::dropdown.list.item>
             @endif
         </x-filament::dropdown.list>
@@ -159,7 +177,7 @@
                 tag="a"
                 :target="($registrationItem?->shouldOpenUrlInNewTab() ?? false) ? '_blank' : null"
             >
-                {{ $registrationItem?->getLabel() ?? filament()->getTenantRegistrationPage()::getLabel() }}
+                {{ $registrationItem?->getLabel() ?? filament()->getTenantRegistrationPage() ::getLabel() }}
             </x-filament::dropdown.list.item>
         </x-filament::dropdown.list>
     @endif

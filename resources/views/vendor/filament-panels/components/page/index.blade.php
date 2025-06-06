@@ -1,5 +1,5 @@
 @props([
-    'fullHeight' => false,
+    "fullHeight" => false,
 ])
 
 @php
@@ -13,8 +13,8 @@
 <div
     {{
         $attributes->class([
-            'fi-page',
-            'h-full' => $fullHeight,
+            "fi-page",
+            "h-full" => $fullHeight,
         ])
     }}
 >
@@ -22,8 +22,8 @@
 
     <section
         @class([
-            'flex flex-col gap-y-8 py-8',
-            'h-full' => $fullHeight,
+            "flex flex-col gap-y-8 py-8",
+            "h-full" => $fullHeight,
         ])
     >
         @if ($header = $this->getHeader())
@@ -55,12 +55,14 @@
 
         <div
             @class([
-                'flex flex-col gap-8' => $subNavigation,
+                "flex flex-col gap-8" => $subNavigation,
                 match ($subNavigationPosition) {
-                    SubNavigationPosition::Start, SubNavigationPosition::End => 'md:flex-row md:items-start',
+                    SubNavigationPosition::Start,
+                    SubNavigationPosition::End
+                        => "md:flex-row md:items-start",
                     default => null,
                 } => $subNavigation,
-                'h-full' => $fullHeight,
+                "h-full" => $fullHeight,
             ])
         >
             @if ($subNavigation)
@@ -99,8 +101,8 @@
 
             <div
                 @class([
-                    'grid flex-1 auto-cols-fr gap-y-8',
-                    'h-full' => $fullHeight,
+                    "grid flex-1 auto-cols-fr gap-y-8",
+                    "h-full" => $fullHeight,
                 ])
             >
                 {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::PAGE_HEADER_WIDGETS_BEFORE, scopes: $this->getRenderHookScopes()) }}

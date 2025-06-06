@@ -1,20 +1,20 @@
 @props([
-    'actions' => [],
-    'details' => [],
-    'title',
-    'url',
+    "actions" => [],
+    "details" => [],
+    "title",
+    "url",
 ])
 
 <li
-    {{ $attributes->class(['fi-global-search-result scroll-mt-9 transition duration-75 focus-within:bg-gray-50 hover:bg-gray-50 dark:focus-within:bg-white/5 dark:hover:bg-white/5']) }}
+    {{ $attributes->class(["fi-global-search-result scroll-mt-9 transition duration-75 focus-within:bg-gray-50 hover:bg-gray-50 dark:focus-within:bg-white/5 dark:hover:bg-white/5"]) }}
 >
     <a
         {{ \Filament\Support\generate_href_html($url) }}
         x-on:click="close()"
         @class([
-            'fi-global-search-result-link block outline-none',
-            'pe-4 ps-4 pt-4' => $actions,
-            'p-4' => ! $actions,
+            "fi-global-search-result-link block outline-none",
+            "pe-4 ps-4 pt-4" => $actions,
+            "p-4" => ! $actions,
         ])
     >
         <h4 class="text-sm font-medium text-gray-950 dark:text-white">

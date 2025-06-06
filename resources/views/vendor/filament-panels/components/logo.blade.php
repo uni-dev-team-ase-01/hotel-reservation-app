@@ -1,21 +1,21 @@
 @php
     $brandName = filament()->getBrandName();
     $brandLogo = filament()->getBrandLogo();
-    $brandLogoHeight = filament()->getBrandLogoHeight() ?? '1.5rem';
+    $brandLogoHeight = filament()->getBrandLogoHeight() ?? "1.5rem";
     $darkModeBrandLogo = filament()->getDarkModeBrandLogo();
     $hasDarkModeBrandLogo = filled($darkModeBrandLogo);
 
     $getLogoClasses = fn (bool $isDarkMode): string => \Illuminate\Support\Arr::toCssClasses([
-        'fi-logo',
-        'flex' => ! $hasDarkModeBrandLogo,
-        'flex dark:hidden' => $hasDarkModeBrandLogo && (! $isDarkMode),
-        'hidden dark:flex' => $hasDarkModeBrandLogo && $isDarkMode,
+        "fi-logo",
+        "flex" => ! $hasDarkModeBrandLogo,
+        "flex dark:hidden" => $hasDarkModeBrandLogo && ! $isDarkMode,
+        "hidden dark:flex" => $hasDarkModeBrandLogo && $isDarkMode,
     ]);
 
     $logoStyles = "height: {$brandLogoHeight}";
 @endphp
 
-@capture($content, $logo, $isDarkMode = false)
+@capture($content, $logo, ($isDarkMode = false))
     @if ($logo instanceof \Illuminate\Contracts\Support\Htmlable)
         <div
             {{
@@ -28,7 +28,7 @@
         </div>
     @elseif (filled($logo))
         <img
-            alt="{{ __('filament-panels::layout.logo.alt', ['name' => $brandName]) }}"
+            alt="{{ __("filament-panels::layout.logo.alt", ["name" => $brandName]) }}"
             src="{{ $logo }}"
             {{
                 $attributes
@@ -41,7 +41,7 @@
             {{
                 $attributes->class([
                     $getLogoClasses($isDarkMode),
-                    'text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white',
+                    "text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white",
                 ])
             }}
         >

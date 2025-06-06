@@ -1,7 +1,7 @@
 <x-filament-panels::page
     @class([
-        'fi-resource-create-record-page',
-        'fi-resource-' . str_replace('/', '-', $this->getResource()::getSlug()),
+        "fi-resource-create-record-page",
+        "fi-resource-" . str_replace("/", "-", $this->getResource()::getSlug()),
     ])
 >
     <x-filament-panels::form

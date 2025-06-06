@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Hotel;
-use App\Models\Room;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
@@ -12,8 +11,10 @@ class RoomController extends Controller
     {
         // dd($request->all());
         $hotel = Hotel::with(['rooms.rates'])->findOrFail($hotelId);
+
         return view('customer.hotels.rooms.index', compact('hotel'));
     }
+
     /**
      * API: Get available rooms for a hotel given check-in and check-out dates.
      *
@@ -35,7 +36,7 @@ class RoomController extends Controller
             ->with([
                 'roomRates' => function ($q) {
                     $q->where('rate_type', 'daily');
-                }
+                },
             ])
             ->whereDoesntHave('reservations', function ($query) use ($checkIn, $checkOut) {
                 $query->where(function ($q) use ($checkIn, $checkOut) {
@@ -78,5 +79,4 @@ class RoomController extends Controller
             'data' => $rooms,
         ]);
     }
-
 }

@@ -1,11 +1,11 @@
 @props([
-    'active' => false,
-    'collapsible' => true,
-    'icon' => null,
-    'items' => [],
-    'label' => null,
-    'sidebarCollapsible' => true,
-    'subNavigation' => false,
+    "active" => false,
+    "collapsible" => true,
+    "icon" => null,
+    "items" => [],
+    "label" => null,
+    "sidebarCollapsible" => true,
+    "subNavigation" => false,
 ])
 
 @php
@@ -18,8 +18,8 @@
     data-group-label="{{ $subNavigation ? "sub_navigation_{$label}" : $label }}"
     {{
         $attributes->class([
-            'fi-sidebar-group flex flex-col gap-y-1',
-            'fi-active' => $active,
+            "fi-sidebar-group flex flex-col gap-y-1",
+            "fi-active" => $active,
         ])
     }}
 >
@@ -35,8 +35,8 @@
                 x-transition:enter-end="opacity-100"
             @endif
             @class([
-                'fi-sidebar-group-button flex items-center gap-x-3 px-2 py-2',
-                'cursor-pointer' => $collapsible,
+                "fi-sidebar-group-button flex items-center gap-x-3 px-2 py-2",
+                "cursor-pointer" => $collapsible,
             ])
         >
             @if ($icon)
@@ -91,9 +91,9 @@
                     <x-filament::icon
                         :icon="$icon"
                         @class([
-                            'h-6 w-6',
-                            'text-gray-400 dark:text-gray-500' => ! $active,
-                            'text-primary-600 dark:text-primary-400' => $active,
+                            "h-6 w-6",
+                            "text-gray-400 dark:text-gray-500" => ! $active,
+                            "text-primary-600 dark:text-primary-400" => $active,
                         ])
                     />
                 </button>
@@ -104,10 +104,7 @@
 
                 foreach ($items as $item) {
                     if ($childItems = $item->getChildItems()) {
-                        $lists[] = [
-                            $item,
-                            ...$childItems,
-                        ];
+                        $lists[] = [$item, ...$childItems];
                         $lists[] = [];
 
                         continue;
@@ -184,7 +181,7 @@
                         $itemIcon = null;
                         $itemActiveIcon = null;
                     } else {
-                        throw new \Exception('Navigation group [' . $label . '] has an icon but one or more of its items also have icons. Either the group or its items can have icons, but not both. This is to ensure a proper user experience.');
+                        throw new \Exception("Navigation group [" . $label . "] has an icon but one or more of its items also have icons. Either the group or its items can have icons, but not both. This is to ensure a proper user experience.");
                     }
                 }
             @endphp

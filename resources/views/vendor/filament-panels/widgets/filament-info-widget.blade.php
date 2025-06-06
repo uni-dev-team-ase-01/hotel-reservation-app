@@ -25,7 +25,7 @@
                 </a>
 
                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    {{ \Composer\InstalledVersions::getPrettyVersion('filament/filament') }}
+                    {{ \Composer\InstalledVersions::getPrettyVersion("filament/filament") }}
                 </p>
             </div>
 
@@ -38,7 +38,7 @@
                     rel="noopener noreferrer"
                     target="_blank"
                 >
-                    {{ __('filament-panels::widgets/filament-info-widget.actions.open_documentation.label') }}
+                    {{ __("filament-panels::widgets/filament-info-widget.actions.open_documentation.label") }}
                 </x-filament::link>
 
                 <x-filament::link
@@ -62,7 +62,7 @@
                         </svg>
                     </x-slot>
 
-                    {{ __('filament-panels::widgets/filament-info-widget.actions.open_github.label') }}
+                    {{ __("filament-panels::widgets/filament-info-widget.actions.open_github.label") }}
                 </x-filament::link>
             </div>
         </div>

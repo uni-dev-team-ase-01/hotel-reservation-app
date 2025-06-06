@@ -1,15 +1,17 @@
 @php
-    $user = filament()->auth()->user();
+    $user = filament()
+        ->auth()
+        ->user();
     $items = filament()->getUserMenuItems();
 
-    $profileItem = $items['profile'] ?? $items['account'] ?? null;
+    $profileItem = $items["profile"] ?? ($items["account"] ?? null);
     $profileItemUrl = $profileItem?->getUrl();
     $profilePage = filament()->getProfilePage();
     $hasProfileItem = filament()->hasProfile() || filled($profileItemUrl);
 
-    $logoutItem = $items['logout'] ?? null;
+    $logoutItem = $items["logout"] ?? null;
 
-    $items = \Illuminate\Support\Arr::except($items, ['account', 'logout', 'profile']);
+    $items = \Illuminate\Support\Arr::except($items, ["account", "logout", "profile"]);
 @endphp
 
 {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_BEFORE) }}
@@ -24,7 +26,7 @@
 >
     <x-slot name="trigger">
         <button
-            aria-label="{{ __('filament-panels::layout.actions.open_user_menu.label') }}"
+            aria-label="{{ __("filament-panels::layout.actions.open_user_menu.label") }}"
             type="button"
             class="shrink-0"
         >
@@ -44,7 +46,7 @@
                     :target="($profileItem?->shouldOpenUrlInNewTab() ?? false) ? '_blank' : null"
                     tag="a"
                 >
-                    {{ $profileItem?->getLabel() ?? ($profilePage ? $profilePage::getLabel() : null) ?? filament()->getUserName($user) }}
+                    {{ $profileItem?->getLabel() ?? (($profilePage ? $profilePage::getLabel() : null) ?? filament()->getUserName($user)) }}
                 </x-filament::dropdown.list.item>
             </x-filament::dropdown.list>
         @else
@@ -59,7 +61,7 @@
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_PROFILE_AFTER) }}
     @endif
 
-    @if (filament()->hasDarkMode() && (! filament()->hasDarkModeForced()))
+    @if (filament()->hasDarkMode() && ! filament()->hasDarkModeForced())
         <x-filament::dropdown.list>
             <x-filament-panels::theme-switcher />
         </x-filament::dropdown.list>
@@ -91,7 +93,7 @@
             method="post"
             tag="form"
         >
-            {{ $logoutItem?->getLabel() ?? __('filament-panels::layout.actions.logout.label') }}
+            {{ $logoutItem?->getLabel() ?? __("filament-panels::layout.actions.logout.label") }}
         </x-filament::dropdown.list.item>
     </x-filament::dropdown.list>
 </x-filament::dropdown>

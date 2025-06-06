@@ -3,7 +3,7 @@
         <script>
             window.addEventListener('beforeunload', (event) => {
                 if (typeof @this === 'undefined') {
-                    return
+                    return;
                 }
 
                 if (
@@ -26,12 +26,12 @@
                     ].length &&
                     !$wire?.__instance?.effects?.redirect
                 ) {
-                    event.preventDefault()
-                    event.returnValue = true
+                    event.preventDefault();
+                    event.returnValue = true;
 
-                    return
+                    return;
                 }
-            })
+            });
         </script>
     @endscript
 @endif

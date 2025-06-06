@@ -1,6 +1,6 @@
 @props([
-    'icon',
-    'theme',
+    "icon",
+    "theme",
 ])
 
 @php

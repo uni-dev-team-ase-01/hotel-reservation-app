@@ -1,5 +1,5 @@
 @props([
-    'navigation',
+    "navigation",
 ])
 
 <x-filament::input.wrapper

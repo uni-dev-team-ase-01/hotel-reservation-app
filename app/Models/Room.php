@@ -53,7 +53,7 @@ class Room extends Model
 
     public function getFullNameAttribute()
     {
-        return $this->hotel->name . ' - Room ' . $this->room_number;
+        return $this->hotel->name.' - Room '.$this->room_number;
     }
 
     // need review

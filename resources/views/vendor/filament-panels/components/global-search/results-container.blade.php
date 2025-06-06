@@ -1,5 +1,5 @@
 @props([
-    'results',
+    "results",
 ])
 
 <div
@@ -25,13 +25,13 @@
     x-transition:leave-end="opacity-0"
     {{
         $attributes->class([
-            'fi-global-search-results-ctn absolute inset-x-4 z-10 mt-2 max-h-96 overflow-auto rounded-lg bg-white shadow-lg ring-1 ring-gray-950/5 transition dark:bg-gray-900 dark:ring-white/10 sm:inset-x-auto sm:end-0 sm:w-screen sm:max-w-sm',
+            "fi-global-search-results-ctn absolute inset-x-4 z-10 mt-2 max-h-96 overflow-auto rounded-lg bg-white shadow-lg ring-1 ring-gray-950/5 transition dark:bg-gray-900 dark:ring-white/10 sm:inset-x-auto sm:end-0 sm:w-screen sm:max-w-sm",
             // This zero translation along the z-axis fixes a Safari bug
             // where the results container is incorrectly placed in the stacking context
             // due to the overflow-x value of clip on the topbar element.
             //
             // https://github.com/filamentphp/filament/issues/8215
-            '[transform:translateZ(0)]',
+            "[transform:translateZ(0)]",
         ])
     }}
 >

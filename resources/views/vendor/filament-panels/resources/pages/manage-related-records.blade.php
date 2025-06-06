@@ -1,7 +1,7 @@
 <x-filament-panels::page
     @class([
-        'fi-resource-manage-related-records-page',
-        'fi-resource-' . str_replace('/', '-', $this->getResource()::getSlug()),
+        "fi-resource-manage-related-records-page",
+        "fi-resource-" . str_replace("/", "-", $this->getResource()::getSlug()),
     ])
 >
     @if ($this->table->getColumns())

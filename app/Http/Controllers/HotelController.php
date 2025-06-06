@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Hotel;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class HotelController extends Controller
@@ -11,19 +10,21 @@ class HotelController extends Controller
     public function index()
     {
         $hotels = Hotel::all();
+
         return view('customer.hotels.index', compact('hotels'));
     }
+
     public function getHotels(Request $request)
     {
         $q = Hotel::query()->where('active', true);
 
         // AJAX filter params
         if ($request->filled('location')) {
-            $q->where('address', 'like', '%' . $request->location . '%');
+            $q->where('address', 'like', '%'.$request->location.'%');
         }
         if ($request->filled('hotel_type')) {
             $types = $request->input('hotel_type', []);
-            if (is_array($types) && count($types) && !in_array('All', $types)) {
+            if (is_array($types) && count($types) && ! in_array('All', $types)) {
                 $q->whereIn('type', $types);
             }
         }
@@ -58,6 +59,7 @@ class HotelController extends Controller
 
         return response()->json(['data' => $hotels]);
     }
+
     /**
      * Search hotels by location, check-in/out date, guests, rooms.
      * Endpoint: GET /api/hotels/search
@@ -127,10 +129,10 @@ class HotelController extends Controller
     public function selectOptions()
     {
         $hotels = Hotel::select('id', 'name', 'address')->orderBy('name')->get();
+
         return response()->json([
             'success' => true,
-            'data' => $hotels
+            'data' => $hotels,
         ]);
     }
-
 }
