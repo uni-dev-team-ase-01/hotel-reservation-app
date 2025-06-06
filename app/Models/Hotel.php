@@ -52,5 +52,3 @@ class Hotel extends Model
         return $this->hasMany(Reservation::class, 'hotel_id');
     }
 }
-
-// Migration for SHould Add Address

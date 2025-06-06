@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class TravelCompany extends Model
 {
+    
     protected $fillable = [
         'company_name',
         'email',
         'phone',
-        'user_id',
+        'status',
+        'message',
     ];
 
     public function user()
