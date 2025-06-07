@@ -1,11 +1,11 @@
 @extends("layouts.app")
 
-@section("title", "About Us - Booking Landing Page")
+@section("title", "Contact Us - Booking Landing Page")
 
 @section("content")
     <main>
         <!-- =======================
-Main banner START -->
+        Main banner START -->
         <section class="pt-4 pt-md-5">
             <div class="container">
                 <div class="row mb-5">
@@ -25,13 +25,9 @@ Main banner START -->
                 <div class="row g-4">
                     <!-- Contact item START -->
                     <div class="col-md-6 col-xl-4">
-                        <div
-                            class="card card-body shadow text-center align-items-center h-100"
-                        >
+                        <div class="card card-body shadow text-center align-items-center h-100">
                             <!-- Icon -->
-                            <div
-                                class="icon-lg bg-info bg-opacity-10 text-info rounded-circle mb-2"
-                            >
+                            <div class="icon-lg bg-info bg-opacity-10 text-info rounded-circle mb-2">
                                 <i class="bi bi-headset fs-5"></i>
                             </div>
                             <!-- Title -->
@@ -57,13 +53,9 @@ Main banner START -->
 
                     <!-- Contact item START -->
                     <div class="col-md-6 col-xl-4">
-                        <div
-                            class="card card-body shadow text-center align-items-center h-100"
-                        >
+                        <div class="card card-body shadow text-center align-items-center h-100">
                             <!-- Icon -->
-                            <div
-                                class="icon-lg bg-danger bg-opacity-10 text-danger rounded-circle mb-2"
-                            >
+                            <div class="icon-lg bg-danger bg-opacity-10 text-danger rounded-circle mb-2">
                                 <i class="bi bi-inboxes-fill fs-5"></i>
                             </div>
                             <!-- Title -->
@@ -72,10 +64,7 @@ Main banner START -->
                                 Large above be to means. Him his for sympathize.
                             </p>
                             <!-- Buttons -->
-                            <a
-                                href="#"
-                                class="btn btn-link text-decoration-underline p-0 mb-0"
-                            >
+                            <a href="#" class="btn btn-link text-decoration-underline p-0 mb-0">
                                 <i class="bi bi-envelope me-1"></i>
                                 example@gmail.com
                             </a>
@@ -86,27 +75,17 @@ Main banner START -->
                     <!-- Contact item START -->
                     <div class="col-xl-4 position-relative">
                         <!-- Svg decoration -->
-                        <figure
-                            class="position-absolute top-0 end-0 z-index-1 mt-n4 ms-n7"
-                        >
-                            <svg
-                                class="fill-warning"
-                                width="77px"
-                                height="77px"
-                            >
+                        <figure class="position-absolute top-0 end-0 z-index-1 mt-n4 ms-n7">
+                            <svg class="fill-warning" width="77px" height="77px">
                                 <path
-                                    d="M76.997,41.258 L45.173,41.258 L67.676,63.760 L63.763,67.673 L41.261,45.171 L41.261,76.994 L35.728,76.994 L35.728,45.171 L13.226,67.673 L9.313,63.760 L31.816,41.258 L-0.007,41.258 L-0.007,35.725 L31.816,35.725 L9.313,13.223 L13.226,9.311 L35.728,31.813 L35.728,-0.010 L41.261,-0.010 L41.261,31.813 L63.763,9.311 L67.676,13.223 L45.174,35.725 L76.997,35.725 L76.997,41.258 Z"
-                                ></path>
+                                    d="M76.997,41.258 L45.173,41.258 L67.676,63.760 L63.763,67.673 L41.261,45.171 L41.261,76.994 L35.728,76.994 L35.728,45.171 L13.226,67.673 L9.313,63.760 L31.816,41.258 L-0.007,41.258 L-0.007,35.725 L31.816,35.725 L9.313,13.223 L13.226,9.311 L35.728,31.813 L35.728,-0.010 L41.261,-0.010 L41.261,31.813 L63.763,9.311 L67.676,13.223 L45.174,35.725 L76.997,35.725 L76.997,41.258 Z">
+                                </path>
                             </svg>
                         </figure>
 
-                        <div
-                            class="card card-body shadow text-center align-items-center h-100"
-                        >
+                        <div class="card card-body shadow text-center align-items-center h-100">
                             <!-- Icon -->
-                            <div
-                                class="icon-lg bg-orange bg-opacity-10 text-orange rounded-circle mb-2"
-                            >
+                            <div class="icon-lg bg-orange bg-opacity-10 text-orange rounded-circle mb-2">
                                 <i class="bi bi-globe2 fs-5"></i>
                             </div>
                             <!-- Title -->
@@ -115,34 +94,22 @@ Main banner START -->
                             <!-- Buttons -->
                             <ul class="list-inline mb-0">
                                 <li class="list-inline-item">
-                                    <a
-                                        class="btn btn-sm bg-facebook px-2 mb-0"
-                                        href="#"
-                                    >
+                                    <a class="btn btn-sm bg-facebook px-2 mb-0" href="#">
                                         <i class="fab fa-fw fa-facebook-f"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item">
-                                    <a
-                                        class="btn btn-sm bg-instagram px-2 mb-0"
-                                        href="#"
-                                    >
+                                    <a class="btn btn-sm bg-instagram px-2 mb-0" href="#">
                                         <i class="fab fa-fw fa-instagram"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item">
-                                    <a
-                                        class="btn btn-sm bg-twitter px-2 mb-0"
-                                        href="#"
-                                    >
+                                    <a class="btn btn-sm bg-twitter px-2 mb-0" href="#">
                                         <i class="fab fa-fw fa-twitter"></i>
                                     </a>
                                 </li>
                                 <li class="list-inline-item">
-                                    <a
-                                        class="btn btn-sm bg-linkedin px-2 mb-0"
-                                        href="#"
-                                    >
+                                    <a class="btn btn-sm bg-linkedin px-2 mb-0" href="#">
                                         <i class="fab fa-fw fa-linkedin-in"></i>
                                     </a>
                                 </li>
@@ -154,10 +121,10 @@ Main banner START -->
             </div>
         </section>
         <!-- =======================
-Main banner START -->
+        Main banner START -->
 
         <!-- =======================
-Contact form and vector START -->
+        Contact form and vector START -->
         <section class="pt-0 pt-lg-5">
             <div class="container">
                 <div class="row g-4 g-lg-5 align-items-center">
@@ -171,14 +138,8 @@ Contact form and vector START -->
                     <div class="col-lg-6">
                         <div class="card bg-light p-4">
                             <!-- Svg decoration -->
-                            <figure
-                                class="position-absolute end-0 bottom-0 mb-n4 me-n2"
-                            >
-                                <svg
-                                    class="fill-orange"
-                                    width="104.2px"
-                                    height="95.2px"
-                                >
+                            <figure class="position-absolute end-0 bottom-0 mb-n4 me-n2">
+                                <svg class="fill-orange" width="104.2px" height="95.2px">
                                     <circle cx="2.6" cy="92.6" r="2.6" />
                                     <circle cx="2.6" cy="77.6" r="2.6" />
                                     <circle cx="2.6" cy="62.6" r="2.6" />
@@ -231,72 +192,66 @@ Contact form and vector START -->
 
                             <!-- Card body START -->
                             <div class="card-body p-0">
-                                <form class="row g-4">
-                                    <!-- Name -->
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            Your name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                    <!-- Email -->
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            Email address *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                    <!-- Mobile number -->
-                                    <div class="col-12">
-                                        <label class="form-label">
-                                            Mobile number *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                        />
-                                    </div>
-                                    <!-- Message -->
-                                    <div class="col-12">
-                                        <label class="form-label">
-                                            Message *
-                                        </label>
-                                        <textarea
-                                            class="form-control"
-                                            rows="3"
-                                        ></textarea>
-                                    </div>
-                                    <!-- Checkbox -->
-                                    <div class="col-12 form-check ms-2">
-                                        <input
-                                            type="checkbox"
-                                            class="form-check-input"
-                                            id="exampleCheck1"
-                                        />
-                                        <label
-                                            class="form-check-label"
-                                            for="exampleCheck1"
-                                        >
-                                            By submitting this form you agree to
-                                            our terms and conditions.
-                                        </label>
-                                    </div>
-                                    <!-- Button -->
-                                    <div class="col-12">
-                                        <button
-                                            class="btn btn-dark mb-0"
-                                            type="button"
-                                        >
-                                            Send Message
-                                        </button>
-                                    </div>
-                                </form>
+                                <section class="container py-5">
+                                    <h1 class="mb-4">Let's connect and get to know each other</h1>
+                                    @if (session('success'))
+                                        <div class="alert alert-success">
+                                            {{ session('success') }}
+                                        </div>
+                                    @endif
+
+                                    @if (session('error'))
+                                        <div class="alert alert-danger">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+                                    @if ($errors->any())
+                                        <div class="alert alert-danger">
+                                            <ul class="mb-0">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+
+                                    {{-- ✉️ Contact Form --}}
+                                    <form method="POST" action="{{ route('contact.submit') }}">
+                                        @csrf
+
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Your Name</label>
+                                            <input type="text" name="name" id="name"
+                                                class="form-control @error('name') is-invalid @enderror"
+                                                value="{{ old('name') }}" required>
+                                            @error('name')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Your Email</label>
+                                            <input type="email" name="email" id="email"
+                                                class="form-control @error('email') is-invalid @enderror"
+                                                value="{{ old('email') }}" required>
+                                            @error('email')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="message" class="form-label">Message</label>
+                                            <textarea name="message" id="message" rows="4"
+                                                class="form-control @error('message') is-invalid @enderror"
+                                                required>{{ old('message') }}</textarea>
+                                            @error('message')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Send Message</button>
+                                    </form>
+                                </section>
                             </div>
                             <!-- Card body END -->
                         </div>
@@ -306,27 +261,22 @@ Contact form and vector START -->
             </div>
         </section>
         <!-- =======================
-Contact form and vector END -->
+        Contact form and vector END -->
 
         <!-- =======================
-Map START -->
+        Map START -->
         <section class="pt-0 pt-lg-5">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <iframe
-                            class="w-100 h-300px grayscale rounded"
+                        <iframe class="w-100 h-300px grayscale rounded"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9663095343008!2d-74.00425878428698!3d40.74076684379132!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259bf5c1654f3%3A0xc80f9cfce5383d5d!2sGoogle!5e0!3m2!1sen!2sin!4v1586000412513!5m2!1sen!2sin"
-                            height="500"
-                            style="border: 0"
-                            aria-hidden="false"
-                            tabindex="0"
-                        ></iframe>
+                            height="500" style="border: 0" aria-hidden="false" tabindex="0"></iframe>
                     </div>
                 </div>
             </div>
         </section>
         <!-- =======================
-Map END -->
+        Map END -->
     </main>
 @endsection

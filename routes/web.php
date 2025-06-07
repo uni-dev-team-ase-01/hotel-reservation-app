@@ -25,6 +25,8 @@ Route::get('hotel/{hotel}/available-rooms', [RoomController::class, 'availableRo
 Route::get('hotel/search', [HotelController::class, 'search']);
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.submit');
+
 
 // Route::middleware(['auth', 'role:super-admin'])->group(function () {
 //     Volt::route('/admin/dashboard', 'admin.dashboard')->name('admin.dashboard');
