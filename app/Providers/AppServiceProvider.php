@@ -3,8 +3,15 @@
 namespace App\Providers;
 
 use App\Http\Responses\CustomFilamentLogoutResponse;
+use App\Policies\ActivityPolicy;
+use App\Policies\PermissionPolicy;
+use App\Policies\RolePolicy;
 use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Stripe\StripeClient;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(Activity::class, ActivityPolicy::class);
+        Gate::policy(Permission::class, PermissionPolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
     }
 }

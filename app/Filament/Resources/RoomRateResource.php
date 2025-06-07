@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enum\RateType;
+use App\Enum\UserRoleType;
 use App\Filament\Resources\RoomRateResource\Pages;
 use App\Models\RoomRate;
 use Filament\Forms;
@@ -10,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RoomRateResource extends Resource
 {
@@ -24,7 +26,8 @@ class RoomRateResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('room_id')
-                    ->relationship('room', 'room_number')
+                    ->relationship('room', 'id')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->room_number}")
                     ->required(),
                 Forms\Components\Select::make('rate_type')
                     ->required()
@@ -41,14 +44,12 @@ class RoomRateResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('room.id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('room.room_number')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('room.hotel.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rate_type'),
                 Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -65,6 +66,7 @@ class RoomRateResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -88,5 +90,21 @@ class RoomRateResource extends Resource
             'view' => Pages\ViewRoomRate::route('/{record}'),
             'edit' => Pages\EditRoomRate::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $user = auth()->user();
+
+        if ($user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value])) {
+            $assignedHotelIds = $user->userHotels->pluck('hotel_id');
+
+            return parent::getEloquentQuery()
+                ->whereHas('room.hotel', function (Builder $query) use ($assignedHotelIds) {
+                    $query->whereIn('id', $assignedHotelIds);
+                });
+        }
+
+        return parent::getEloquentQuery()->whereRaw('1 = 0');
     }
 }

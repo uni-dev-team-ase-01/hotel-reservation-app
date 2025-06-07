@@ -11,6 +11,7 @@ class TravelCompanyController extends Controller
     {
         return view('travel-agent.index');
     }
+
     public function store(Request $request)
     {
         try {
@@ -29,12 +30,11 @@ class TravelCompanyController extends Controller
                 ->withErrors($e->errors())
                 ->withInput();
         } catch (\Exception $e) {
-            \Log::error('Travel company store error: ' . $e->getMessage());
+            \Log::error('Travel company store error: '.$e->getMessage());
+
             return redirect()->back()
                 ->with('error', 'Oops! Something went wrong. Please try again later.')
                 ->withInput();
         }
     }
-
-
 }

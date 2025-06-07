@@ -26,11 +26,21 @@ class ReservationResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $user = auth()->user();
+        $isHotelStaff = $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+        $userHotels = $isHotelStaff ? $user->userHotels->pluck('hotel_id') : collect();
+
         return $form
             ->schema([
                 Forms\Components\Select::make('hotel_id')
                     ->label('Hotel')
-                    ->options(Hotel::where('active', true)->pluck('name', 'id'))
+                    ->options(function () use ($isHotelStaff, $userHotels) {
+                        if ($isHotelStaff) {
+                            return Hotel::whereIn('id', $userHotels)->pluck('name', 'id');
+                        }
+
+                        return Hotel::pluck('name', 'id');
+                    })
                     ->required()
                     ->searchable()
                     ->live()
@@ -46,14 +56,27 @@ class ReservationResource extends Resource
 
                 Forms\Components\Select::make('user_id')
                     ->label('Customer')
-                    ->relationship('user', 'name')
+                    ->relationship('user', 'name', function (Builder $query) {
+                        $query->whereHas('roles', function (Builder $roleQuery) {
+                            $roleQuery->whereIn('name', [
+                                UserRoleType::CUSTOMER->value,
+                                UserRoleType::TRAVEL_COMPANY->value,
+                            ]);
+                        });
+                    })
                     ->searchable()
                     ->preload()
                     ->default(function () {
                         $user_id = request()->query('user_id');
                         if (
-                            $user_id && User::where('id', $user_id)
-                            // ->where('active', true)
+                            $user_id &&
+                            User::where('id', $user_id)
+                                ->whereHas('roles', function (Builder $roleQuery) {
+                                    $roleQuery->whereIn('name', [
+                                        UserRoleType::CUSTOMER->value,
+                                        UserRoleType::TRAVEL_COMPANY->value,
+                                    ]);
+                                })
                                 ->exists()
                         ) {
                             return $user_id;
@@ -267,6 +290,9 @@ class ReservationResource extends Resource
                 ->whereIn('hotel_id', $assignedHotelIds);
         } elseif ($user->hasRole(UserRoleType::SUPER_ADMIN->value)) {
             return parent::getEloquentQuery();
+        } elseif ($user->hasRole(UserRoleType::TRAVEL_COMPANY->value)) {
+            return parent::getEloquentQuery()
+                ->where('user_id', $user->id);
         }
 
         return parent::getEloquentQuery()->whereRaw('1 = 0');

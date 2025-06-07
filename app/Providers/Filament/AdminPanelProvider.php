@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
 
-            ->id('manage')
+            ->id('dashboard')
             ->path('/dashboard')
             ->authGuard('admin')
             ->login()
@@ -47,8 +47,8 @@ class AdminPanelProvider extends PanelProvider
                 config('filament-logger.activity_resource'),
             ])
             ->plugins([
-                FilamentUsersPlugin::make(),
-                FilamentSpatieRolesPermissionsPlugin::make(),
+                // FilamentUsersPlugin::make(),
+                // FilamentSpatieRolesPermissionsPlugin::make(),
             ])
             ->middleware([
                 EncryptCookies::class,

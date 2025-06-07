@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\HotelResource\RelationManagers;
 
+use App\Enum\UserRoleType;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class UserHotelsRelationManager extends RelationManager
 {
@@ -21,7 +23,7 @@ class UserHotelsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->label('User')
-                    ->options(User::all()->pluck('name', 'id'))
+                    ->options(User::all()->pluck('email', 'id'))
                     ->searchable()
                     ->required(),
             ]);
@@ -39,6 +41,16 @@ class UserHotelsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('Email')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('user.roles.name')
+                    ->label('Role')
+                    ->formatStateUsing(function ($state, $record) {
+                        $roleName = $record->user->roles->first()?->name;
+
+                        return $roleName ? UserRoleType::tryFrom($roleName)?->getLabel() ?? $roleName : 'No Role';
+                    })
                     ->searchable()
                     ->sortable(),
 
@@ -80,5 +92,43 @@ class UserHotelsRelationManager extends RelationManager
                         ->label('Remove Assignments'),
                 ]),
             ]);
+    }
+
+    public function canCreate(): bool
+    {
+        $user = auth()->guard('admin')->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasAnyRole([
+            UserRoleType::SUPER_ADMIN->value,
+        ]);
+    }
+
+    public function canEdit(Model $record): bool
+    {
+        return $this->canCreate();
+    }
+
+    public function canEditAny(): bool
+    {
+        return $this->canCreate();
+    }
+
+    public function canDelete(Model $record): bool
+    {
+        return $this->canCreate();
+    }
+
+    public function canDeleteBulk(): bool
+    {
+        return $this->canCreate();
+    }
+
+    public function canDeleteAny(): bool
+    {
+        return $this->canCreate();
     }
 }

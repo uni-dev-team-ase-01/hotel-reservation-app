@@ -14,16 +14,15 @@ class TravelCompanySeeder extends Seeder
                 'company_name' => 'Travel Express',
                 'email' => 'contact@travelexpress.com',
                 'phone' => '555-1234',
-                'message' => ''
+                'message' => '',
             ],
             [
                 'company_name' => 'Global Tours',
                 'email' => 'info@globaltours.com',
                 'phone' => '555-5678',
-                'message' => ''
+                'message' => '',
             ],
         ];
-
 
         foreach ($companies as $company) {
             TravelCompany::create($company);

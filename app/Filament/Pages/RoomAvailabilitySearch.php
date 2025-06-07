@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Enum\RateType;
 use App\Enum\RoomType;
+use App\Enum\UserRoleType;
 use App\Models\Hotel;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -44,21 +45,46 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
 
     public $showResults = false;
 
+    public $data = [];
+
     public function mount(): void
     {
         $this->checkInDate = now()->format('Y-m-d');
         $this->checkOutDate = now()->addDay()->format('Y-m-d');
+
+        $user = auth()->guard('admin')->user();
+        $isHotelStaff = $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+
+        if ($isHotelStaff) {
+            $userHotels = $user->userHotels->pluck('hotel_id');
+            if ($userHotels->count() === 1) {
+                $this->data['hotelId'] = $userHotels->first();
+            }
+        }
+
+        $this->form->fill($this->data);
     }
 
     public function form(Form $form): Form
     {
+        $user = auth()->guard('admin')->user();
+        $isHotelStaff = $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+        $userHotels = $isHotelStaff ? $user->userHotels->pluck('hotel_id') : collect();
+
         return $form
             ->schema([
                 Select::make('hotelId')
                     ->label('Hotel')
-                    ->options(Hotel::where('active', true)->pluck('name', 'id'))
+                    ->options(function () use ($isHotelStaff, $userHotels) {
+                        if ($isHotelStaff) {
+                            return Hotel::whereIn('id', $userHotels)->pluck('name', 'id');
+                        }
+
+                        return Hotel::pluck('name', 'id');
+                    })
+                    ->required()
                     ->searchable()
-                    ->placeholder('Select a hotel'),
+                    ->disabled($isHotelStaff && $userHotels->count() === 1),
 
                 DateTimePicker::make('checkInDate')
                     ->label('Check-in Date')
@@ -207,7 +233,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->icon('heroicon-o-calendar')
                     ->color('success')
                     ->visible(fn () => ! empty($this->selectedRooms))
-                    ->url(fn () => route('filament.manage.resources.reservations.create', [
+                    ->url(fn () => route('filament.dashboard.resources.reservations.create', [
                         'rooms' => $this->selectedRooms,
                         'check_in' => $this->checkInDate,
                         'check_out' => $this->checkOutDate,
@@ -218,6 +244,17 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             ->emptyStateHeading('No Available Rooms')
             ->emptyStateDescription('No rooms are available for the selected dates and criteria.')
             ->emptyStateIcon('heroicon-o-home');
+    }
+
+    public static function canAccess(): bool
+    {
+        $user = auth()->guard('admin')->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
     }
 
     protected function getAvailableRoomsQuery()

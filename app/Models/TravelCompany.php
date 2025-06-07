@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TravelCompany extends Model
 {
-    
     protected $fillable = [
         'company_name',
         'email',
