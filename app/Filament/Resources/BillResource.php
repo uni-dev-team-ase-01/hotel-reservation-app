@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enum\PaymentStatus;
 use App\Enum\UserRoleType;
 use App\Filament\Resources\BillResource\Pages;
+use App\Filament\Resources\BillResource\RelationManagers\BillServicesRelationManager;
 use App\Filament\Resources\BillResource\RelationManagers\PaymentsRelationManager;
 use App\Models\Bill;
 use Filament\Forms;
@@ -103,6 +104,7 @@ class BillResource extends Resource
     public static function getRelations(): array
     {
         return [
+            BillServicesRelationManager::class,
             PaymentsRelationManager::class,
         ];
     }

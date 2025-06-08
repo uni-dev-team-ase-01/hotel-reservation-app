@@ -25,8 +25,8 @@ class PaymentsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric(),
-                Forms\Components\DateTimePicker::make('paid_at')
-                    ->required(),
+                // Forms\Components\DateTimePicker::make('paid_at')
+                //     ->required(),
             ]);
     }
 
@@ -42,6 +42,9 @@ class PaymentsRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('paid_at')
                     ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

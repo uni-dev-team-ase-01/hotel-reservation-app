@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enum\UserRoleType;
 use App\Models\Payment;
 use App\Models\User;
 
@@ -12,7 +13,12 @@ class PaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasAnyRole([
+            UserRoleType::HOTEL_CLERK->value,
+            UserRoleType::HOTEL_MANAGER->value,
+            UserRoleType::TRAVEL_COMPANY->value,
+            UserRoleType::CUSTOMER->value,
+        ]);
     }
 
     /**
@@ -20,6 +26,16 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
+        if ($user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value])) {
+            $reservation = $payment->bill->reservation;
+
+            return $reservation ? $user->userHotels()->where('hotel_id', $reservation->hotel_id)->exists() : false;
+        }
+
+        if ($user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value, UserRoleType::CUSTOMER->value])) {
+            return $payment->bill->reservation && $payment->bill->reservation->user_id === $user->id;
+        }
+
         return false;
     }
 
@@ -28,7 +44,11 @@ class PaymentPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        if ($user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value, UserRoleType::CUSTOMER->value])) {
+            return false;
+        }
+
+        return $this->viewAny($user);
     }
 
     /**
@@ -36,7 +56,11 @@ class PaymentPolicy
      */
     public function update(User $user, Payment $payment): bool
     {
-        return false;
+        if ($user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value, UserRoleType::CUSTOMER->value])) {
+            return false;
+        }
+
+        return $this->viewAny($user);
     }
 
     /**
@@ -44,7 +68,11 @@ class PaymentPolicy
      */
     public function delete(User $user, Payment $payment): bool
     {
-        return false;
+        if ($user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value, UserRoleType::CUSTOMER->value])) {
+            return false;
+        }
+
+        return $this->viewAny($user);
     }
 
     /**
@@ -52,7 +80,11 @@ class PaymentPolicy
      */
     public function restore(User $user, Payment $payment): bool
     {
-        return false;
+        if ($user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value, UserRoleType::CUSTOMER->value])) {
+            return false;
+        }
+
+        return $this->viewAny($user);
     }
 
     /**
