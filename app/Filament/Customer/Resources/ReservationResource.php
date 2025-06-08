@@ -5,6 +5,8 @@ namespace App\Filament\Customer\Resources;
 use App\Enum\ReservationStatus;
 use App\Enum\UserRoleType;
 use App\Filament\Customer\Resources\ReservationResource\Pages;
+use App\Filament\Customer\Resources\ReservationResource\RelationManagers\BillsRelationManager;
+use App\Filament\Customer\Resources\ReservationResource\RelationManagers\ReservationRoomsRelationManager;
 use App\Models\Reservation;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,7 +20,7 @@ class ReservationResource extends Resource
 {
     protected static ?string $model = Reservation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
     protected static ?string $navigationLabel = 'My Reservations';
 
@@ -154,7 +156,8 @@ class ReservationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ReservationRoomsRelationManager::class,
+            BillsRelationManager::class,
         ];
     }
 
@@ -163,6 +166,7 @@ class ReservationResource extends Resource
         return [
             'index' => Pages\ListReservations::route('/'),
             'create' => Pages\CreateReservation::route('/create'),
+            'view' => Pages\ViewReservation::route('/{record}'),
             'edit' => Pages\EditReservation::route('/{record}/edit'),
         ];
     }
