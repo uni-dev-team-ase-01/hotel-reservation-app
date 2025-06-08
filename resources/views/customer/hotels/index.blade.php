@@ -799,7 +799,7 @@
                 };
             }
 
-            // Apply filters
+
             const filterHotelsBtn = document.getElementById('filter-hotels');
             if (filterHotelsBtn) {
                 filterHotelsBtn.onclick = function (e) {
@@ -810,7 +810,6 @@
                 };
             }
 
-            // Search form
             const searchForm = document.getElementById('search-form');
 
             function handleSearchFormSubmit(e) {
@@ -823,21 +822,7 @@
                 } else if (dateRange) {
                     check_in = check_out = dateRange;
                 }
-                if (!check_in || !check_out) {
-                    if (typeof Toastify !== 'undefined') {
-                        Toastify({
-                            text: 'Please select both check-in and check-out dates.',
-                            duration: 3000,
-                            close: true,
-                            gravity: 'top',
-                            position: 'right',
-                            backgroundColor: '#d9534f',
-                        }).showToast();
-                    } else {
-                        alert('Please select both check-in and check-out dates.');
-                    }
-                    return false;
-                }
+
                 const formData = new FormData(searchForm);
                 const params = {};
                 for (const [key, val] of formData.entries()) {

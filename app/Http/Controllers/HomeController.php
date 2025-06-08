@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Hotel;
+
 class HomeController extends Controller
 {
     public function index()
     {
+        $hotels = Hotel::all(); 
         $cities = [
             ['name' => 'Colombo', 'img' => 'assets/images/category/hotel/nearby/01.jpg'],
             ['name' => 'Kandy', 'img' => 'assets/images/category/hotel/nearby/03.jpg'],
@@ -21,6 +24,6 @@ class HomeController extends Controller
             ['name' => 'Dambulla', 'img' => 'assets/images/category/hotel/nearby/02.jpg'],
         ];
 
-        return view('customer.home', compact('cities'));
+        return view('customer.home', compact('cities','hotels'));
     }
 }

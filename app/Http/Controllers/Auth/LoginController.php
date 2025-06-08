@@ -27,7 +27,13 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected function redirectTo()
+    {
+        if (session()->has('pending_booking')) {
+            return route('reservation.paymentForm');
+        }
+        return '/';
+    }
 
     /**
      * Create a new controller instance.
@@ -42,7 +48,7 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        if (! $user->hasRole('customer')) {
+        if (!$user->hasRole('customer')) {
             Auth::guard('web')->logout();
 
             return redirect('/login')->withErrors(['email' => 'Access denied. Customers only.']);
