@@ -290,7 +290,7 @@ class ReservationResource extends Resource
                 ->whereIn('hotel_id', $assignedHotelIds);
         } elseif ($user->hasRole(UserRoleType::SUPER_ADMIN->value)) {
             return parent::getEloquentQuery();
-        } elseif ($user->hasRole(UserRoleType::TRAVEL_COMPANY->value)) {
+        } elseif ($user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value, UserRoleType::CUSTOMER->value])) {
             return parent::getEloquentQuery()
                 ->where('user_id', $user->id);
         }

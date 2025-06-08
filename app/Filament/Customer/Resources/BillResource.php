@@ -1,13 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Customer\Resources;
 
-use App\Enum\PaymentStatus;
 use App\Enum\UserRoleType;
-use App\Filament\Resources\BillResource\Pages;
-use App\Filament\Resources\BillResource\RelationManagers\PaymentsRelationManager;
+use App\Filament\Customer\Resources\BillResource\Pages;
 use App\Models\Bill;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -26,27 +23,7 @@ class BillResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('reservation_id')
-                    ->relationship('reservation', 'id')
-                    ->required(),
-                Forms\Components\TextInput::make('room_charges')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('extra_charges')
-                    ->numeric(),
-                Forms\Components\TextInput::make('discount')
-                    ->numeric(),
-                Forms\Components\TextInput::make('taxes')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('total_amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\Select::make('payment_status')
-                    ->required()
-                    ->options(collect(PaymentStatus::cases())->mapWithKeys(fn ($case) => [
-                        $case->value => $case->getLabel(),
-                    ])),
+                //
             ]);
     }
 
@@ -89,9 +66,7 @@ class BillResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -103,7 +78,7 @@ class BillResource extends Resource
     public static function getRelations(): array
     {
         return [
-            PaymentsRelationManager::class,
+            //
         ];
     }
 

@@ -16,7 +16,7 @@ class ReservationPolicy
         return $user->hasAnyRole([
             UserRoleType::HOTEL_CLERK->value,
             UserRoleType::HOTEL_MANAGER->value,
-            UserRoleType::SUPER_ADMIN->value,
+            // UserRoleType::SUPER_ADMIN->value,
             UserRoleType::TRAVEL_COMPANY->value,
             UserRoleType::CUSTOMER->value,
         ]);
@@ -35,7 +35,7 @@ class ReservationPolicy
             return $user->userHotels->pluck('hotel_id')->contains($reservation->hotel_id);
         }
 
-        if ($user->hasRole(UserRoleType::CUSTOMER->value)) {
+        if ($user->hasAnyRole([UserRoleType::CUSTOMER->value, UserRoleType::TRAVEL_COMPANY->value])) {
             return $reservation->user_id === $user->id;
         }
 

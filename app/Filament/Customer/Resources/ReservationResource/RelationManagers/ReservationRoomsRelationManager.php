@@ -1,10 +1,7 @@
 <?php
 
-namespace App\Filament\Resources\ReservationResource\RelationManagers;
+namespace App\Filament\Customer\Resources\ReservationResource\RelationManagers;
 
-use App\Enum\UserRoleType;
-use App\Filament\Resources\RoomResource;
-use App\Models\Room;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -15,30 +12,20 @@ class ReservationRoomsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reservationRooms';
 
-    protected static ?string $title = 'Reserved Rooms';
-
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('room_id')
-                    ->label('Room')
-                    ->options(function () {
-                        return Room::with('hotel')
-                            ->get()
-                            ->mapWithKeys(function ($room) {
-                                return [$room->id => $room->hotel->name.' - Room '.$room->room_number.' ('.$room->room_type.')'];
-                            });
-                    })
-                    ->searchable()
-                    ->required(),
+                Forms\Components\TextInput::make('room_number')
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('room.room_number')
+            ->recordTitleAttribute('room_number')
             ->columns([
                 Tables\Columns\TextColumn::make('room.hotel.name')
                     ->label('Hotel')
@@ -81,32 +68,15 @@ class ReservationRoomsRelationManager extends RelationManager
                     ->relationship('room.hotel', 'name'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
-                    ->label('Add Room')
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['reservation_id'] = $this->getOwnerRecord()->id;
-
-                        return $data;
-                    }),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->label('Remove Room'),
-                Tables\Actions\Action::make('view_room')
-                    ->label('View Room')
-                    ->icon('heroicon-o-eye')
-                    ->url(
-                        fn ($record) => $record->room_id
-                            ? RoomResource::getUrl('view', ['record' => $record->room_id])
-                            : null
-                    )
-                    ->visible(fn ($record) => $record->room_id !== null && ! auth()->user()?->hasAnyRole([UserRoleType::CUSTOMER->value, UserRoleType::TRAVEL_COMPANY->value])),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Remove Rooms'),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
