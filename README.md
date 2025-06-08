@@ -47,3 +47,40 @@ Filament
 - Added laravel permission plugin
 - Added users plugin
 - 
+
+## Environment Variables
+
+add your database connection to .env file
+```bash
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
+
+add your Stipe values to .env file
+
+```bash
+STRIPE_KEY=your_publishable_key
+STRIPE_SECRET=your_secret_key
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
+
+```
+create Stripe Sandbox
+
+enable customer portal in Stripe
+
+also, setup webhook for `payment_method.detached` and `payment_method.attached` events (destination : `/api/webhook/stripe`). `STRIPE_WEBHOOK_SECRET` can be find there.
+
+
+## Scheduler
+run Laravel scheduler
+
+```bash
+php artisan schedule:work
+```
+
+configured schedule jobs
+- cancel reservations no payment method attached at 7pm
