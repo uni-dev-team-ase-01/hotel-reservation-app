@@ -28,7 +28,13 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected function redirectTo()
+    {
+        if (session()->has('pending_booking')) {
+            return route('reservation.paymentForm');
+        }
+        return '/';
+    }
 
     /**
      * Create a new controller instance.
