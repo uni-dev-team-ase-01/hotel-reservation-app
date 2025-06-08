@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -20,6 +21,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+        // $superAdminRole = Role::where('name', 'super-admin')
+        //     ->where('guard_name')
+        //     ->first();
+        // $superAdmin->assignRole($superAdminRole);
+        $superAdmin->guard_name = 'admin';
         $superAdmin->assignRole('super-admin');
 
         $customer = User::firstOrCreate(
@@ -29,6 +35,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+        $customer->guard_name = 'web';
         $customer->assignRole('customer');
 
         $travel = User::firstOrCreate(
@@ -38,6 +45,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+        $travel->guard_name = 'admin';
         $travel->assignRole('travel-company');
 
         $manager = User::firstOrCreate(
@@ -47,6 +55,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+        $manager->guard_name = 'admin';
         $manager->assignRole('hotel-manager');
 
         $clerk = User::firstOrCreate(
@@ -56,6 +65,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+        $clerk->guard_name = 'admin';
         $clerk->assignRole('hotel-clerk');
     }
 }

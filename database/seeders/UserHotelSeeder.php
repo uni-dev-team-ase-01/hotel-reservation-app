@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enum\UserRoleType;
 use App\Models\Hotel;
 use App\Models\User;
 use App\Models\UserHotel;
@@ -13,7 +14,9 @@ class UserHotelSeeder extends Seeder
     {
         // UserHotel::truncate();
 
-        $users = User::all();
+        $users = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', [UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+        })->get();
         $hotel = Hotel::first();
 
         $data = [];

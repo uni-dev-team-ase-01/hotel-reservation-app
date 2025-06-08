@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enum\UserRoleType;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
 {
@@ -68,7 +70,12 @@ class RegisterController extends Controller
             'phone' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
         ]);
-        $customer->assignRole('customer');
+
+        $customerRole = Role::where('name', UserRoleType::CUSTOMER->value)
+            ->where('guard_name', 'web')
+            ->first();
+
+        $customer->assignRole($customerRole);
 
         return $customer;
     }
