@@ -142,43 +142,111 @@
                 </div>
             </div>
         </section>
+
+        <!-- Room Details Modal START -->
+        <div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="roomDetailsModalLabel">Please Provide Your Stay Details</h5>
+                        {{-- No close button to make it mandatory initially --}}
+                    </div>
+                    <div class="modal-body">
+                        <form id="room-details-modal-form">
+                            <div class="mb-3">
+                                <label for="modal_date_range" class="form-label">Check-in - Check-out Dates</label>
+                                <input type="text" class="form-control flatpickr-modal" id="modal_date_range" name="modal_date_range" placeholder="Select dates" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="modal_adults" class="form-label">Adults (13+)</label>
+                                    <input type="number" class="form-control" id="modal_adults" name="modal_adults" value="2" min="1" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="modal_children" class="form-label">Children (0-12)</label>
+                                    <input type="number" class="form-control" id="modal_children" name="modal_children" value="0" min="0" required>
+                                </div>
+                            </div>
+                            <input type="hidden" id="modal_num_rooms" name="modal_num_rooms" value="1">
+                             <div class="alert alert-danger d-none mt-2" id="modal-validation-error"></div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="modal-submit-button">View Available Rooms</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Room Details Modal END -->
     </main>
 @endsection
 
 @push("scripts")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/min/tiny-slider.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> {{-- Added Flatpickr for modal --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> {{-- Added Flatpickr CSS --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const hotelId = @json($hotel->id);
-            const urlParams = new URLSearchParams(window.location.search);
-            const checkIn = urlParams.get('check_in');
-            const checkOut = urlParams.get('check_out');
-            const adults = urlParams.get('adults') || 2;
-            const children = urlParams.get('children') || 0;
+            let urlParams = new URLSearchParams(window.location.search); // Use let for potential reassignment
 
-            document.getElementById('checkin-display').textContent =
-                checkIn ?? '-';
-            document.getElementById('checkout-display').textContent =
-                checkOut ?? '-';
+            // Make these variables updatable from modal
+            let checkIn = urlParams.get('check_in');
+            let checkOut = urlParams.get('check_out');
+            let adults = urlParams.get('adults') || '2'; // Default to string for consistency with form values
+            let children = urlParams.get('children') || '0';
+            let num_rooms = urlParams.get('num_rooms') || '1';
+
+
+            const checkinDisplay = document.getElementById('checkin-display');
+            const checkoutDisplay = document.getElementById('checkout-display');
+
+            checkinDisplay.textContent = checkIn ?? '-';
+            checkoutDisplay.textContent = checkOut ?? '-';
 
             const roomsList = document.getElementById('rooms-list');
             const roomsLoading = document.getElementById('rooms-loading');
             const priceSummary = document.getElementById('price-summary');
             const continueBtn = document.getElementById('continue-booking-btn');
 
+            const roomDetailsModalElement = document.getElementById('roomDetailsModal');
+            const roomDetailsModal = new bootstrap.Modal(roomDetailsModalElement);
+            const modalForm = document.getElementById('room-details-modal-form');
+            const modalDateRangeInput = document.getElementById('modal_date_range');
+            const modalAdultsInput = document.getElementById('modal_adults');
+            const modalChildrenInput = document.getElementById('modal_children');
+            const modalNumRoomsInput = document.getElementById('modal_num_rooms');
+            const modalValidationError = document.getElementById('modal-validation-error');
+            const modalSubmitButton = document.getElementById('modal-submit-button');
+
+            let modalFlatpickr = flatpickr(".flatpickr-modal", { // Initialize modal flatpickr
+                mode: "range",
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d M Y",
+                minDate: "today"
+            });
+
             let selectedRooms = [];
 
             async function fetchAvailableRooms() {
-                roomsLoading.style.display = '';
+                console.log("Fetching available rooms with:", { checkIn, checkOut, adults, children, num_rooms });
+                roomsLoading.style.display = 'block'; // Use block for visibility
                 roomsList.innerHTML = '';
+                priceSummary.innerHTML = `<div class="alert alert-secondary">Select rooms to view price summary.</div>`; // Reset summary
+                continueBtn.style.display = 'none'; // Hide button initially
 
                 let url = `/hotel/${hotelId}/available-rooms`;
-                const queryParams = [];
-                if (checkIn) queryParams.push(`check_in=${checkIn}`);
-                if (checkOut) queryParams.push(`check_out=${checkOut}`);
-                if (adults) queryParams.push(`adults=${adults}`);
-                if (children) queryParams.push(`children=${children}`);
-                if (queryParams.length) url += `?${queryParams.join('&')}`;
+                const currentParams = new URLSearchParams(); // Use URLSearchParams for easier construction
+                if (checkIn) currentParams.set('check_in', checkIn);
+                if (checkOut) currentParams.set('check_out', checkOut);
+                if (adults) currentParams.set('adults', adults);
+                if (children) currentParams.set('children', children);
+                // num_rooms is not directly used by RoomController@availableRooms but can be passed for consistency
+                // if (num_rooms) currentParams.set('num_rooms', num_rooms);
+
+                const queryString = currentParams.toString();
+                if (queryString) url += `?${queryString}`;
 
                 try {
                     const res = await fetch(url);
@@ -191,48 +259,49 @@
                         return;
                     }
 
-                    selectedRooms = [];
-                    updatePriceSummary();
+                    selectedRooms = []; // Reset selected rooms
+                    updatePriceSummary(); // Update summary (will show "select rooms")
 
                     roomData.forEach((room) => {
                         const card = document.createElement('div');
-                        card.className =
-                            'card border bg-transparent p-3 mb-3 room-selection-card';
+                        card.className = 'card border bg-transparent p-3 mb-3 room-selection-card';
                         card.dataset.roomId = room.id;
-                        card.dataset.roomRate = room.daily_rate ?? 0;
+                        // Assuming room.daily_rate is the price per night for this room for the searched dates
+                        // The controller's availableRooms method now includes 'daily_rate' in its mapped output.
+                        card.dataset.roomRate = room.daily_rate || 0;
+                        card.dataset.roomType = room.room_type || 'N/A';
+                        card.dataset.roomOccupancy = room.occupancy || 1;
 
+                        // Simplified card innerHTML, can be expanded
                         card.innerHTML = `
-                    <div class="row g-3 g-md-4">
-                        <div class="col-md-4">
-                            <img src="${room.image || '/assets/images/category/hotel/4by3/02.jpg'}" class="card-img" alt="">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body d-flex flex-column p-0 h-100">
-                                <h5 class="card-title">Room No. ${room.id}</h5>
-                                <ul class="nav small nav-divider mb-0">
-                                    <li class="nav-item mb-0"><i class="fa-solid fa-bed me-1"></i>${room.room_type || '---'}</li>
-                                </ul>
-                                <div class="d-flex justify-content-between align-items-center mt-2 mt-md-auto">
-                                    <div class="d-flex text-success">
-                                        <h6 class="h5 mb-0 text-success">$${room.daily_rate ?? 'N/A'}</h6>
-                                        <span class="fw-light">/per night</span>
+                            <div class="row g-3 g-md-4">
+                                <div class="col-md-4">
+                                    <img src="${room.image || '/assets/images/category/hotel/4by3/0default.jpg'}" class="card-img" alt="${room.room_type || 'Room'}">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body d-flex flex-column p-0 h-100">
+                                        <h5 class="card-title">${room.room_type || `Room #${room.id}`}</h5>
+                                        <p class="small mb-0">Max Occupancy: ${room.occupancy}</p>
+                                        <p class="small mb-2">Beds: ${room.beds_configuration ? JSON.parse(room.beds_configuration).map(b => `${b.count} ${b.type}`).join(', ') : 'N/A'}</p>
+                                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                                            <div class="d-flex text-success">
+                                                <h6 class="h5 mb-0 text-success">$${parseFloat(room.daily_rate || 0).toFixed(2)}</h6>
+                                                <span class="fw-light ms-1">/per night</span>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-dark mb-0 select-room-toggle-btn"
+                                                data-room-id="${room.id}"
+                                                data-room-rate="${room.daily_rate || 0}">
+                                                Select
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-dark mb-0 select-room-toggle-btn"
-                                        data-room-id="${room.id}"
-                                        data-room-rate="${room.daily_rate ?? 0}">
-                                        Select
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                `;
-
+                        `;
                         roomsList.appendChild(card);
                     });
 
-                    document
-                        .querySelectorAll('.select-room-toggle-btn')
+                    document.querySelectorAll('.select-room-toggle-btn')
                         .forEach((btn) => {
                             btn.onclick = function () {
                                 const roomId = parseInt(this.dataset.roomId);
@@ -273,46 +342,123 @@
             }
 
             function updatePriceSummary() {
+                if (!checkIn || !checkOut) { // Don't calculate price if dates are missing
+                    priceSummary.innerHTML = `<div class="alert alert-warning">Please select check-in and check-out dates.</div>`;
+                    continueBtn.style.display = 'none';
+                    return;
+                }
+
                 if (selectedRooms.length === 0) {
                     priceSummary.innerHTML = `<div class="alert alert-secondary">Select rooms to view price summary.</div>`;
                     continueBtn.style.display = 'none';
                     return;
                 }
 
-                let total = selectedRooms.reduce((sum, r) => sum + r.rate, 0);
-                let roomDetails = selectedRooms
-                    .map(
-                        (r, i) => `
-            <li class="list-group-item px-2 d-flex justify-content-between">
-                <span class="h6 fw-light mb-0">Room ${i + 1} (ID: ${r.id})</span>
-                <span class="h6 fw-light mb-0">$${r.rate}</span>
-            </li>
-        `,
-                    )
-                    .join('');
+                const nights = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24));
+                if (nights <= 0) {
+                     priceSummary.innerHTML = `<div class="alert alert-danger">Check-out date must be after check-in date.</div>`;
+                     continueBtn.style.display = 'none';
+                     return;
+                }
+
+                let total = selectedRooms.reduce((sum, r) => sum + (r.rate * nights), 0);
+                let roomDetails = selectedRooms.map((r, i) => `
+                    <li class="list-group-item px-2 d-flex justify-content-between">
+                        <span class="h6 fw-light mb-0">Room ${i + 1} (${r.type || 'N/A'})</span>
+                        <span class="h6 fw-light mb-0">$${(r.rate * nights).toFixed(2)} (${nights} night${nights > 1 ? 's' : ''})</span>
+                    </li>
+                `).join('');
 
                 priceSummary.innerHTML = `
-            <ul class="list-group list-group-borderless mb-3">
-                ${roomDetails}
-                <li class="list-group-item px-2 d-flex justify-content-between">
-                    <span class="h6 fw-light mb-0">Guests</span>
-                    <span class="h6 fw-light mb-0">${adults} Adults, ${children} Children</span>
-                </li>
-                <li class="list-group-item bg-light d-flex justify-content-between rounded-2 px-2 mt-2">
-                    <span class="h5 fw-normal mb-0 ps-1">Total</span>
-                    <span class="h5 fw-normal mb-0">$${total}</span>
-                </li>
-            </ul>
-        `;
+                    <ul class="list-group list-group-borderless mb-3">
+                        ${roomDetails}
+                        <li class="list-group-item px-2 d-flex justify-content-between">
+                            <span class="h6 fw-light mb-0">Guests</span>
+                            <span class="h6 fw-light mb-0">${adults} Adult${adults > 1 ? 's' : ''}${children > 0 ? `, ${children} Child${children > 1 ? 'ren' : ''}` : ''}</span>
+                        </li>
+                         <li class="list-group-item px-2 d-flex justify-content-between">
+                            <span class="h6 fw-light mb-0">Rooms</span>
+                            <span class="h6 fw-light mb-0">${selectedRooms.length}</span>
+                        </li>
+                        <li class="list-group-item bg-light d-flex justify-content-between rounded-2 px-2 mt-2">
+                            <span class="h5 fw-normal mb-0 ps-1">Total</span>
+                            <span class="h5 fw-normal mb-0">$${total.toFixed(2)}</span>
+                        </li>
+                    </ul>
+                `;
 
-                continueBtn.style.display = '';
-                const selectedRoomIds = selectedRooms
-                    .map((r) => r.id)
-                    .join(',');
-                continueBtn.href = `/hotel/${hotelId}/rooms/${selectedRoomIds}/book?check_in=${checkIn}&check_out=${checkOut}&adults=${adults}&children=${children}`;
+                continueBtn.style.display = 'block'; // Use block for visibility
+                const selectedRoomIds = selectedRooms.map((r) => r.id).join(',');
+                const bookingParams = new URLSearchParams({
+                    check_in: checkIn,
+                    check_out: checkOut,
+                    adults: adults,
+                    children: children,
+                    num_rooms: selectedRooms.length // Pass actual number of selected rooms
+                });
+                continueBtn.href = `/hotel/${hotelId}/rooms/${selectedRoomIds}/book?${bookingParams.toString()}`;
             }
 
-            fetchAvailableRooms();
+            modalSubmitButton.addEventListener('click', function() {
+                modalValidationError.classList.add('d-none');
+                modalValidationError.textContent = '';
+
+                const dateRangeValue = modalDateRangeInput.value;
+                const adultsValue = modalAdultsInput.value;
+                const childrenValue = modalChildrenInput.value;
+                const numRoomsValue = modalNumRoomsInput.value;
+
+                if (!dateRangeValue || !dateRangeValue.includes('to')) {
+                    modalValidationError.textContent = 'Please select valid check-in and check-out dates.';
+                    modalValidationError.classList.remove('d-none');
+                    return;
+                }
+                if (parseInt(adultsValue) < 1) {
+                    modalValidationError.textContent = 'At least one adult is required.';
+                    modalValidationError.classList.remove('d-none');
+                    return;
+                }
+
+                const [newCheckIn, newCheckOut] = dateRangeValue.split(' to ');
+
+                // Update global variables
+                checkIn = newCheckIn;
+                checkOut = newCheckOut;
+                adults = adultsValue;
+                children = childrenValue;
+                num_rooms = numRoomsValue; // Update num_rooms as well
+
+                // Update main page displays
+                checkinDisplay.textContent = checkIn;
+                checkoutDisplay.textContent = checkOut;
+                // Potentially update guest display if there's one on the main page
+
+                // Update browser URL
+                const newUrlParams = new URLSearchParams(window.location.search);
+                newUrlParams.set('check_in', checkIn);
+                newUrlParams.set('check_out', checkOut);
+                newUrlParams.set('adults', adults);
+                newUrlParams.set('children', children);
+                newUrlParams.set('num_rooms', num_rooms);
+                history.pushState(null, '', window.location.pathname + '?' + newUrlParams.toString());
+
+                roomDetailsModal.hide();
+                fetchAvailableRooms();
+            });
+
+
+            if (!checkIn || !checkOut) {
+                // Pre-fill modal if some data is available from URL, or use defaults
+                if (modalFlatpickr[0]) { // Flatpickr might return an array of instances
+                     modalFlatpickr[0].setDate(checkIn && checkOut ? [checkIn, checkOut] : []);
+                }
+                modalAdultsInput.value = adults;
+                modalChildrenInput.value = children;
+                modalNumRoomsInput.value = num_rooms;
+                roomDetailsModal.show();
+            } else {
+                fetchAvailableRooms();
+            }
 
             // Hotel image slider
             if (

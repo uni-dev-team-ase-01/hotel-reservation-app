@@ -267,52 +267,84 @@
         let currentPage = 1;
         let allLocations = [];
 
-        // Fetch all hotels for select box (best practice: lightweight endpoint)
         async function populateLocationsDropdownFromApi(selectedValue = null) {
             const locationSelect = document.getElementById('location-select');
             if (!locationSelect) {
-                console.warn("Location select dropdown not found.");
+                console.warn("Location select dropdown ('location-select') not found.");
                 return;
             }
+
             try {
-                console.log("Populating locations dropdown...");
+                console.log("Populating locations dropdown for hotels/index page...");
                 const response = await fetch('/hotels/select-options');
                 if (!response.ok) {
                     console.error("Failed to fetch locations:", response.status, response.statusText);
-                    locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    if (window.Choices && locationSelect.choices) {
+                        locationSelect.choices.setChoices([{ value: '', label: 'Could not load locations' }], 'value', 'label', true);
+                    } else {
+                        locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    }
                     return;
                 }
                 const result = await response.json();
+
                 if (!result.success || !Array.isArray(result.data)) {
                     console.error("Location API did not return successful data:", result);
-                    locationSelect.innerHTML = `<option value="">Error in location data</option>`;
+                     if (window.Choices && locationSelect.choices) {
+                        locationSelect.choices.setChoices([{ value: '', label: 'Error in location data' }], 'value', 'label', true);
+                    } else {
+                        locationSelect.innerHTML = `<option value="">Error in location data</option>`;
+                    }
                     return;
                 }
 
-                const prev = locationSelect.value;
-                locationSelect.innerHTML = `<option value="">Select location</option>`;
-                allLocations = [];
+                let choicesArray = [{ value: '', label: 'Select location', selected: false, disabled: true }];
+                let uniqueLocations = [];
+
                 result.data.forEach((item) => {
-                    const locationName = item.address;
-                    if (locationName && !allLocations.includes(locationName)) {
-                        allLocations.push(locationName);
-                        locationSelect.innerHTML += `<option value="${locationName}">${locationName}</option>`;
+                    const locationName = item.address; // Use item.address directly
+                    if (locationName && !uniqueLocations.includes(locationName)) {
+                        uniqueLocations.push(locationName);
+                        choicesArray.push({ value: locationName, label: locationName, selected: false });
                     }
                 });
 
-                if (selectedValue !== null) {
-                    locationSelect.value = selectedValue;
-                } else if (prev) {
-                    locationSelect.value = prev;
+                // Update global allLocations for typeahead if it's still in use (it was previously)
+                allLocations = [...uniqueLocations]; // Keep a plain array of location names for typeahead
+
+                if (window.Choices && locationSelect.choices) {
+                    locationSelect.choices.setChoices(choicesArray, 'value', 'label', true);
+                    if (selectedValue) {
+                        const valueExists = choicesArray.some(choice => choice.value === selectedValue);
+                        if (valueExists) {
+                            locationSelect.choices.setValue([{ value: selectedValue, label: selectedValue }]);
+                        } else {
+                           console.warn(`Selected value "${selectedValue}" not found in new choices for location (hotels/index page).`);
+                           // locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                        }
+                    } else {
+                         locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                    }
+                } else {
+                    locationSelect.innerHTML = choicesArray.map(choice => `<option value="${choice.value}" ${choice.disabled ? 'disabled' : ''} ${choice.selected ? 'selected' : ''}>${choice.label}</option>`).join('');
+                    if (selectedValue) {
+                        locationSelect.value = selectedValue;
+                    } else {
+                        locationSelect.value = "";
+                    }
                 }
-                console.log("Locations dropdown populated.");
+                console.log("Locations dropdown populated for hotels/index page.");
             } catch (error) {
-                console.error("Error in populateLocationsDropdownFromApi:", error);
-                if(locationSelect) locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+                console.error("Error in populateLocationsDropdownFromApi (hotels/index page):", error);
+                if (window.Choices && locationSelect.choices) {
+                    locationSelect.choices.setChoices([{ value: '', label: 'Error loading locations' }], 'value', 'label', true);
+                } else {
+                    if(locationSelect) locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+                }
             }
         }
 
-        // Vanilla JS typeahead for location search
+        // Vanilla JS typeahead for location search (kept for now, might be redundant if Choices.js search is sufficient)
         function setupLocationTypeahead() {
             const input = document.getElementsByClassName('location-typeahead');
             const select = document.getElementById('location-select');
@@ -1010,6 +1042,8 @@
             });
 
             // Decide what to do on initial load
+            // The populateLocationsDropdownFromApi is called first, then this logic runs.
+            // The setting of value for Choices.js instance is now handled within populateLocationsDropdownFromApi.
             if (performSpecificSearchViaUrl) {
                 console.log('DOMContentLoaded: Performing specific search based on URL parameters.');
                 handleSearchFormSubmit();
@@ -1017,7 +1051,31 @@
                 console.log('DOMContentLoaded: No specific search URL parameters found. Fetching all active hotels by default.');
                 fetchAllActiveHotels();
             }
-        });
+        }); // This is the end of the .then() from populateLocationsDropdownFromApi(paramLocation).then(() => { ... });
+
+        // The DOMContentLoaded should now look more like:
+        // document.addEventListener('DOMContentLoaded', function () {
+        //     ... (other initializations like guest selectors, flatpickr options setup) ...
+        //     const urlParams = new URLSearchParams(window.location.search);
+        //     const paramLocation = urlParams.get('location');
+        //     ... (set up form fields from other params: adults, children, rooms) ...
+        //     updateGuestInput(); // if needed after setting guest params
+
+        //     populateLocationsDropdownFromApi(paramLocation).then(() => {
+        //          // The pre-selection is now handled inside populateLocationsDropdownFromApi
+        //          // So this .then() might only be needed if other actions depend on locations being loaded.
+        //          // For example, if setupLocationTypeahead needs allLocations to be populated by it.
+        //          if (typeof setupLocationTypeahead === 'function' && locationSelect.id === 'location-select') {
+        //              setupLocationTypeahead(); // Assuming it uses the global allLocations array
+        //          }
+
+        //          // Decide initial search action AFTER locations and other params are set.
+        //          if (performSpecificSearchViaUrl) { ... } else { fetchAllActiveHotels(); }
+        //     });
+        // });
+        // The current structure where populateLocationsDropdownFromApi is called inside the DOMContentLoaded,
+        // and then the decision to search is made, is fine. The key is that populateLocationsDropdownFromApi
+        // now handles its own value setting for Choices.js.
 
         // New function for default load
         async function fetchAllActiveHotels() {

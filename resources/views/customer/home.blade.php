@@ -744,47 +744,74 @@
     <script>
         let homeFlatpickrInstance; // Make instance globally accessible within script if needed
 
-        // Copied from hotels/index.blade.php - slightly adapted for home page
         async function populateLocationsDropdownFromApi(selectedValue = null) {
-            const locationSelect = document.querySelector('#home-search-form select[name="location"]'); // Use new form ID
+            const locationSelect = document.querySelector('#home-search-form select[name="location"]');
             if (!locationSelect) {
-                console.error("Location select not found for home page (#home-search-form select[name='location'])");
+                console.error("Location select element not found on home page.");
                 return;
             }
 
             try {
                 const response = await fetch('/hotels/select-options');
                 if (!response.ok) {
-                    console.error("Failed to fetch locations for home page");
-                    locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    console.error("Failed to fetch locations:", response.status);
+                    if (window.Choices && locationSelect.choices) {
+                        locationSelect.choices.setChoices([{ value: '', label: 'Could not load locations' }], 'value', 'label', true);
+                    } else {
+                        locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    }
                     return;
                 }
                 const result = await response.json();
-                const prev = selectedValue || locationSelect.value;
-                locationSelect.innerHTML = `<option value="">Select location</option>`;
-                let allLocations = [];
-                result.data.forEach((item) => { // Assuming result.data is an array of objects
-                    const locationName = item.address; // Use item.address directly
-                    if (locationName && !allLocations.includes(locationName)) {
-                        allLocations.push(locationName);
-                        locationSelect.innerHTML += `<option value="${locationName}">${locationName}</option>`;
-                    }
-                });
 
-                if (prev) { // If a previous value or selectedValue (from URL param) exists
-                    locationSelect.value = prev;
+                let choicesArray = [{ value: '', label: 'Select location', selected: false, disabled: true }]; // Disabled default option
+                let uniqueLocations = [];
+
+                if (result.data && Array.isArray(result.data)) {
+                    result.data.forEach((item) => {
+                        const locationName = item.address;
+                        if (locationName && !uniqueLocations.includes(locationName)) {
+                            uniqueLocations.push(locationName);
+                            choicesArray.push({ value: locationName, label: locationName, selected: false });
+                        }
+                    });
                 }
-                // This function itself doesn't handle Choices.js re-initialization directly.
-                // That should be handled after this promise resolves if Choices.js is used.
+
+                if (window.Choices && locationSelect.choices) {
+                    locationSelect.choices.setChoices(choicesArray, 'value', 'label', true);
+                    if (selectedValue) {
+                        const valueExists = choicesArray.some(choice => choice.value === selectedValue);
+                        if (valueExists) {
+                            locationSelect.choices.setValue([{ value: selectedValue, label: selectedValue }]);
+                        } else {
+                            console.warn(`Selected value "${selectedValue}" not found in new choices for location (home page).`);
+                            // Optionally, select the placeholder if the value doesn't exist
+                            // locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                        }
+                    } else {
+                        // Ensure placeholder is selected if no selectedValue and choices were repopulated
+                         locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                    }
+                } else {
+                    locationSelect.innerHTML = choicesArray.map(choice => `<option value="${choice.value}" ${choice.disabled ? 'disabled' : ''} ${choice.selected ? 'selected' : ''}>${choice.label}</option>`).join('');
+                    if (selectedValue) {
+                        locationSelect.value = selectedValue;
+                    } else {
+                        locationSelect.value = ""; // Select the placeholder
+                    }
+                }
             } catch (error) {
-                console.error("Error populating locations:", error);
-                locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+                console.error("Error in populateLocationsDropdownFromApi (home page):", error);
+                if (window.Choices && locationSelect.choices) {
+                    locationSelect.choices.setChoices([{ value: '', label: 'Error loading locations' }], 'value', 'label', true);
+                } else {
+                    locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+                }
             }
         }
 
-
         document.addEventListener("DOMContentLoaded", function () {
-            const bookingForm = document.getElementById('home-search-form'); // Use the new ID
+            const bookingForm = document.getElementById('home-search-form');
             if (!bookingForm) {
                 console.error("Home page search form with ID 'home-search-form' not found.");
                 return;
@@ -797,7 +824,7 @@
                 flatpickrDefaultDates = [query.check_in, query.check_out];
             }
 
-            homeFlatpickrInstance = flatpickr(bookingForm.querySelector(".flatpickr"), { // Target flatpickr within the form
+            homeFlatpickrInstance = flatpickr(bookingForm.querySelector(".flatpickr"), {
                 mode: "range",
                 dateFormat: "Y-m-d", // Internal format
                 altInput: true,      // User-friendly display
@@ -836,8 +863,8 @@
             }
 
             // Get the booking form and handle submission
-            var bookingForm = document.querySelector('.card.shadow.rounded-3.position-relative.p-4.pe-md-5.pb-5.pb-md-4');
-            if (bookingForm) {
+            // const bookingForm is already declared above using getElementById('home-search-form')
+            if (bookingForm) { // Use the bookingForm declared with const
                 // Pre-fill from query params on load
                 setFormFromQuery(bookingForm, getQueryParams());
 
@@ -892,29 +919,8 @@
                     btnParent.replaceChild(newBtn, searchBtn);
                 }
 
-                // Populate locations, then set the value if query.location exists.
-                // Also, call setFormFromQuery for other fields (guests/rooms).
-                // Date pre-fill is handled by flatpickr defaultDate.
-                populateLocationsDropdownFromApi(query.location).then(() => {
-                    if (query.location) {
-                        const currentForm = document.getElementById('home-search-form'); // Re-select to be safe within async scope
-                        const locationSelectElem = currentForm.querySelector('select[name="location"]');
-                        if (locationSelectElem) {
-                             if (window.Choices && locationSelectElem.choices) { // Check if Choices.js is active
-                                 // Ensure the value exists as an option before setting
-                                 const optionExists = Array.from(locationSelectElem.options).some(opt => opt.value === query.location);
-                                 if(optionExists){
-                                     locationSelectElem.choices.setValue([{value: query.location, label: query.location}]);
-                                 } else {
-                                     console.warn(`Location value "${query.location}" from URL not found in populated options.`);
-                                     // Optionally add it if desired and if Choices.js allows dynamic option addition easily
-                                 }
-                             } else {
-                                locationSelectElem.value = query.location; // Fallback for standard select
-                             }
-                        }
-                    }
-                });
+                // Call populateLocationsDropdownFromApi. It now handles setting the selected value internally.
+                populateLocationsDropdownFromApi(query.location);
 
                 // Set other form fields (guests, rooms) that don't depend on async location population.
                 setFormFromQuery(bookingForm, query);
