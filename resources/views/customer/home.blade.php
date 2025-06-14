@@ -648,165 +648,59 @@
             </div>
 
             <div class="row g-4">
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Sri Lanka
+                @if(!empty($hotels) && $hotels->count() > 0)
+                    @foreach ($hotels as $hotel)
+                    <div class="col-sm-6 col-xl-3">
+                        <!-- Card START -->
+                        <div class="card card-img-scale overflow-hidden bg-transparent">
+                            <!-- Image and overlay -->
+                            <div class="card-img-scale-wrapper rounded-3">
+                                <!-- Image -->
+                                <img src="{{ asset( ($hotel->images[0] ?? null) ? ($hotel->images[0]) : 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
+                                {{-- Note: If images are stored with Storage::put('public/...') then Storage::url($hotel->images[0]) would be correct.
+                                     If they are already in public path directly, asset() is fine.
+                                     The factory currently suggests simple names like 'placeholders/hotel_image_1.jpg',
+                                     implying they might be directly under public/ or public/placeholders/.
+                                     Using asset() directly assumes these paths are relative to the public directory.
+                                --}}
+                                <!-- Badge -->
+                                <div class="position-absolute bottom-0 start-0 p-3">
+                                    <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        {{-- Display city or a part of address if full address is too long --}}
+                                        {{ $hotel->city ?? ($hotel->address ? Str::limit(explode(',', $hotel->address)[0], 15) : 'Unknown Location') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card body -->
+                            <div class="card-body px-2">
+                                <!-- Title -->
+                                <h5 class="card-title">
+                                    <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
+                                        {{ $hotel->name }}
+                                    </a>
+                                </h5>
+                                <!-- Price and rating -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="text-success mb-0">
+                                        {{-- Price removed as $hotel->price is not reliable and should come from room rates --}}
+                                    </h6>
+                                    <h6 class="mb-0">
+                                        {{ number_format($hotel->star_rating ?? 0, 1) }}
+                                        <i class="fa-solid fa-star text-warning ms-1"></i>
+                                    </h6>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
-                                    {{ $hotel->name }}
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    {{-- Price removed as $hotel->price is not reliable --}}
-                                </h6>
-                                <h6 class="mb-0">
-                                    {{ $hotel->star_rating ?? 'N/A' }}
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
+                        <!-- Card END -->
                     </div>
-                    <!-- Card END -->
-                </div>
-
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/02.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    California
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
-                                    {{ $hotel->name }}
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    {{-- Price removed --}}
-                                </h6>
-                                <h6 class="mb-0">
-                                    {{ $hotel->star_rating ?? 'N/A' }}
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12">
+                        <p>No featured hotels available at the moment.</p>
                     </div>
-                    <!-- Card END -->
-                </div>
-
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/03.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Los Angeles
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
-                                    {{ $hotel->name }}
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    {{-- Price removed --}}
-                                </h6>
-                                <h6 class="mb-0">
-                                    {{ $hotel->star_rating ?? 'N/A' }}
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card END -->
-                </div>
-
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/04.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Chicago
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
-                                    {{ $hotel->name }}
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    {{-- Price removed --}}
-                                </h6>
-                                <h6 class="mb-0">
-                                    {{ $hotel->star_rating ?? 'N/A' }}
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card END -->
-                </div>
+                @endif
             </div>
             <!-- Row END -->
         </div>
