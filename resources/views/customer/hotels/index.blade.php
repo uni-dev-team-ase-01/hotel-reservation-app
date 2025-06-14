@@ -695,14 +695,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize flatpickr if available
-            if (window.flatpickr) {
-                flatpickr('#checkinout', {
-                    mode: 'range',
-                    dateFormat: 'Y-m-d',
-                });
-            }
-
+            // Function to update guest input display and hidden fields
             function updateGuestInput() {
                 const adultsEl = document.querySelector(
                     '.guest-selector-count.adults',
@@ -920,11 +913,91 @@
                  });
             }
 
-            // Initial fetch for hotels is removed. User must initiate search.
-            // if (typeof fetchHotels !== 'undefined') fetchHotels();
+            // Initial flatpickr options (will be potentially overridden by URL params)
+            let flatpickrOptions = {
+                mode: 'range',
+                dateFormat: 'Y-m-d',
+            };
 
-            // Initial rendering of empty state for hotels if desired, or leave it to search
-            renderHotels([], 1); // Show "No hotels" message initially
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramLocation = urlParams.get('location');
+            const paramCheckIn = urlParams.get('check_in');
+            const paramCheckOut = urlParams.get('check_out');
+            const paramAdults = urlParams.get('adults');
+            const paramChildren = urlParams.get('children');
+            const paramRooms = urlParams.get('rooms');
+
+            let performAutoSearch = false;
+
+            if (paramCheckIn && paramCheckOut) {
+                const checkInOutEl = document.getElementById('checkinout');
+                if (checkInOutEl) {
+                    // Set value for display, though flatpickr defaultDate is better for initialization
+                    checkInOutEl.value = `${paramCheckIn} to ${paramCheckOut}`;
+                    flatpickrOptions.defaultDate = [paramCheckIn, paramCheckOut];
+                }
+                performAutoSearch = true;
+            }
+
+            // Initialize flatpickr with potentially modified options
+            if (window.flatpickr) {
+                flatpickr('#checkinout', flatpickrOptions);
+            }
+
+            if (paramAdults) {
+                const adultsEl = document.querySelector('.guest-selector-count.adults');
+                if (adultsEl) adultsEl.textContent = paramAdults;
+                const adultsInputEl = document.getElementById('adults-input');
+                if (adultsInputEl) adultsInputEl.value = paramAdults;
+            }
+            if (paramChildren) {
+                const childEl = document.querySelector('.guest-selector-count.child');
+                if (childEl) childEl.textContent = paramChildren;
+                const childrenInputEl = document.getElementById('children-input');
+                if(childrenInputEl) childrenInputEl.value = paramChildren;
+            }
+            if (paramRooms) {
+                const roomsEl = document.querySelector('.guest-selector-count.rooms');
+                if (roomsEl) roomsEl.textContent = paramRooms;
+                const roomsInputEl = document.getElementById('rooms-input');
+                if(roomsInputEl) roomsInputEl.value = paramRooms;
+            }
+
+            if (paramAdults || paramChildren || paramRooms) { // only call if any guest param is present
+                updateGuestInput();
+            }
+
+
+            populateLocationsDropdownFromApi(paramLocation).then(() => {
+                if (paramLocation) {
+                    const locationSelect = document.getElementById('location-select');
+                    if (locationSelect) {
+                        // For Choices.js, setting value after options are populated is key.
+                        // Check if Choices instance exists on the element.
+                         if (window.Choices && locationSelect.choices) {
+                             locationSelect.choices.setValue([{value: paramLocation, label: paramLocation}]); // More robust way for choices
+                         } else {
+                            locationSelect.value = paramLocation; // Fallback
+                         }
+                    }
+                }
+                // if (typeof setupLocationTypeahead !== 'undefined') setupLocationTypeahead();
+            });
+
+            if (performAutoSearch) {
+                // Location is also required for a meaningful auto-search by handleSearchFormSubmit's validation
+                if (paramLocation || (document.getElementById('location-select') && document.getElementById('location-select').value)) {
+                    handleSearchFormSubmit();
+                } else {
+                    // If location is considered essential for auto-search and not present, render empty.
+                    // Or, if backend can handle no location, this check might be removed.
+                    // For now, if dates are there but location is not, don't auto-search.
+                    console.log("Auto-search skipped: Location parameter missing or not set.");
+                    renderHotels([], 1);
+                }
+            } else {
+                renderHotels([], 1);
+            }
         });
     </script>
 @endpush
