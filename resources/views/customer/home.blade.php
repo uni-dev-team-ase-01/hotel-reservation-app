@@ -141,14 +141,8 @@
                                         <label class="form-label">
                                             Location
                                         </label>
-                                        <select class="form-select js-choice" data-search-enabled="true">
-                                            <option value="">
-                                                Select location
-                                            </option>
-                                            @foreach ($hotels as $hotel)
-                                                <option value="{{ $hotel->id }}">{{ $hotel->address }}</option>
-                                            @endforeach
-
+                                        <select class="form-select js-choice" data-search-enabled="true" name="location">
+                                            <option value="">Select location</option>
                                         </select>
                                     </div>
                                 </div>
@@ -164,8 +158,8 @@
                                         <label class="form-label">
                                             Check in - out
                                         </label>
-                                        <input type="text" class="form-control flatpickr" data-mode="range"
-                                            placeholder="Select date" value="19 Sep to 28 Sep" />
+                                        <input type="text" class="form-control flatpickr"
+                                            placeholder="Select date" /> <!-- Value will be set by flatpickr or JS -->
                                     </div>
                                 </div>
                             </div>
@@ -854,15 +848,69 @@
 @endsection
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+
     <script>
+        let homeFlatpickrInstance; // Make instance globally accessible within script if needed
+
+        // Copied from hotels/index.blade.php - slightly adapted for home page
+        async function populateLocationsDropdownFromApi(selectedValue = null) {
+            const locationSelect = document.querySelector('#booking-form .form-select[name="location"]'); // More specific selector
+            if (!locationSelect) {
+                console.error("Location select not found for home page");
+                return;
+            }
+
+            try {
+                // Assuming the same endpoint provides suitable location data (addresses)
+                const response = await fetch('/hotels/select-options');
+                if (!response.ok) {
+                    console.error("Failed to fetch locations for home page");
+                    locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    return;
+                }
+                const result = await response.json();
+                const prev = selectedValue || locationSelect.value; // Use selectedValue if provided
+                locationSelect.innerHTML = `<option value="">Select location</option>`;
+                let allLocations = []; // To avoid duplicates if API returns them
+                result.data.forEach((hotel) => {
+                    const location = hotel.address || hotel.location;
+                    if (location && !allLocations.includes(location)) {
+                        allLocations.push(location);
+                        locationSelect.innerHTML += `<option value="${location}">${location}</option>`;
+                    }
+                });
+
+                if (prev) {
+                    locationSelect.value = prev;
+                }
+                 // If Choices.js is used on this specific select, it might need re-initialization or update here
+                 // For now, assuming standard select or that Choices.js picks up changes.
+            } catch (error) {
+                console.error("Error populating locations:", error);
+                locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+            }
+        }
+
+
         document.addEventListener("DOMContentLoaded", function () {
-            // Initialize flatpickr on all inputs with class 'flatpickr'
-            flatpickr(".flatpickr", {
+            let flatpickrDefaultDates = [];
+            const query = getQueryParams(); // Get query params first
+
+            if (query.check_in && query.check_out) {
+                // Validate if dates are in YYYY-MM-DD, otherwise, this might fail or need parsing
+                flatpickrDefaultDates = [query.check_in, query.check_out];
+            }
+
+            homeFlatpickrInstance = flatpickr(".flatpickr", {
                 mode: "range",
-                dateFormat: "d M"
+                dateFormat: "Y-m-d", // Internal format
+                altInput: true,      // User-friendly display
+                altFormat: "d M Y",  // Format for user display
+                defaultDate: flatpickrDefaultDates
             });
 
-            // Pre-fill form from query params if found in URL
             function getQueryParams() {
                 const params = {};
                 window.location.search.substring(1).split("&").forEach(function (part) {
@@ -875,22 +923,13 @@
             }
 
             function setFormFromQuery(bookingForm, query) {
-                // Set location
-                if (query.location) {
-                    let locationSelect = bookingForm.querySelector('.form-select');
-                    if (locationSelect) locationSelect.value = query.location;
-                }
-                // Set date range formatted as "d M"
-                if (query.check_in && query.check_out) {
-                    let dateInput = bookingForm.querySelector('.flatpickr');
-                    if (dateInput) {
-                        dateInput.value = `${query.check_in} to ${query.check_out}`;
-                        if (window.flatpickr && dateInput._flatpickr) {
-                            dateInput._flatpickr.setDate([query.check_in, query.check_out]);
-                        }
-                    }
-                }
-                // Set guests/rooms
+                // Set location - This will be handled after populateLocationsDropdownFromApi
+                // if (query.location) { ... }
+
+                // Dates are handled by flatpickr's defaultDate now based on YYYY-MM-DD from query
+
+                // Set guests/rooms (using the same selectors as before)
+                // These are for display only, actual values for submission are from hidden fields or read directly
                 if (query.adults) {
                     let el = bookingForm.querySelector('.guest-selector-count.adults');
                     if (el) el.textContent = query.adults;
@@ -915,21 +954,25 @@
                     e.preventDefault();
 
                     // Get location
-                    var locationSelect = bookingForm.querySelector('.form-select');
+                    var locationSelect = bookingForm.querySelector('select[name="location"]');
                     var location = locationSelect ? locationSelect.value : '';
 
-                    // Get date range and convert to check_in and check_out
-                    var dateInput = bookingForm.querySelector('.flatpickr');
-                    var dateRange = dateInput ? dateInput.value : '';
                     var check_in = '', check_out = '';
-                    if (dateRange && dateRange.includes(' to ')) {
-                        [check_in, check_out] = dateRange.split(' to ');
-                    } else if (dateRange) {
-                        check_in = dateRange;
-                        check_out = dateRange;
+                    if (homeFlatpickrInstance && homeFlatpickrInstance.selectedDates.length === 2) {
+                        check_in = homeFlatpickrInstance.formatDate(homeFlatpickrInstance.selectedDates[0], "Y-m-d");
+                        check_out = homeFlatpickrInstance.formatDate(homeFlatpickrInstance.selectedDates[1], "Y-m-d");
+                    } else {
+                        // Optional: Show a message if dates are not selected
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({ text: "Please select check-in and check-out dates.", duration: 3000, backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)" }).showToast();
+                        } else {
+                            alert("Please select check-in and check-out dates.");
+                        }
+                        return; // Prevent redirection if dates are not valid
                     }
 
-                    // Get guest & room counts
+                    // Get guest & room counts from display elements
+                    // Note: It's more robust to have hidden inputs updated by guest selector, like in hotels/index
                     var adults = bookingForm.querySelector('.guest-selector-count.adults')?.textContent.trim() || '2';
                     var children = bookingForm.querySelector('.guest-selector-count.child')?.textContent.trim() || '0';
                     var rooms = bookingForm.querySelector('.guest-selector-count.rooms')?.textContent.trim() || '1';
@@ -947,17 +990,33 @@
                     window.location.href = '/hotels?' + params.toString();
                 });
 
-                // Replace the <a> search button with <button type="submit">
+                // Ensure search button is type submit
                 var searchBtn = bookingForm.querySelector('.btn.btn-primary');
                 if (searchBtn && searchBtn.tagName.toLowerCase() === 'a') {
                     var btnParent = searchBtn.parentNode;
                     var newBtn = document.createElement('button');
-                    newBtn.type = 'submit';
+                    newBtn.type = 'submit'; // Crucial for form submission
                     newBtn.className = searchBtn.className;
                     newBtn.innerHTML = searchBtn.innerHTML;
                     btnParent.replaceChild(newBtn, searchBtn);
                 }
-            }
+
+                // Populate locations then set form values from query
+                populateLocationsDropdownFromApi(query.location).then(() => {
+                    if (query.location) {
+                        if (locationSelect) { // locationSelect is defined outside this .then in the main scope
+                           // If Choices.js is active on this select, it might need specific handling here
+                           // For standard select, this is fine.
+                           locationSelect.value = query.location;
+                        }
+                    }
+                    // Other parts of setFormFromQuery that depend on dynamic content can also be called here
+                });
+                 // Call setFormFromQuery for other fields that don't depend on async ops
+                setFormFromQuery(bookingForm, query);
+
+
+            } // end if(bookingForm)
         });
     </script>
 @endpush

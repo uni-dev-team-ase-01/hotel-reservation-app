@@ -56,4 +56,3 @@ Route::post('/reservation/payment', [ReservationController::class, 'processPayme
 Route::post('/stripe/intent', [ReservationController::class, 'createStripeIntent'])->middleware('auth')->name('stripe.intent');
 
 Route::get('/reservation/success/{reservation?}', [ReservationController::class, 'success'])->middleware('auth')->name('reservation.success');
-Route::get('/hotel/{hotel}/rooms/{rooms}/book', [ReservationController::class, 'startBooking'])->name('reservation.startBooking');
