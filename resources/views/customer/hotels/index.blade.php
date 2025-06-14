@@ -270,26 +270,45 @@
         // Fetch all hotels for select box (best practice: lightweight endpoint)
         async function populateLocationsDropdownFromApi(selectedValue = null) {
             const locationSelect = document.getElementById('location-select');
-            if (!locationSelect) return;
-            // This endpoint might need to be adjusted if locations are derived from the new /hotel/search results
-            // For now, assuming it's a general list of all possible locations.
-            const response = await fetch('/hotels/select-options');
-            if (!response.ok) return;
-            const result = await response.json();
-            const prev = locationSelect.value;
-            locationSelect.innerHTML = `<option value="">Select location</option>`;
-            allLocations = [];
-            result.data.forEach((hotel) => { // Assuming this endpoint returns a flat list of locations or hotels with addresses
-                const location = hotel.address || hotel.location; // Adjust if structure is different
-                if (location && !allLocations.includes(location)) {
-                    allLocations.push(location);
-                    locationSelect.innerHTML += `<option value="${location}">${location}</option>`;
+            if (!locationSelect) {
+                console.warn("Location select dropdown not found.");
+                return;
+            }
+            try {
+                console.log("Populating locations dropdown...");
+                const response = await fetch('/hotels/select-options');
+                if (!response.ok) {
+                    console.error("Failed to fetch locations:", response.status, response.statusText);
+                    locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    return;
                 }
-            });
-            if (selectedValue !== null) {
-                locationSelect.value = selectedValue;
-            } else if (prev) {
-                locationSelect.value = prev;
+                const result = await response.json();
+                if (!result.success || !Array.isArray(result.data)) {
+                    console.error("Location API did not return successful data:", result);
+                    locationSelect.innerHTML = `<option value="">Error in location data</option>`;
+                    return;
+                }
+
+                const prev = locationSelect.value;
+                locationSelect.innerHTML = `<option value="">Select location</option>`;
+                allLocations = [];
+                result.data.forEach((item) => {
+                    const locationName = item.address;
+                    if (locationName && !allLocations.includes(locationName)) {
+                        allLocations.push(locationName);
+                        locationSelect.innerHTML += `<option value="${locationName}">${locationName}</option>`;
+                    }
+                });
+
+                if (selectedValue !== null) {
+                    locationSelect.value = selectedValue;
+                } else if (prev) {
+                    locationSelect.value = prev;
+                }
+                console.log("Locations dropdown populated.");
+            } catch (error) {
+                console.error("Error in populateLocationsDropdownFromApi:", error);
+                if(locationSelect) locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
             }
         }
 
@@ -484,6 +503,13 @@
                             `;
 
                 const numAvailableRooms = item.rooms ? item.rooms.length : 0;
+                let roomAvailabilityMessage = '';
+
+                // Display room availability message only if it's a search result
+                if (item.isSearchResult === true) {
+                    roomAvailabilityMessage = numAvailableRooms > 0 ? `<p class="mb-0 small mt-1"><strong>${numAvailableRooms} room type(s) available for your search.</strong></p>` : '<p class="mb-0 small mt-1 text-danger">No rooms available for these criteria.</p>';
+                }
+
 
                 // --- Select Room Button logic ---
                 const searchFormEl = document.getElementById('search-form');
@@ -535,7 +561,7 @@
                                                 <a href="/hotel/${hotel.id}" target="_blank">${hotel.name}</a>
                                             </h5>
                                             <small><i class="bi bi-geo-alt me-2"></i>${hotel.address || 'Location not available'}</small>
-                                            ${numAvailableRooms > 0 ? `<p class="mb-0 small mt-1"><strong>${numAvailableRooms} room type(s) available for your search.</strong></p>` : '<p class="mb-0 small mt-1 text-danger">No rooms available for these criteria.</p>'}
+                                            ${roomAvailabilityMessage}
                                             <ul class="nav nav-divider mt-3">
                                                 ${amenitiesHTML}
                                             </ul>
@@ -674,12 +700,13 @@
                 const result = await response.json();
 
                 // result.data is expected to be an array of {"hotel": {...}, "rooms": [...]}
-                allHotels = result.data || [];
+                // Add isSearchResult: true flag for specific searches
+                console.log("fetchHotels: Processing search results from /hotel/search");
+                allHotels = (result.data || []).map(item => ({ ...item, isSearchResult: true }));
                 filteredHotels = [...allHotels];
                 renderHotels(filteredHotels, 1);
-                // populateLocationsDropdownFromApi(); // Might not be needed or could be smarter
             } catch (e) {
-                console.error("FetchHotels Error:", e);
+                console.error("Error in fetchHotels (specific search):", e);
                 const container = document.getElementById(
                     'hotel-list-container',
                 );
@@ -984,34 +1011,38 @@
 
             // Decide what to do on initial load
             if (performSpecificSearchViaUrl) {
-                console.log('Performing specific search based on URL parameters.');
-                handleSearchFormSubmit(); // This calls fetchHotels with specific params to /hotel/search
+                console.log('DOMContentLoaded: Performing specific search based on URL parameters.');
+                handleSearchFormSubmit();
             } else {
-                console.log('No specific search URL parameters. Fetching all active hotels by default.');
+                console.log('DOMContentLoaded: No specific search URL parameters found. Fetching all active hotels by default.');
                 fetchAllActiveHotels();
             }
         });
 
         // New function for default load
         async function fetchAllActiveHotels() {
+            console.log("fetchAllActiveHotels: Starting to fetch all active hotels.");
             const searchButton = document.getElementById('search-hotels');
             if (searchButton) searchButton.disabled = true;
 
             try {
-                let url = '/hotels/getHotels'; // Endpoint for getting all active hotels
+                let url = '/hotels/getHotels';
+                console.log(`fetchAllActiveHotels: Fetching from URL: ${url}`);
                 const response = await fetch(url);
                 if (!response.ok) {
                     let errorData;
                     try { errorData = await response.json(); } catch (e) { /* no json error body */ }
                     const message = errorData?.message || `Failed to fetch hotels (status: ${response.status})`;
+                    console.error("fetchAllActiveHotels: Fetch error - ", message);
                     throw new Error(message);
                 }
                 const result = await response.json();
+                console.log("fetchAllActiveHotels: Successfully fetched data.", result);
 
                 let rawHotels = result.data || [];
-                // Map to the {hotel, rooms} structure expected by renderHotels
+                console.log(`fetchAllActiveHotels: Mapping ${rawHotels.length} raw hotels.`);
+                // Map to the {hotel, rooms, isSearchResult} structure expected by renderHotels
                 allHotels = rawHotels.map((hotelData, idx) => {
-                    // Basic hotel data transformation (similar to old fetchHotels mapping)
                     const hotel = {
                         id: hotelData.id || idx + 1,
                         name: hotelData.name,
@@ -1020,26 +1051,26 @@
                         images: Array.isArray(hotelData.images) && hotelData.images.length > 0
                             ? hotelData.images.map(img => (typeof img === 'string' ? img : img.image_path || 'assets/images/category/hotel/4by3/04.jpg'))
                             : (typeof hotelData.images === 'string' && hotelData.images ? [hotelData.images] : ['assets/images/category/hotel/4by3/04.jpg']),
-                        price_per_night: hotelData.price_per_night || hotelData.price || 0, // Ensure price_per_night for consistency
+                        price_per_night: hotelData.price_per_night || hotelData.price || 0,
                         original_price_per_night: hotelData.original_price_per_night || hotelData.original_price || null,
                         discount_percentage: hotelData.discount_percentage || hotelData.discount || null,
                         website: hotelData.website || '#',
                         description: hotelData.description || '',
                         type: hotelData.type || hotelData.hotel_type || '',
-                        amenities: hotelData.amenities || [], // Ensure amenities is an array
-                        // Properties for listGroup in renderHotels
+                        amenities: hotelData.amenities || [],
                         is_free_cancellation: hotelData.is_free_cancellation !== undefined ? hotelData.is_free_cancellation : (hotelData.description && hotelData.description.toLowerCase().includes('free cancellation')),
                         is_non_refundable: hotelData.is_non_refundable !== undefined ? hotelData.is_non_refundable : (hotelData.description && hotelData.description.toLowerCase().includes('non refundable')),
                         has_free_breakfast: hotelData.has_free_breakfast !== undefined ? hotelData.has_free_breakfast : (hotelData.description && hotelData.description.toLowerCase().includes('breakfast')),
                     };
-                    return { hotel: hotel, rooms: [] }; // rooms array is empty for default load
+                    return { hotel: hotel, rooms: [], isSearchResult: false }; // Add isSearchResult: false
                 });
 
                 filteredHotels = [...allHotels];
+                console.log("fetchAllActiveHotels: Data mapped. Calling renderHotels.");
                 renderHotels(filteredHotels, 1);
 
             } catch (e) {
-                console.error("Error in fetchAllActiveHotels:", e);
+                console.error("Error in fetchAllActiveHotels function:", e);
                 const container = document.getElementById('hotel-list-container');
                 if (container) container.innerHTML = `<div class="alert alert-danger">${e.message || 'Failed to load hotels.'}</div>`;
                 renderPagination(1, 1);

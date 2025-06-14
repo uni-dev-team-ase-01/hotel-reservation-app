@@ -129,7 +129,7 @@
                     <h6 class="d-none d-xl-block mb-3">Check Availability</h6>
 
                     <!-- Booking from START -->
-                    <form class="card shadow rounded-3 position-relative p-4 pe-md-5 pb-5 pb-md-4">
+                    <form id="home-search-form" class="card shadow rounded-3 position-relative p-4 pe-md-5 pb-5 pb-md-4">
                         <div class="row g-4 align-items-center">
                             <!-- Location -->
                             <div class="col-lg-4">
@@ -746,14 +746,13 @@
 
         // Copied from hotels/index.blade.php - slightly adapted for home page
         async function populateLocationsDropdownFromApi(selectedValue = null) {
-            const locationSelect = document.querySelector('#booking-form .form-select[name="location"]'); // More specific selector
+            const locationSelect = document.querySelector('#home-search-form select[name="location"]'); // Use new form ID
             if (!locationSelect) {
-                console.error("Location select not found for home page");
+                console.error("Location select not found for home page (#home-search-form select[name='location'])");
                 return;
             }
 
             try {
-                // Assuming the same endpoint provides suitable location data (addresses)
                 const response = await fetch('/hotels/select-options');
                 if (!response.ok) {
                     console.error("Failed to fetch locations for home page");
@@ -761,22 +760,22 @@
                     return;
                 }
                 const result = await response.json();
-                const prev = selectedValue || locationSelect.value; // Use selectedValue if provided
+                const prev = selectedValue || locationSelect.value;
                 locationSelect.innerHTML = `<option value="">Select location</option>`;
-                let allLocations = []; // To avoid duplicates if API returns them
-                result.data.forEach((hotel) => {
-                    const location = hotel.address || hotel.location;
-                    if (location && !allLocations.includes(location)) {
-                        allLocations.push(location);
-                        locationSelect.innerHTML += `<option value="${location}">${location}</option>`;
+                let allLocations = [];
+                result.data.forEach((item) => { // Assuming result.data is an array of objects
+                    const locationName = item.address; // Use item.address directly
+                    if (locationName && !allLocations.includes(locationName)) {
+                        allLocations.push(locationName);
+                        locationSelect.innerHTML += `<option value="${locationName}">${locationName}</option>`;
                     }
                 });
 
-                if (prev) {
+                if (prev) { // If a previous value or selectedValue (from URL param) exists
                     locationSelect.value = prev;
                 }
-                 // If Choices.js is used on this specific select, it might need re-initialization or update here
-                 // For now, assuming standard select or that Choices.js picks up changes.
+                // This function itself doesn't handle Choices.js re-initialization directly.
+                // That should be handled after this promise resolves if Choices.js is used.
             } catch (error) {
                 console.error("Error populating locations:", error);
                 locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
@@ -785,15 +784,20 @@
 
 
         document.addEventListener("DOMContentLoaded", function () {
+            const bookingForm = document.getElementById('home-search-form'); // Use the new ID
+            if (!bookingForm) {
+                console.error("Home page search form with ID 'home-search-form' not found.");
+                return;
+            }
+
             let flatpickrDefaultDates = [];
-            const query = getQueryParams(); // Get query params first
+            const query = getQueryParams();
 
             if (query.check_in && query.check_out) {
-                // Validate if dates are in YYYY-MM-DD, otherwise, this might fail or need parsing
                 flatpickrDefaultDates = [query.check_in, query.check_out];
             }
 
-            homeFlatpickrInstance = flatpickr(".flatpickr", {
+            homeFlatpickrInstance = flatpickr(bookingForm.querySelector(".flatpickr"), { // Target flatpickr within the form
                 mode: "range",
                 dateFormat: "Y-m-d", // Internal format
                 altInput: true,      // User-friendly display
@@ -812,17 +816,14 @@
                 return params;
             }
 
-            function setFormFromQuery(bookingForm, query) {
-                // Set location - This will be handled after populateLocationsDropdownFromApi
-                // if (query.location) { ... }
+            function setFormFromQuery(formElement, queryParams) {
+                // Location is now set after populateLocationsDropdownFromApi promise resolves.
+                // Dates are handled by flatpickr's defaultDate.
 
-                // Dates are handled by flatpickr's defaultDate now based on YYYY-MM-DD from query
-
-                // Set guests/rooms (using the same selectors as before)
-                // These are for display only, actual values for submission are from hidden fields or read directly
-                if (query.adults) {
-                    let el = bookingForm.querySelector('.guest-selector-count.adults');
-                    if (el) el.textContent = query.adults;
+                // Set guests/rooms from query parameters
+                if (queryParams.adults) {
+                    let el = formElement.querySelector('.guest-selector-count.adults');
+                    if (el) el.textContent = queryParams.adults;
                 }
                 if (query.children) {
                     let el = bookingForm.querySelector('.guest-selector-count.child');
@@ -844,7 +845,7 @@
                     e.preventDefault();
 
                     // Get location
-                    var locationSelect = bookingForm.querySelector('select[name="location"]');
+                    var locationSelect = bookingForm.querySelector('select[name="location"]'); // bookingForm is now #home-search-form
                     var location = locationSelect ? locationSelect.value : '';
 
                     var check_in = '', check_out = '';
@@ -891,20 +892,32 @@
                     btnParent.replaceChild(newBtn, searchBtn);
                 }
 
-                // Populate locations then set form values from query
+                // Populate locations, then set the value if query.location exists.
+                // Also, call setFormFromQuery for other fields (guests/rooms).
+                // Date pre-fill is handled by flatpickr defaultDate.
                 populateLocationsDropdownFromApi(query.location).then(() => {
                     if (query.location) {
-                        if (locationSelect) { // locationSelect is defined outside this .then in the main scope
-                           // If Choices.js is active on this select, it might need specific handling here
-                           // For standard select, this is fine.
-                           locationSelect.value = query.location;
+                        const currentForm = document.getElementById('home-search-form'); // Re-select to be safe within async scope
+                        const locationSelectElem = currentForm.querySelector('select[name="location"]');
+                        if (locationSelectElem) {
+                             if (window.Choices && locationSelectElem.choices) { // Check if Choices.js is active
+                                 // Ensure the value exists as an option before setting
+                                 const optionExists = Array.from(locationSelectElem.options).some(opt => opt.value === query.location);
+                                 if(optionExists){
+                                     locationSelectElem.choices.setValue([{value: query.location, label: query.location}]);
+                                 } else {
+                                     console.warn(`Location value "${query.location}" from URL not found in populated options.`);
+                                     // Optionally add it if desired and if Choices.js allows dynamic option addition easily
+                                 }
+                             } else {
+                                locationSelectElem.value = query.location; // Fallback for standard select
+                             }
                         }
                     }
-                    // Other parts of setFormFromQuery that depend on dynamic content can also be called here
                 });
-                 // Call setFormFromQuery for other fields that don't depend on async ops
-                setFormFromQuery(bookingForm, query);
 
+                // Set other form fields (guests, rooms) that don't depend on async location population.
+                setFormFromQuery(bookingForm, query);
 
             } // end if(bookingForm)
         });
