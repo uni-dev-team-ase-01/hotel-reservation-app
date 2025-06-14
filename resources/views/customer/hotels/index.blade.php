@@ -271,16 +271,19 @@
         async function populateLocationsDropdownFromApi(selectedValue = null) {
             const locationSelect = document.getElementById('location-select');
             if (!locationSelect) return;
+            // This endpoint might need to be adjusted if locations are derived from the new /hotel/search results
+            // For now, assuming it's a general list of all possible locations.
             const response = await fetch('/hotels/select-options');
             if (!response.ok) return;
             const result = await response.json();
             const prev = locationSelect.value;
             locationSelect.innerHTML = `<option value="">Select location</option>`;
             allLocations = [];
-            result.data.forEach((hotel) => {
-                if (!allLocations.includes(hotel.address)) {
-                    allLocations.push(hotel.address);
-                    locationSelect.innerHTML += `<option value="${hotel.address}">${hotel.address}</option>`;
+            result.data.forEach((hotel) => { // Assuming this endpoint returns a flat list of locations or hotels with addresses
+                const location = hotel.address || hotel.location; // Adjust if structure is different
+                if (location && !allLocations.includes(location)) {
+                    allLocations.push(location);
+                    locationSelect.innerHTML += `<option value="${location}">${location}</option>`;
                 }
             });
             if (selectedValue !== null) {
@@ -409,7 +412,8 @@
             const end = start + PAGE_SIZE;
             const hotelsPage = hotels.slice(start, end);
 
-            hotelsPage.forEach((hotel, index) => {
+            hotelsPage.forEach((item, index) => { // item is now {hotel: ..., rooms: ...}
+                const hotel = item.hotel; // Extract hotel object
                 const rating = hotel.star_rating || 0;
                 const fullStars = Math.floor(rating);
                 const halfStar = rating % 1 >= 0.5 ? 1 : 0;
@@ -425,60 +429,76 @@
                     starsHTML += `<li class="list-inline-item me-0 small"><i class="fa-regular fa-star text-warning"></i></li>`;
                 }
 
-                let imgs = Array.isArray(hotel.images)
+                let imgs = Array.isArray(hotel.images) && hotel.images.length > 0
                     ? hotel.images
-                    : [hotel.images];
+                    : (typeof hotel.images === 'string' && hotel.images ? [hotel.images] : ['assets/images/category/hotel/4by3/04.jpg']); // Default image
                 let sliderId = `tiny-slider-${hotel.id}`;
                 let imgSliderHTML = '';
                 if (imgs.length > 1) {
                     imgSliderHTML = `<div class="tiny-slider arrow-round arrow-xs arrow-dark overflow-hidden rounded-2" id="${sliderId}">
                                 <div class="tiny-slider-inner">
-                                    ${imgs.map((img) => `<div><img src="${img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
+                                    ${imgs.map((img) => `<div><img src="${img.image_path || img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
                                 </div>
                                 </div>`;
                 } else {
-                    imgSliderHTML = `<img src="${imgs[0]}" class="img-fluid rounded-start" alt="${hotel.name}">`;
+                    imgSliderHTML = `<img src="${imgs[0].image_path || imgs[0]}" class="img-fluid rounded-start" alt="${hotel.name}">`;
                 }
 
-                const discountBadge = hotel.discount
+                const discountBadge = hotel.discount_percentage // Assuming discount_percentage from HotelResource
                     ? `
                             <div class="position-absolute top-0 start-0 z-index-1 m-2">
-                                <div class="badge text-bg-danger">${hotel.discount}% Off</div>
+                                <div class="badge text-bg-danger">${hotel.discount_percentage}% Off</div>
                             </div>`
                     : '';
 
-                const amenitiesHTML = `
+                // Amenities: Assuming hotel.amenities is an array of strings from HotelResource
+                let amenitiesHTML = '';
+                if(hotel.amenities && Array.isArray(hotel.amenities)) {
+                    hotel.amenities.slice(0, 4).forEach(amenity => { // Show max 4 amenities
+                        amenitiesHTML += `<li class="nav-item">${amenity}</li>`;
+                    });
+                } else {
+                     amenitiesHTML = `
                             <li class="nav-item">Air Conditioning</li>
                             <li class="nav-item">Wifi</li>
                             <li class="nav-item">Kitchen</li>
                             <li class="nav-item">Pool</li>
-                            `;
+                            `; // Fallback
+                }
+
 
                 let listGroup = '';
-                if (hotel.free_cancellation)
+                // Assuming these properties exist in item.hotel after HotelResource transformation
+                if (hotel.is_free_cancellation) // Example property name
                     listGroup += `<li class="list-group-item d-flex text-success p-0"><i class="bi bi-patch-check-fill me-2"></i>Free Cancellation</li>`;
-                else if (hotel.refundable === false)
+                else if (hotel.is_non_refundable) // Example property name
                     listGroup += `<li class="list-group-item d-flex text-danger p-0"><i class="bi bi-patch-check-fill me-2"></i>Non Refundable</li>`;
-                if (hotel.free_breakfast)
+                if (hotel.has_free_breakfast) // Example property name
                     listGroup += `<li class="list-group-item d-flex text-success p-0"><i class="bi bi-patch-check-fill me-2"></i>Free Breakfast</li>`;
 
                 const priceHTML = `
                             <div class="d-flex align-items-center">
-                                ${hotel.original_price ? `<span class="text-decoration-line-through mb-0">$${hotel.original_price}</span>` : ''}
+                                ${hotel.price_per_night ? `<h5 class="fw-bold mb-0 me-1">$${hotel.price_per_night.toFixed(2)}</h5>` : ''}
+                                ${hotel.original_price_per_night ? `<span class="text-decoration-line-through mb-0">$${hotel.original_price_per_night.toFixed(2)}</span>` : ''}
                             </div>
                             `;
 
-                // --- Select Room Button logic: check for check-in/out dates ---
-                const checkinout =
-                    document.getElementById('checkinout')?.value || '';
-                let query = '';
-                let check_in = '',
-                    check_out = '';
-                if (checkinout && checkinout.includes(' to ')) {
-                    [check_in, check_out] = checkinout.split(' to ');
-                    query = `?check_in=${encodeURIComponent(check_in)}&check_out=${encodeURIComponent(check_out)}`;
+                const numAvailableRooms = item.rooms ? item.rooms.length : 0;
+
+                // --- Select Room Button logic ---
+                const searchFormEl = document.getElementById('search-form');
+                const mainSearchParams = new FormData(searchFormEl);
+                const checkinoutValue = document.getElementById('checkinout')?.value || '';
+                let queryParams = new URLSearchParams();
+
+                if (checkinoutValue && checkinoutValue.includes(' to ')) {
+                    const [cin, cout] = checkinoutValue.split(' to ');
+                    queryParams.set('check_in', cin);
+                    queryParams.set('check_out', cout);
                 }
-                // Button will be handled with JS for toast warning if dates are missing
+                queryParams.set('adults', mainSearchParams.get('adults') || '1');
+                queryParams.set('children', mainSearchParams.get('children') || '0');
+                queryParams.set('num_rooms', mainSearchParams.get('rooms') || '1'); // Number of rooms requested
 
                 const cardHTML = `
                             <div class="card shadow p-2 mb-3">
@@ -512,9 +532,10 @@
                                                 </ul>
                                             </div>
                                             <h5 class="card-title mb-1">
-                                                <a href="${hotel.website || '#'}" target="_blank">${hotel.name}</a>
+                                                <a href="/hotel/${hotel.id}" target="_blank">${hotel.name}</a>
                                             </h5>
                                             <small><i class="bi bi-geo-alt me-2"></i>${hotel.address || 'Location not available'}</small>
+                                            ${numAvailableRooms > 0 ? `<p class="mb-0 small mt-1"><strong>${numAvailableRooms} room type(s) available for your search.</strong></p>` : '<p class="mb-0 small mt-1 text-danger">No rooms available for these criteria.</p>'}
                                             <ul class="nav nav-divider mt-3">
                                                 ${amenitiesHTML}
                                             </ul>
@@ -524,7 +545,9 @@
                                             <div class="d-sm-flex justify-content-sm-between align-items-center mt-3 mt-md-auto">
                                                 ${priceHTML}
                                                 <div class="mt-3 mt-sm-0">
-                                                    <button class="btn btn-sm btn-dark mb-0 w-100 select-room-btn" data-hotel-id="${hotel.id}" data-query="${query}">View</button>
+                                                    <button class="btn btn-sm btn-dark mb-0 w-100 select-room-btn"
+                                                            data-hotel-id="${hotel.id}"
+                                                            data-query="${queryParams.toString()}">View Rooms</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -554,31 +577,27 @@
             // Attach click listeners to Select Room buttons
             document.querySelectorAll('.select-room-btn').forEach((btn) => {
                 btn.onclick = function (e) {
+                    e.preventDefault();
                     const hotelId = this.getAttribute('data-hotel-id');
-                    const query = this.getAttribute('data-query');
-                    if (
-                        !query ||
-                        !query.includes('check_in=') ||
-                        !query.includes('check_out=')
-                    ) {
+                    const queryString = this.getAttribute('data-query');
+
+                    const params = new URLSearchParams(queryString);
+                    if (!params.has('check_in') || !params.has('check_out') || !params.get('check_in') || !params.get('check_out')) {
                         if (typeof Toastify !== 'undefined') {
                             Toastify({
-                                text: 'Please select check-in and check-out dates before proceeding!',
-                                duration: 3000,
+                                text: 'Please select valid check-in and check-out dates in the main search form first!',
+                                duration: 3500,
                                 close: true,
                                 gravity: 'top',
                                 position: 'right',
                                 backgroundColor: '#d9534f',
                             }).showToast();
                         } else {
-                            alert(
-                                'Please select check-in and check-out dates before proceeding!',
-                            );
+                            alert('Please select valid check-in and check-out dates in the main search form first!');
                         }
                         return;
                     }
-                    // Open the rooms page with selected dates
-                    window.location.href = `/hotel/${hotelId}/rooms${query}`;
+                    window.location.href = `/hotel/${hotelId}/rooms?${queryString}`;
                 };
             });
         }
@@ -591,75 +610,87 @@
                 .filter((v) => v !== 'All');
             let selectedStars = formData.getAll('star_rating[]').map(Number);
 
-            filteredHotels = allHotels.filter((hotel) => {
-                let pass = true;
-                if (
-                    selectedTypes.length > 0 &&
-                    !selectedTypes.includes(hotel.type || hotel.hotel_type)
-                )
-                    pass = false;
-                if (
-                    selectedStars.length > 0 &&
-                    !selectedStars.includes(Math.floor(hotel.star_rating))
-                )
-                    pass = false;
-                return pass;
-            });
+            // Ensure allHotels contains the new structure {hotel, rooms}
+            if (allHotels.length > 0 && allHotels[0].hotel === undefined) {
+                console.warn("allHotels does not have the expected structure for filtering. Old data might be present.");
+                // Potentially re-fetch or handle error
+                filteredHotels = []; // Or keep old filter logic if necessary as a fallback
+            } else {
+                 filteredHotels = allHotels.filter((item) => { // item is {hotel, rooms}
+                    let hotel = item.hotel;
+                    let pass = true;
+                    if (
+                        selectedTypes.length > 0 &&
+                        !selectedTypes.includes(hotel.type || hotel.hotel_type) // Ensure 'type' or 'hotel_type' exists on hotel object
+                    )
+                        pass = false;
+                    if (
+                        selectedStars.length > 0 &&
+                        !selectedStars.includes(Math.floor(hotel.star_rating))
+                    )
+                        pass = false;
+                    return pass;
+                });
+            }
             renderHotels(filteredHotels, 1);
-            populateLocationsDropdownFromApi();
+            // populateLocationsDropdownFromApi(); // This might not be needed here or could repopulate from filtered results
         }
 
         async function fetchHotels(params = {}) {
+            // Validate that check_in and check_out are present if it's a search, not initial load
+            if (params.location || params.check_in || params.check_out) { // Heuristic: if any search param is there, dates are mandatory
+                 if (!params.check_in || !params.check_out) {
+                    if (typeof Toastify !== 'undefined') {
+                        Toastify({
+                            text: 'Please select check-in and check-out dates for the search.',
+                            duration: 3000,
+                            close: true,
+                            gravity: 'top',
+                            position: 'right',
+                            backgroundColor: '#d9534f',
+                        }).showToast();
+                    } else {
+                        alert('Please select check-in and check-out dates for the search.');
+                    }
+                    // Do not proceed with fetch if essential dates are missing for a search action
+                    // render empty or current state? For now, just return.
+                    document.getElementById('search-hotels').disabled = false; // Re-enable button
+                    return;
+                }
+            }
+
             try {
-                let url = '/hotels/getHotels';
+                document.getElementById('search-hotels').disabled = true; // Disable search button
+                let url = '/hotel/search'; // Changed URL
                 if (Object.keys(params).length) {
                     const query = new URLSearchParams(params).toString();
                     url += '?' + query;
                 }
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch hotels');
+                if (!response.ok) {
+                    const errorResult = await response.json();
+                    throw new Error(errorResult.message || 'Failed to fetch hotels');
+                }
                 const result = await response.json();
-                let hotels = result.data || result;
-                hotels = hotels.map((hotel, idx) => ({
-                    id: hotel.id || idx + 1,
-                    name: hotel.name,
-                    address: hotel.address,
-                    star_rating: hotel.star_rating,
-                    images: Array.isArray(hotel.images)
-                        ? hotel.images
-                        : typeof hotel.images === 'string' && hotel.images
-                            ? [hotel.images]
-                            : ['assets/images/category/hotel/4by3/04.jpg'],
-                    price: hotel.price || '',
-                    original_price: hotel.original_price || null,
-                    discount: hotel.discount || null,
-                    website: hotel.website || '#',
-                    free_cancellation:
-                        hotel.description &&
-                        hotel.description
-                            .toLowerCase()
-                            .includes('free cancellation'),
-                    free_breakfast:
-                        hotel.description &&
-                        hotel.description.toLowerCase().includes('breakfast'),
-                    refundable: !(
-                        hotel.description &&
-                        hotel.description
-                            .toLowerCase()
-                            .includes('non refundable')
-                    ),
-                    type: hotel.type || hotel.hotel_type || '',
-                }));
-                allHotels = hotels;
-                filteredHotels = [...hotels];
+
+                // result.data is expected to be an array of {"hotel": {...}, "rooms": [...]}
+                allHotels = result.data || [];
+                filteredHotels = [...allHotels];
                 renderHotels(filteredHotels, 1);
-                populateLocationsDropdownFromApi();
+                // populateLocationsDropdownFromApi(); // Might not be needed or could be smarter
             } catch (e) {
+                console.error("FetchHotels Error:", e);
                 const container = document.getElementById(
                     'hotel-list-container',
                 );
-                container.innerHTML = `<div class="alert alert-danger">Failed to load hotels.</div>`;
-                renderPagination(1, 1);
+                container.innerHTML = `<div class="alert alert-danger">Failed to load hotels: ${e.message}</div>`;
+                renderPagination(1, 1); // Render empty pagination
+                allHotels = []; // Clear data
+                filteredHotels = [];
+            } finally {
+                 if (document.getElementById('search-hotels')) {
+                    document.getElementById('search-hotels').disabled = false; // Re-enable search button
+                 }
             }
         }
 
@@ -814,23 +845,51 @@
 
             function handleSearchFormSubmit(e) {
                 if (e) e.preventDefault();
+
+                const locationSelect = document.getElementById('location-select');
+                const locationValue = locationSelect ? locationSelect.value : '';
+
                 const dateRangeEl = document.getElementById('checkinout');
                 const dateRange = dateRangeEl ? dateRangeEl.value : '';
                 let check_in = '', check_out = '';
+
+                if (!locationValue) {
+                     if (typeof Toastify !== 'undefined') {
+                        Toastify({
+                            text: 'Please select a location.',
+                            duration: 3000, close: true, gravity: 'top', position: 'right', backgroundColor: '#d9534f',
+                        }).showToast();
+                    } else { alert('Please select a location.'); }
+                    return false;
+                }
+
                 if (dateRange && dateRange.includes(' to ')) {
                     [check_in, check_out] = dateRange.split(' to ');
-                } else if (dateRange) {
-                    check_in = check_out = dateRange;
+                } else {
+                    // Allow search without dates initially, or enforce date selection here
+                    // For now, let's enforce date selection as per controller validation
+                     if (typeof Toastify !== 'undefined') {
+                        Toastify({
+                            text: 'Please select both check-in and check-out dates.',
+                            duration: 3000, close: true, gravity: 'top', position: 'right', backgroundColor: '#d9534f',
+                        }).showToast();
+                    } else { alert('Please select both check-in and check-out dates.'); }
+                    return false; // Stop if dates are not a range or not selected
                 }
 
                 const formData = new FormData(searchForm);
-                const params = {};
-                for (const [key, val] of formData.entries()) {
-                    params[key] = val;
-                }
-                params.check_in = check_in;
-                params.check_out = check_out;
+                const params = {
+                    location: formData.get('location'), // Ensure location is from the select
+                    adults: formData.get('adults'),
+                    children: formData.get('children'),
+                    rooms: formData.get('rooms'),
+                    check_in: check_in,
+                    check_out: check_out
+                };
+
+                // Remove date_range if it was part of formData to avoid confusion
                 delete params.date_range;
+
                 if (typeof fetchHotels !== 'undefined') fetchHotels(params);
                 return false;
             }
@@ -838,33 +897,34 @@
             if (searchForm) {
                 searchForm.onsubmit = handleSearchFormSubmit;
 
-                // Submit on change for all form fields
-                Array.from(searchForm.elements).forEach(el => {
-                    if (el.tagName === "INPUT" || el.tagName === "SELECT") {
-                        el.addEventListener('change', handleSearchFormSubmit);
+                // Remove automatic search on every field change to prevent excessive API calls.
+                // Search will be triggered by the submit button or specific explicit actions.
+                // Array.from(searchForm.elements).forEach(el => {
+                //     if (el.tagName === "INPUT" || el.tagName === "SELECT") {
+                //         // el.removeEventListener('change', handleSearchFormSubmit); // If previously added
+                //     }
+                // });
+            }
+
+            // Location select does not need to auto-submit anymore, user clicks search button.
+            // const locationSelect = document.getElementById('location-select');
+            // if (locationSelect) {
+            //     locationSelect.onchange = null; // Remove previous handler if any
+            // }
+
+            if (typeof populateLocationsDropdownFromApi !== 'undefined') {
+                 populateLocationsDropdownFromApi().then(() => {
+                    if (typeof setupLocationTypeahead !== 'undefined') {
+                        setupLocationTypeahead();
                     }
-                });
-            }
-            // Location select triggers search
-            const locationSelect = document.getElementById('location-select');
-            if (locationSelect) {
-                locationSelect.onchange = function () {
-                    const searchFormEl = document.getElementById('search-form');
-                    if (searchFormEl)
-                        searchFormEl.dispatchEvent(new Event('submit'));
-                };
+                 });
             }
 
-            // Setup typeahead after dropdown is populated
-            if (
-                typeof populateLocationsDropdownFromApi !== 'undefined' &&
-                typeof setupLocationTypeahead !== 'undefined'
-            ) {
-                populateLocationsDropdownFromApi().then(setupLocationTypeahead);
-            }
+            // Initial fetch for hotels is removed. User must initiate search.
+            // if (typeof fetchHotels !== 'undefined') fetchHotels();
 
-            // Initial fetch for hotels
-            if (typeof fetchHotels !== 'undefined') fetchHotels();
+            // Initial rendering of empty state for hotels if desired, or leave it to search
+            renderHotels([], 1); // Show "No hotels" message initially
         });
     </script>
 @endpush
