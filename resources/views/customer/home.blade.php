@@ -655,7 +655,7 @@
                         <!-- Image and overlay -->
                         <div class="card-img-scale-wrapper rounded-3">
                             <!-- Image -->
-                            <img src="assets/images/category/hotel/01.jpg" class="card-img" alt="hotel image" />
+                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
                             <!-- Badge -->
                             <div class="position-absolute bottom-0 start-0 p-3">
                                 <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
@@ -669,18 +669,17 @@
                         <div class="card-body px-2">
                             <!-- Title -->
                             <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    Baga Comfort
+                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
+                                    {{ $hotel->name }}
                                 </a>
                             </h5>
                             <!-- Price and rating -->
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="text-success mb-0">
-                                    $455
-                                    <small class="fw-light">/starting at</small>
+                                    {{-- Price removed as $hotel->price is not reliable --}}
                                 </h6>
                                 <h6 class="mb-0">
-                                    4.5
+                                    {{ $hotel->star_rating ?? 'N/A' }}
                                     <i class="fa-solid fa-star text-warning ms-1"></i>
                                 </h6>
                             </div>
@@ -696,7 +695,7 @@
                         <!-- Image and overlay -->
                         <div class="card-img-scale-wrapper rounded-3">
                             <!-- Image -->
-                            <img src="assets/images/category/hotel/02.jpg" class="card-img" alt="hotel image" />
+                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/02.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
                             <!-- Badge -->
                             <div class="position-absolute bottom-0 start-0 p-3">
                                 <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
@@ -710,18 +709,17 @@
                         <div class="card-body px-2">
                             <!-- Title -->
                             <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    New Apollo Hotel
+                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
+                                    {{ $hotel->name }}
                                 </a>
                             </h5>
                             <!-- Price and rating -->
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="text-success mb-0">
-                                    $585
-                                    <small class="fw-light">/starting at</small>
+                                    {{-- Price removed --}}
                                 </h6>
                                 <h6 class="mb-0">
-                                    4.8
+                                    {{ $hotel->star_rating ?? 'N/A' }}
                                     <i class="fa-solid fa-star text-warning ms-1"></i>
                                 </h6>
                             </div>
@@ -737,7 +735,7 @@
                         <!-- Image and overlay -->
                         <div class="card-img-scale-wrapper rounded-3">
                             <!-- Image -->
-                            <img src="assets/images/category/hotel/03.jpg" class="card-img" alt="hotel image" />
+                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/03.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
                             <!-- Badge -->
                             <div class="position-absolute bottom-0 start-0 p-3">
                                 <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
@@ -751,18 +749,17 @@
                         <div class="card-body px-2">
                             <!-- Title -->
                             <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    New Age Hotel
+                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
+                                    {{ $hotel->name }}
                                 </a>
                             </h5>
                             <!-- Price and rating -->
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="text-success mb-0">
-                                    $385
-                                    <small class="fw-light">/starting at</small>
+                                    {{-- Price removed --}}
                                 </h6>
                                 <h6 class="mb-0">
-                                    4.6
+                                    {{ $hotel->star_rating ?? 'N/A' }}
                                     <i class="fa-solid fa-star text-warning ms-1"></i>
                                 </h6>
                             </div>
@@ -778,7 +775,7 @@
                         <!-- Image and overlay -->
                         <div class="card-img-scale-wrapper rounded-3">
                             <!-- Image -->
-                            <img src="assets/images/category/hotel/04.jpg" class="card-img" alt="hotel image" />
+                            <img src="{{ asset($hotel->images[0] ?? 'assets/images/category/hotel/04.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
                             <!-- Badge -->
                             <div class="position-absolute bottom-0 start-0 p-3">
                                 <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
@@ -792,18 +789,17 @@
                         <div class="card-body px-2">
                             <!-- Title -->
                             <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    Helios Beach Resort
+                                <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
+                                    {{ $hotel->name }}
                                 </a>
                             </h5>
                             <!-- Price and rating -->
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="text-success mb-0">
-                                    $665
-                                    <small class="fw-light">/starting at</small>
+                                    {{-- Price removed --}}
                                 </h6>
                                 <h6 class="mb-0">
-                                    4.8
+                                    {{ $hotel->star_rating ?? 'N/A' }}
                                     <i class="fa-solid fa-star text-warning ms-1"></i>
                                 </h6>
                             </div>

@@ -637,12 +637,12 @@
         }
 
         async function fetchHotels(params = {}) {
-            // Validate that check_in and check_out are present if it's a search, not initial load
-            if (params.location || params.check_in || params.check_out) { // Heuristic: if any search param is there, dates are mandatory
-                 if (!params.check_in || !params.check_out) {
-                    if (typeof Toastify !== 'undefined') {
-                        Toastify({
-                            text: 'Please select check-in and check-out dates for the search.',
+            // This function is primarily for /hotel/search (specific searches)
+            // Validate that check_in and check_out are present if it's a search
+            if (!params.check_in || !params.check_out) {
+                if (typeof Toastify !== 'undefined') {
+                    Toastify({
+                        text: 'Please select check-in and check-out dates for the search.',
                             duration: 3000,
                             close: true,
                             gravity: 'top',
@@ -913,7 +913,7 @@
                  });
             }
 
-            // Initial flatpickr options (will be potentially overridden by URL params)
+            // Initial flatpickr options
             let flatpickrOptions = {
                 mode: 'range',
                 dateFormat: 'Y-m-d',
@@ -927,19 +927,17 @@
             const paramChildren = urlParams.get('children');
             const paramRooms = urlParams.get('rooms');
 
-            let performAutoSearch = false;
-
-            if (paramCheckIn && paramCheckOut) {
+            let performSpecificSearchViaUrl = false; // Renamed for clarity
+            // Condition for specific search: location, check-in, and check-out must be present
+            if (paramLocation && paramCheckIn && paramCheckOut) {
+                performSpecificSearchViaUrl = true;
                 const checkInOutEl = document.getElementById('checkinout');
                 if (checkInOutEl) {
-                    // Set value for display, though flatpickr defaultDate is better for initialization
                     checkInOutEl.value = `${paramCheckIn} to ${paramCheckOut}`;
                     flatpickrOptions.defaultDate = [paramCheckIn, paramCheckOut];
                 }
-                performAutoSearch = true;
             }
 
-            // Initialize flatpickr with potentially modified options
             if (window.flatpickr) {
                 flatpickr('#checkinout', flatpickrOptions);
             }
@@ -984,20 +982,70 @@
                 // if (typeof setupLocationTypeahead !== 'undefined') setupLocationTypeahead();
             });
 
-            if (performAutoSearch) {
-                // Location is also required for a meaningful auto-search by handleSearchFormSubmit's validation
-                if (paramLocation || (document.getElementById('location-select') && document.getElementById('location-select').value)) {
-                    handleSearchFormSubmit();
-                } else {
-                    // If location is considered essential for auto-search and not present, render empty.
-                    // Or, if backend can handle no location, this check might be removed.
-                    // For now, if dates are there but location is not, don't auto-search.
-                    console.log("Auto-search skipped: Location parameter missing or not set.");
-                    renderHotels([], 1);
-                }
+            // Decide what to do on initial load
+            if (performSpecificSearchViaUrl) {
+                console.log('Performing specific search based on URL parameters.');
+                handleSearchFormSubmit(); // This calls fetchHotels with specific params to /hotel/search
             } else {
-                renderHotels([], 1);
+                console.log('No specific search URL parameters. Fetching all active hotels by default.');
+                fetchAllActiveHotels();
             }
         });
+
+        // New function for default load
+        async function fetchAllActiveHotels() {
+            const searchButton = document.getElementById('search-hotels');
+            if (searchButton) searchButton.disabled = true;
+
+            try {
+                let url = '/hotels/getHotels'; // Endpoint for getting all active hotels
+                const response = await fetch(url);
+                if (!response.ok) {
+                    let errorData;
+                    try { errorData = await response.json(); } catch (e) { /* no json error body */ }
+                    const message = errorData?.message || `Failed to fetch hotels (status: ${response.status})`;
+                    throw new Error(message);
+                }
+                const result = await response.json();
+
+                let rawHotels = result.data || [];
+                // Map to the {hotel, rooms} structure expected by renderHotels
+                allHotels = rawHotels.map((hotelData, idx) => {
+                    // Basic hotel data transformation (similar to old fetchHotels mapping)
+                    const hotel = {
+                        id: hotelData.id || idx + 1,
+                        name: hotelData.name,
+                        address: hotelData.address,
+                        star_rating: hotelData.star_rating,
+                        images: Array.isArray(hotelData.images) && hotelData.images.length > 0
+                            ? hotelData.images.map(img => (typeof img === 'string' ? img : img.image_path || 'assets/images/category/hotel/4by3/04.jpg'))
+                            : (typeof hotelData.images === 'string' && hotelData.images ? [hotelData.images] : ['assets/images/category/hotel/4by3/04.jpg']),
+                        price_per_night: hotelData.price_per_night || hotelData.price || 0, // Ensure price_per_night for consistency
+                        original_price_per_night: hotelData.original_price_per_night || hotelData.original_price || null,
+                        discount_percentage: hotelData.discount_percentage || hotelData.discount || null,
+                        website: hotelData.website || '#',
+                        description: hotelData.description || '',
+                        type: hotelData.type || hotelData.hotel_type || '',
+                        amenities: hotelData.amenities || [], // Ensure amenities is an array
+                        // Properties for listGroup in renderHotels
+                        is_free_cancellation: hotelData.is_free_cancellation !== undefined ? hotelData.is_free_cancellation : (hotelData.description && hotelData.description.toLowerCase().includes('free cancellation')),
+                        is_non_refundable: hotelData.is_non_refundable !== undefined ? hotelData.is_non_refundable : (hotelData.description && hotelData.description.toLowerCase().includes('non refundable')),
+                        has_free_breakfast: hotelData.has_free_breakfast !== undefined ? hotelData.has_free_breakfast : (hotelData.description && hotelData.description.toLowerCase().includes('breakfast')),
+                    };
+                    return { hotel: hotel, rooms: [] }; // rooms array is empty for default load
+                });
+
+                filteredHotels = [...allHotels];
+                renderHotels(filteredHotels, 1);
+
+            } catch (e) {
+                console.error("Error in fetchAllActiveHotels:", e);
+                const container = document.getElementById('hotel-list-container');
+                if (container) container.innerHTML = `<div class="alert alert-danger">${e.message || 'Failed to load hotels.'}</div>`;
+                renderPagination(1, 1);
+            } finally {
+                if (searchButton) searchButton.disabled = false;
+            }
+        }
     </script>
 @endpush
