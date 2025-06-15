@@ -36,7 +36,7 @@ class BillsRelationManager extends RelationManager
                     ->numeric()
                     ->label('Discount')
                     ->step(0.01)
-                    ->prefix('$')
+                    ->suffix('%')
                     ->nullable(),
 
                 Forms\Components\TextInput::make('taxes')
@@ -93,7 +93,7 @@ class BillsRelationManager extends RelationManager
                     ->placeholder('None'),
 
                 Tables\Columns\TextColumn::make('discount')
-                    ->money('USD')
+                    ->suffix('%')
                     ->sortable()
                     ->label('Discount')
                     ->placeholder('None'),

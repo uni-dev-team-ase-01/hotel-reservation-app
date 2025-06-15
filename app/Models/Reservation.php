@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\RateType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -19,6 +20,7 @@ class Reservation extends Model
         'confirmation_number',
         'auto_cancelled',
         'no_show_billed',
+        'rate_type',
     ];
 
     protected $casts = [
@@ -73,5 +75,37 @@ class Reservation extends Model
     public function getHotelNameAttribute()
     {
         return $this->hotel ? $this->hotel->name : 'No Hotel Assigned';
+    }
+
+    public function getRoomsPriceAttribute()
+    {
+        $totalPrice = 0;
+        $duration = $this->getDuration();
+
+        foreach ($this->rooms as $room) {
+            $roomRate = $room->getCurrentRate($this->rate_type);
+            $totalPrice += $roomRate * $duration;
+        }
+
+        return $totalPrice;
+    }
+
+    private function getDuration()
+    {
+        $days = $this->check_in_date->diffInDays($this->check_out_date);
+
+        if ($this->rate_type === RateType::DAILY->value) {
+            return $days;
+        }
+
+        if ($this->rate_type === RateType::WEEKLY->value) {
+            return ceil($days / 7);
+        }
+
+        if ($this->rate_type === RateType::MONTHLY->value) {
+            return ceil($days / 30);
+        }
+
+        return $days;
     }
 }

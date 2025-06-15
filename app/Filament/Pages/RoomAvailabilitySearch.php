@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Enum\RateType;
+use App\Enum\ReservationStatus;
 use App\Enum\RoomType;
 use App\Enum\UserRoleType;
 use App\Models\Hotel;
@@ -211,7 +212,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             ])
             ->bulkActions([
                 Tables\Actions\BulkAction::make('selectMultiple')
-                    ->label('Select All')
+                    ->label('Reserve Selected Rooms')
                     ->icon('heroicon-o-check')
                     ->action(function ($records) {
                         foreach ($records as $record) {
@@ -254,7 +255,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             return false;
         }
 
-        return $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+        return $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value, UserRoleType::TRAVEL_COMPANY->value]);
     }
 
     protected function getAvailableRoomsQuery()
@@ -286,7 +287,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
 
         // TODO: need test this logic
         $query->whereDoesntHave('reservations', function ($reservationQuery) {
-            $reservationQuery->whereNotIn('status', ['cancelled', 'no_show'])
+            $reservationQuery->whereNotIn('status', [ReservationStatus::CANCELLED, ReservationStatus::NO_SHOW, ReservationStatus::CHECKED_OUT])
                 ->where(function ($dateQuery) {
                     $dateQuery->where('check_in_date', '<', $this->checkOutDate)
                         ->where('check_out_date', '>', $this->checkInDate);

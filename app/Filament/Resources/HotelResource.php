@@ -31,6 +31,15 @@ class HotelResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->required()
                     ->columnSpanFull(),
+                Forms\Components\Textarea::make('address')
+                    ->required()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('district')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('phone')
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('star_rating')
                     ->required()
                     ->numeric(),
@@ -55,6 +64,10 @@ class HotelResource extends Resource
                 Tables\Columns\TextColumn::make('images')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('website')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('district')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),

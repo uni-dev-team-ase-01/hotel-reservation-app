@@ -32,16 +32,22 @@ class BillResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('room_charges')
                     ->required()
+                    ->readOnly()
                     ->numeric(),
                 Forms\Components\TextInput::make('extra_charges')
+                    ->readOnly()
                     ->numeric(),
                 Forms\Components\TextInput::make('discount')
+                    ->required()
+                    ->step(0.01)
+                    ->suffix('%')
                     ->numeric(),
                 Forms\Components\TextInput::make('taxes')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('total_amount')
                     ->required()
+                    ->readOnly()
                     ->numeric(),
                 Forms\Components\Select::make('payment_status')
                     ->required()
@@ -69,6 +75,7 @@ class BillResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('discount')
                     ->numeric()
+                    ->suffix('% ')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('taxes')
                     ->numeric()

@@ -23,6 +23,9 @@ class PaymentsRelationManager extends RelationManager
                         $case->value => $case->getLabel(),
                     ])),
                 Forms\Components\TextInput::make('amount')
+                    ->default(function() {
+                        return $this->ownerRecord->total_amount ?? 0;
+                    })
                     ->required()
                     ->numeric(),
                 // Forms\Components\DateTimePicker::make('paid_at')
