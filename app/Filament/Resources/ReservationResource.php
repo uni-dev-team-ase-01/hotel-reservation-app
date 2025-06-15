@@ -7,16 +7,23 @@ use App\Enum\UserRoleType;
 use App\Filament\Resources\ReservationResource\Pages;
 use App\Filament\Resources\ReservationResource\RelationManagers\BillsRelationManager;
 use App\Filament\Resources\ReservationResource\RelationManagers\ReservationRoomsRelationManager;
+use App\Mail\UserCreated;
 use App\Models\Hotel;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class ReservationResource extends Resource
 {
@@ -54,11 +61,11 @@ class ReservationResource extends Resource
                     })
                     ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
                     ->dehydrated()
-                    ->afterStateUpdated(fn (Forms\Set $set) => $set('rooms', [])),
+                    ->afterStateUpdated(fn(Forms\Set $set) => $set('rooms', [])),
 
                 Forms\Components\Select::make('user_id')
                     ->label('Customer')
-                    ->hidden(fn () => $user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->hidden(fn() => $user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value]))
                     ->relationship('user', 'name', function (Builder $query) {
                         $query->whereHas('roles', function (Builder $roleQuery) {
                             $roleQuery->whereIn('name', [
@@ -74,20 +81,99 @@ class ReservationResource extends Resource
                         if (
                             $user_id &&
                             User::where('id', $user_id)
-                                ->whereHas('roles', function (Builder $roleQuery) {
-                                    $roleQuery->whereIn('name', [
-                                        UserRoleType::CUSTOMER->value,
-                                        UserRoleType::TRAVEL_COMPANY->value,
-                                    ]);
-                                })
-                                ->exists()
+                            ->whereHas('roles', function (Builder $roleQuery) {
+                                $roleQuery->whereIn('name', [
+                                    UserRoleType::CUSTOMER->value,
+                                    UserRoleType::TRAVEL_COMPANY->value,
+                                ]);
+                            })
+                            ->exists()
                         ) {
                             return $user_id;
                         }
 
                         return null;
                     })
-                    ->required(),
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(User::class, 'email'),
+
+                        Forms\Components\TextInput::make('phone')
+                            ->tel()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Placeholder::make('password_info')
+                            ->label('Password')
+                            ->content('A secure password will be automatically generated and sent via email'),
+
+                        Forms\Components\Toggle::make('send_welcome_email')
+                            ->label('Send welcome email with login credentials')
+                            ->default(true)
+                            ->helperText('User will receive an email with their login details'),
+                    ])
+                    ->createOptionUsing(function (array $data) {
+                        $generatedPassword = Str::random(12);
+
+                        $user = User::create([
+                            'name' => $data['name'],
+                            'email' => $data['email'],
+                            'phone' => $data['phone'] ?? null,
+                            'password' => bcrypt($generatedPassword),
+                            'email_verified_at' => now(),
+                        ]);
+
+                        $customerRole = Role::where('name', UserRoleType::CUSTOMER->value)
+                            ->where('guard_name', 'web')
+                            ->first();
+
+                        $user->assignRole($customerRole);
+
+                        if ($data['send_welcome_email'] ?? true) {
+                            try {
+                                Mail::to($user->email)->send(new UserCreated($user, $generatedPassword));
+
+                                Notification::make()
+                                    ->title('User created successfully')
+                                    ->body('Welcome email sent to ' . $user->email)
+                                    ->success()
+                                    ->send();
+                            } catch (\Exception $e) {
+                                logger('Failed to send welcome email', [
+                                    'user_id' => $user->id,
+                                    'email' => $user->email,
+                                    'error' => $e->getMessage(),
+                                ]);
+                                Notification::make()
+                                    ->title('User created but email failed')
+                                    ->body('User created successfully, but welcome email could not be sent.')
+                                    ->warning()
+                                    ->send();
+                            }
+                        } else {
+                            Notification::make()
+                                ->title('User created successfully')
+                                ->body('Password: ' . $generatedPassword . ' (Please save this!)')
+                                ->success()
+                                ->persistent()
+                                ->send();
+                        }
+
+                        return $user->id;
+                    })
+                    ->createOptionAction(function (Action $action) {
+                        return $action
+                            ->modalHeading('Create New User')
+                            ->modalSubmitActionLabel('Create User')
+                            ->modalWidth('lg');
+                    })
+                    ->required(!$user->hasRole(UserRoleType::HOTEL_CLERK->value)),
 
                 Forms\Components\DateTimePicker::make('check_in_date')
                     ->label('Check-in Date')
@@ -128,7 +214,7 @@ class ReservationResource extends Resource
 
                         return null;
                     })
-                    ->afterStateUpdated(fn (Forms\Set $set) => $set('rooms', [])),
+                    ->afterStateUpdated(fn(Forms\Set $set) => $set('rooms', [])),
 
                 // Forms\Components\DatePicker::make('check_out_date')
                 //     ->label('Check-out Date')
@@ -165,7 +251,7 @@ class ReservationResource extends Resource
                     ->label('Rooms')
                     ->visibleOn('create')
                     ->multiple()
-                    ->disabled(fn () => auth()->user()->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->disabled(fn() => auth()->user()->hasRole(UserRoleType::TRAVEL_COMPANY->value))
                     ->options(function (Forms\Get $get) {
                         $hotelId = $get('hotel_id');
                         $checkIn = $get('check_in_date');
@@ -211,7 +297,7 @@ class ReservationResource extends Resource
 
                 Forms\Components\TextInput::make('confirmation_number')
                     ->label('Confirmation Number')
-                    ->default(fn () => 'RES-'.strtoupper(uniqid()))
+                    ->default(fn() => 'RES-' . strtoupper(uniqid()))
                     ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
                     ->dehydrated()
                     ->required(),
@@ -266,7 +352,7 @@ class ReservationResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
-                    ->options(collect(ReservationStatus::cases())->mapWithKeys(fn ($case) => [
+                    ->options(collect(ReservationStatus::cases())->mapWithKeys(fn($case) => [
                         $case->value => $case->getLabel(),
                     ])),
 

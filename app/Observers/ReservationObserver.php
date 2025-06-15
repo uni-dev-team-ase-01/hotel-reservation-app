@@ -17,6 +17,14 @@ class ReservationObserver
      */
     public function saved(Reservation $reservation): void
     {
+        if (!$reservation->user) {
+            return;
+        }
+
+        if (!$reservation->wasChanged('status')) {
+            return;
+        }
+
         if ($reservation->status === ReservationStatus::CONFIRMED->value) {
             Mail::to($reservation->user)->send(new ReservationConfirmed($reservation));
         }
