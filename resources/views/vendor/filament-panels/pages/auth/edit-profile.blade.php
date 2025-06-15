@@ -6,7 +6,7 @@
         color="secondary"
         size="sm"
         class="mb-4"
-        :href="filament()->getCurrentPanel()->getId() === 'customer' ? route('filament.customer.pages.dashboard') : route('filament.admin.pages.dashboard')"
+        :href="filament()->getCurrentPanel()->getId() === 'customer' ? route('filament.customer.pages.dashboard') : route('filament.dashboard.pages.dashboard')"
         tag="a"
     >
         Back to Dashboard

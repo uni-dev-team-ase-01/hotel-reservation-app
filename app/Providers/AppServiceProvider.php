@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Http\Responses\CustomFilamentLogoutResponse;
 use App\Models\Payment;
+use App\Models\Reservation;
 use App\Observers\PaymentObserver;
+use App\Observers\ReservationObserver;
 use App\Policies\ActivityPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
@@ -39,5 +41,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Permission::class, PermissionPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
         Payment::observe(PaymentObserver::class);
+        Reservation::observe(ReservationObserver::class);
     }
 }
