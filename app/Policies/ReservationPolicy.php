@@ -51,6 +51,7 @@ class ReservationPolicy
             UserRoleType::HOTEL_CLERK->value,
             UserRoleType::HOTEL_MANAGER->value,
             UserRoleType::SUPER_ADMIN->value,
+            UserRoleType::TRAVEL_COMPANY->value,
         ]);
     }
 

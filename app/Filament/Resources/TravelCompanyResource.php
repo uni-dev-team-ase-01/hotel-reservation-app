@@ -33,6 +33,8 @@ class TravelCompanyResource extends Resource
                     ->tel()
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Toggle::make('status')
+                    ->required(),
                 Forms\Components\Select::make('user_id')
                     ->label('User')
                     ->relationship(
@@ -56,6 +58,8 @@ class TravelCompanyResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
+                Tables\Columns\IconColumn::make('status')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

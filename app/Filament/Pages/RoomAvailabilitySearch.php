@@ -255,7 +255,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             return false;
         }
 
-        return $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value]);
+        return $user->hasAnyRole([UserRoleType::HOTEL_CLERK->value, UserRoleType::HOTEL_MANAGER->value, UserRoleType::TRAVEL_COMPANY->value]);
     }
 
     protected function getAvailableRoomsQuery()
