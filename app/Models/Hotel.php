@@ -17,6 +17,7 @@ class Hotel extends Model
         'active',
         'charge',
         'address',
+        'district',
     ];
 
     public function rooms()
