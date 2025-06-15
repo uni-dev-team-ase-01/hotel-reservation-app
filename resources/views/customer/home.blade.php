@@ -129,7 +129,7 @@
                     <h6 class="d-none d-xl-block mb-3">Check Availability</h6>
 
                     <!-- Booking from START -->
-                    <form class="card shadow rounded-3 position-relative p-4 pe-md-5 pb-5 pb-md-4">
+                    <form id="home-search-form" class="card shadow rounded-3 position-relative p-4 pe-md-5 pb-5 pb-md-4">
                         <div class="row g-4 align-items-center">
                             <!-- Location -->
                             <div class="col-lg-4">
@@ -141,14 +141,8 @@
                                         <label class="form-label">
                                             Location
                                         </label>
-                                        <select class="form-select js-choice" data-search-enabled="true">
-                                            <option value="">
-                                                Select location
-                                            </option>
-                                            @foreach ($hotels as $hotel)
-                                                <option value="{{ $hotel->id }}">{{ $hotel->address }}</option>
-                                            @endforeach
-
+                                        <select class="form-select js-choice" data-search-enabled="true" name="location">
+                                            <option value="">Select location</option>
                                         </select>
                                     </div>
                                 </div>
@@ -164,8 +158,8 @@
                                         <label class="form-label">
                                             Check in - out
                                         </label>
-                                        <input type="text" class="form-control flatpickr" data-mode="range"
-                                            placeholder="Select date" value="19 Sep to 28 Sep" />
+                                        <input type="text" class="form-control flatpickr"
+                                            placeholder="Select date" /> <!-- Value will be set by flatpickr or JS -->
                                     </div>
                                 </div>
                             </div>
@@ -654,169 +648,60 @@
             </div>
 
             <div class="row g-4">
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="assets/images/category/hotel/01.jpg" class="card-img" alt="hotel image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Sri Lanka
+                @if(!empty($hotels) && $hotels->count() > 0)
+                    @foreach ($hotels as $hotel)
+                    <div class="col-sm-6 col-xl-3">
+                        <!-- Card START -->
+                        <div class="card card-img-scale overflow-hidden bg-transparent">
+                            <!-- Image and overlay -->
+                            <div class="card-img-scale-wrapper rounded-3">
+                           
+                                <!-- Image -->
+                                <img src="{{ asset( ($hotel->images ?? null) ? ($hotel->images) : 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
+                                {{-- Note: If images are stored with Storage::put('public/...') then Storage::url($hotel->images) would be correct.
+                                     If they are already in public path directly, asset() is fine.
+                                     The factory currently suggests simple names like 'placeholders/hotel_image_1.jpg',
+                                     implying they might be directly under public/ or public/placeholders/.
+                                     Using asset() directly assumes these paths are relative to the public directory.
+                                --}}
+                                <!-- Badge -->
+                                <div class="position-absolute bottom-0 start-0 p-3">
+                                    <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
+                                        <i class="bi bi-geo-alt me-2"></i>
+                                        {{-- Display city or a part of address if full address is too long --}}
+                                        {{ $hotel->city ?? ($hotel->address ? Str::limit(explode(',', $hotel->address)[0], 15) : 'Unknown Location') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card body -->
+                            <div class="card-body px-2">
+                                <!-- Title -->
+                                <h5 class="card-title">
+                                    <a href="{{ url("/hotel/{$hotel->id}/rooms") }}" class="stretched-link">
+                                        {{ $hotel->name }}
+                                    </a>
+                                </h5>
+                                <!-- Price and rating -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="text-success mb-0">
+                                        {{-- Price removed as $hotel->price is not reliable and should come from room rates --}}
+                                    </h6>
+                                    <h6 class="mb-0">
+                                        {{ number_format($hotel->star_rating ?? 0, 1) }}
+                                        <i class="fa-solid fa-star text-warning ms-1"></i>
+                                    </h6>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    Baga Comfort
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    $455
-                                    <small class="fw-light">/starting at</small>
-                                </h6>
-                                <h6 class="mb-0">
-                                    4.5
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
+                        <!-- Card END -->
                     </div>
-                    <!-- Card END -->
-                </div>
-
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="assets/images/category/hotel/02.jpg" class="card-img" alt="hotel image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    California
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    New Apollo Hotel
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    $585
-                                    <small class="fw-light">/starting at</small>
-                                </h6>
-                                <h6 class="mb-0">
-                                    4.8
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12">
+                        <p>No featured hotels available at the moment.</p>
                     </div>
-                    <!-- Card END -->
-                </div>
-
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="assets/images/category/hotel/03.jpg" class="card-img" alt="hotel image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Los Angeles
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    New Age Hotel
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    $385
-                                    <small class="fw-light">/starting at</small>
-                                </h6>
-                                <h6 class="mb-0">
-                                    4.6
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card END -->
-                </div>
-
-                <!-- Hotel item -->
-                <div class="col-sm-6 col-xl-3">
-                    <!-- Card START -->
-                    <div class="card card-img-scale overflow-hidden bg-transparent">
-                        <!-- Image and overlay -->
-                        <div class="card-img-scale-wrapper rounded-3">
-                            <!-- Image -->
-                            <img src="assets/images/category/hotel/04.jpg" class="card-img" alt="hotel image" />
-                            <!-- Badge -->
-                            <div class="position-absolute bottom-0 start-0 p-3">
-                                <div class="badge text-bg-dark fs-6 rounded-pill stretched-link">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Chicago
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card body -->
-                        <div class="card-body px-2">
-                            <!-- Title -->
-                            <h5 class="card-title">
-                                <a href="hotel-detail.html" class="stretched-link">
-                                    Helios Beach Resort
-                                </a>
-                            </h5>
-                            <!-- Price and rating -->
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="text-success mb-0">
-                                    $665
-                                    <small class="fw-light">/starting at</small>
-                                </h6>
-                                <h6 class="mb-0">
-                                    4.8
-                                    <i class="fa-solid fa-star text-warning ms-1"></i>
-                                </h6>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Card END -->
-                </div>
+                @endif
             </div>
             <!-- Row END -->
         </div>
@@ -854,15 +739,100 @@
 @endsection
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+
     <script>
+        let homeFlatpickrInstance; // Make instance globally accessible within script if needed
+
+        async function populateLocationsDropdownFromApi(selectedValue = null) {
+            const locationSelect = document.querySelector('#home-search-form select[name="location"]');
+            if (!locationSelect) {
+                console.error("Location select element not found on home page.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/hotels/select-options');
+                if (!response.ok) {
+                    console.error("Failed to fetch locations:", response.status);
+                    if (window.Choices && locationSelect.choices) {
+                        locationSelect.choices.setChoices([{ value: '', label: 'Could not load locations' }], 'value', 'label', true);
+                    } else {
+                        locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
+                    }
+                    return;
+                }
+                const result = await response.json();
+
+                let choicesArray = [{ value: '', label: 'Select location', selected: false, disabled: true }]; // Disabled default option
+                let uniqueLocations = [];
+
+                if (result.data && Array.isArray(result.data)) {
+                    result.data.forEach((item) => {
+                        const locationName = item.address;
+                        if (locationName && !uniqueLocations.includes(locationName)) {
+                            uniqueLocations.push(locationName);
+                            choicesArray.push({ value: locationName, label: locationName, selected: false });
+                        }
+                    });
+                }
+
+                if (window.Choices && locationSelect.choices) {
+                    locationSelect.choices.setChoices(choicesArray, 'value', 'label', true);
+                    if (selectedValue) {
+                        const valueExists = choicesArray.some(choice => choice.value === selectedValue);
+                        if (valueExists) {
+                            locationSelect.choices.setValue([{ value: selectedValue, label: selectedValue }]);
+                        } else {
+                            console.warn(`Selected value "${selectedValue}" not found in new choices for location (home page).`);
+                            // Optionally, select the placeholder if the value doesn't exist
+                            // locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                        }
+                    } else {
+                        // Ensure placeholder is selected if no selectedValue and choices were repopulated
+                         locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                    }
+                } else {
+                    locationSelect.innerHTML = choicesArray.map(choice => `<option value="${choice.value}" ${choice.disabled ? 'disabled' : ''} ${choice.selected ? 'selected' : ''}>${choice.label}</option>`).join('');
+                    if (selectedValue) {
+                        locationSelect.value = selectedValue;
+                    } else {
+                        locationSelect.value = ""; // Select the placeholder
+                    }
+                }
+            } catch (error) {
+                console.error("Error in populateLocationsDropdownFromApi (home page):", error);
+                if (window.Choices && locationSelect.choices) {
+                    locationSelect.choices.setChoices([{ value: '', label: 'Error loading locations' }], 'value', 'label', true);
+                } else {
+                    locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+                }
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
-            // Initialize flatpickr on all inputs with class 'flatpickr'
-            flatpickr(".flatpickr", {
+            const bookingForm = document.getElementById('home-search-form');
+            if (!bookingForm) {
+                console.error("Home page search form with ID 'home-search-form' not found.");
+                return;
+            }
+
+            let flatpickrDefaultDates = [];
+            const query = getQueryParams();
+
+            if (query.check_in && query.check_out) {
+                flatpickrDefaultDates = [query.check_in, query.check_out];
+            }
+
+            homeFlatpickrInstance = flatpickr(bookingForm.querySelector(".flatpickr"), {
                 mode: "range",
-                dateFormat: "d M"
+                dateFormat: "Y-m-d", // Internal format
+                altInput: true,      // User-friendly display
+                altFormat: "d M Y",  // Format for user display
+                defaultDate: flatpickrDefaultDates
             });
 
-            // Pre-fill form from query params if found in URL
             function getQueryParams() {
                 const params = {};
                 window.location.search.substring(1).split("&").forEach(function (part) {
@@ -874,26 +844,14 @@
                 return params;
             }
 
-            function setFormFromQuery(bookingForm, query) {
-                // Set location
-                if (query.location) {
-                    let locationSelect = bookingForm.querySelector('.form-select');
-                    if (locationSelect) locationSelect.value = query.location;
-                }
-                // Set date range formatted as "d M"
-                if (query.check_in && query.check_out) {
-                    let dateInput = bookingForm.querySelector('.flatpickr');
-                    if (dateInput) {
-                        dateInput.value = `${query.check_in} to ${query.check_out}`;
-                        if (window.flatpickr && dateInput._flatpickr) {
-                            dateInput._flatpickr.setDate([query.check_in, query.check_out]);
-                        }
-                    }
-                }
-                // Set guests/rooms
-                if (query.adults) {
-                    let el = bookingForm.querySelector('.guest-selector-count.adults');
-                    if (el) el.textContent = query.adults;
+            function setFormFromQuery(formElement, queryParams) {
+                // Location is now set after populateLocationsDropdownFromApi promise resolves.
+                // Dates are handled by flatpickr's defaultDate.
+
+                // Set guests/rooms from query parameters
+                if (queryParams.adults) {
+                    let el = formElement.querySelector('.guest-selector-count.adults');
+                    if (el) el.textContent = queryParams.adults;
                 }
                 if (query.children) {
                     let el = bookingForm.querySelector('.guest-selector-count.child');
@@ -906,8 +864,8 @@
             }
 
             // Get the booking form and handle submission
-            var bookingForm = document.querySelector('.card.shadow.rounded-3.position-relative.p-4.pe-md-5.pb-5.pb-md-4');
-            if (bookingForm) {
+            // const bookingForm is already declared above using getElementById('home-search-form')
+            if (bookingForm) { // Use the bookingForm declared with const
                 // Pre-fill from query params on load
                 setFormFromQuery(bookingForm, getQueryParams());
 
@@ -915,21 +873,25 @@
                     e.preventDefault();
 
                     // Get location
-                    var locationSelect = bookingForm.querySelector('.form-select');
+                    var locationSelect = bookingForm.querySelector('select[name="location"]'); // bookingForm is now #home-search-form
                     var location = locationSelect ? locationSelect.value : '';
 
-                    // Get date range and convert to check_in and check_out
-                    var dateInput = bookingForm.querySelector('.flatpickr');
-                    var dateRange = dateInput ? dateInput.value : '';
                     var check_in = '', check_out = '';
-                    if (dateRange && dateRange.includes(' to ')) {
-                        [check_in, check_out] = dateRange.split(' to ');
-                    } else if (dateRange) {
-                        check_in = dateRange;
-                        check_out = dateRange;
+                    if (homeFlatpickrInstance && homeFlatpickrInstance.selectedDates.length === 2) {
+                        check_in = homeFlatpickrInstance.formatDate(homeFlatpickrInstance.selectedDates[0], "Y-m-d");
+                        check_out = homeFlatpickrInstance.formatDate(homeFlatpickrInstance.selectedDates[1], "Y-m-d");
+                    } else {
+                        // Optional: Show a message if dates are not selected
+                        if (typeof Toastify !== 'undefined') {
+                            Toastify({ text: "Please select check-in and check-out dates.", duration: 3000, backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)" }).showToast();
+                        } else {
+                            alert("Please select check-in and check-out dates.");
+                        }
+                        return; // Prevent redirection if dates are not valid
                     }
 
-                    // Get guest & room counts
+                    // Get guest & room counts from display elements
+                    // Note: It's more robust to have hidden inputs updated by guest selector, like in hotels/index
                     var adults = bookingForm.querySelector('.guest-selector-count.adults')?.textContent.trim() || '2';
                     var children = bookingForm.querySelector('.guest-selector-count.child')?.textContent.trim() || '0';
                     var rooms = bookingForm.querySelector('.guest-selector-count.rooms')?.textContent.trim() || '1';
@@ -947,17 +909,24 @@
                     window.location.href = '/hotels?' + params.toString();
                 });
 
-                // Replace the <a> search button with <button type="submit">
+                // Ensure search button is type submit
                 var searchBtn = bookingForm.querySelector('.btn.btn-primary');
                 if (searchBtn && searchBtn.tagName.toLowerCase() === 'a') {
                     var btnParent = searchBtn.parentNode;
                     var newBtn = document.createElement('button');
-                    newBtn.type = 'submit';
+                    newBtn.type = 'submit'; // Crucial for form submission
                     newBtn.className = searchBtn.className;
                     newBtn.innerHTML = searchBtn.innerHTML;
                     btnParent.replaceChild(newBtn, searchBtn);
                 }
-            }
+
+                // Call populateLocationsDropdownFromApi. It now handles setting the selected value internally.
+                populateLocationsDropdownFromApi(query.location);
+
+                // Set other form fields (guests, rooms) that don't depend on async location population.
+                setFormFromQuery(bookingForm, query);
+
+            } // end if(bookingForm)
         });
     </script>
 @endpush

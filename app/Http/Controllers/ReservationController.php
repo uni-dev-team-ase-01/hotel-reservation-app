@@ -12,6 +12,7 @@ use App\Models\Reservation;
 use Session;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use App\Services\StripeService;
 
 class ReservationController extends Controller
 {
@@ -108,32 +109,56 @@ class ReservationController extends Controller
     //     ]);
     // }
 
-    
     public function paymentForm(Request $request)
-{
-    $bookingData = $request->session()->get('pending_booking');
-    if (!$bookingData) {
-        return redirect()->route('home')->with('error', 'No booking data found.');
+    {
+        $bookingData = $request->session()->get('pending_booking');
+        if (!$bookingData) {
+            return redirect()->route('home')->with('error', 'No booking data found.');
+        }
+
+        $user = Auth::user(); // Fetch authenticated user
+
+        // Optional: Check if the user has a specific role, if applicable
+        // if (method_exists($user, 'hasRole') && !$user->hasRole('customer')) {
+        //     abort(403, 'Only customers can make reservations.');
+        // }
+
+        $hotel = Hotel::find($bookingData['hotel_id']);
+        if (!$hotel) {
+            return redirect()->route('home')->with('error', 'Hotel not found for this booking.');
+        }
+
+        $rooms = Room::whereIn('id', $bookingData['room_ids'])
+            ->where('hotel_id', $hotel->id)
+            ->get();
+
+        // Ensure the rooms fetched match the number of room IDs in bookingData
+        // This helps prevent issues if a room became unavailable or IDs are mismatched.
+        if ($rooms->count() !== count($bookingData['room_ids'])) {
+            // It might be better to redirect to a more specific error page or back with a detailed message.
+            return redirect()->route('home')->with('error', 'One or more selected rooms are no longer available or are invalid. Please try your booking again.');
+        }
+
+        $total = $bookingData['total_price'];
+        $stripeKey = config('services.stripe.public');
+        $savedPaymentMethods = [];
+
+        if ($user && $user->stripe_customer_id && $user->has_stripe_payment_method) {
+            $stripeService = new StripeService(); // Instantiate the service
+            $savedPaymentMethods = $stripeService->getSavedPaymentMethods($user->stripe_customer_id);
+        }
+
+        return view('reservation.payment', [
+            'booking' => $bookingData,
+            'hotel' => $hotel,
+            'rooms' => $rooms,
+            'roomsCount' => $rooms->count(),
+            'total' => $total,
+            'stripeKey' => $stripeKey,
+            'authUser' => $user, // Pass the authenticated user
+            'savedPaymentMethods' => $savedPaymentMethods // Pass saved payment methods
+        ]);
     }
-
-    $hotel = Hotel::find($bookingData['hotel_id']);
-    $rooms = Room::whereIn('id', $bookingData['room_ids'])
-        ->where('hotel_id', $hotel->id)
-        ->get();
-
-    $total = $bookingData['total_price'];
-
-    $stripeKey = config('services.stripe.public'); 
-
-    return view('reservation.payment', [
-        'booking' => $bookingData,
-        'hotel' => $hotel,
-        'rooms' => $rooms,
-        'roomsCount' => $rooms->count(),
-        'total' => $total,
-        'stripeKey' => $stripeKey,   
-    ]);
-}
     
     public function createStripeIntent(Request $request)
     {

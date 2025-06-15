@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/hotels', [HotelController::class, 'index'])->name('hotels');
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::get('/', 'index')->name('hotels');
     Route::get('/getHotels', 'getHotels')->name('hotels.get');
@@ -56,4 +55,3 @@ Route::post('/reservation/payment', [ReservationController::class, 'processPayme
 Route::post('/stripe/intent', [ReservationController::class, 'createStripeIntent'])->middleware('auth')->name('stripe.intent');
 
 Route::get('/reservation/success/{reservation?}', [ReservationController::class, 'success'])->middleware('auth')->name('reservation.success');
-Route::get('/hotel/{hotel}/rooms/{rooms}/book', [ReservationController::class, 'startBooking'])->name('reservation.startBooking');
