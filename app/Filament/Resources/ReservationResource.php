@@ -52,10 +52,13 @@ class ReservationResource extends Resource
 
                         return null;
                     })
+                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->dehydrated()
                     ->afterStateUpdated(fn (Forms\Set $set) => $set('rooms', [])),
 
                 Forms\Components\Select::make('user_id')
                     ->label('Customer')
+                    ->hidden(fn () => $user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
                     ->relationship('user', 'name', function (Builder $query) {
                         $query->whereHas('roles', function (Builder $roleQuery) {
                             $roleQuery->whereIn('name', [
@@ -89,12 +92,14 @@ class ReservationResource extends Resource
                 Forms\Components\DateTimePicker::make('check_in_date')
                     ->label('Check-in Date')
                     ->required()
-                    ->minDate(now())
+                    // ->minDate(now())
                     ->live()
                     ->seconds(false)
                     ->displayFormat('M j, Y H:i')
                     ->format('Y-m-d H:i:s')
                     ->native(false)
+                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->dehydrated()
                     ->default(function () {
                         $check_in = request()->query('check_in');
                         if ($check_in) {
@@ -113,6 +118,8 @@ class ReservationResource extends Resource
                     ->format('Y-m-d H:i:s')
                     // ->timezone('UTC')
                     ->native(false)
+                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->dehydrated()
                     ->default(function () {
                         $check_out = request()->query('check_out');
                         if ($check_out) {
@@ -142,6 +149,8 @@ class ReservationResource extends Resource
                     ->numeric()
                     ->default(1)
                     ->minValue(1)
+                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->dehydrated()
                     ->default(function () {
                         $guests = request()->query('guests');
                         if ($guests) {
@@ -152,10 +161,11 @@ class ReservationResource extends Resource
                     })
                     ->required(),
 
-                Forms\Components\Select::make('rooms')
+                Forms\Components\Select::make('room_ids')
                     ->label('Rooms')
+                    ->visibleOn('create')
                     ->multiple()
-                    ->relationship('rooms', 'room_number')
+                    ->disabled(fn () => auth()->user()->hasRole(UserRoleType::TRAVEL_COMPANY->value))
                     ->options(function (Forms\Get $get) {
                         $hotelId = $get('hotel_id');
                         $checkIn = $get('check_in_date');
@@ -172,7 +182,6 @@ class ReservationResource extends Resource
                         $rooms = request()->query('rooms');
                         if (is_array($rooms)) {
                             $roomIds = array_map('intval', $rooms);
-
                             $validRoomIds = Room::whereIn('id', $roomIds)->pluck('id')->toArray();
 
                             return $validRoomIds;
@@ -182,7 +191,9 @@ class ReservationResource extends Resource
                     })
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->rules(['array', 'min:1'])
+                    ->dehydrated(),
 
                 Forms\Components\Select::make('status')
                     ->options([
@@ -194,11 +205,15 @@ class ReservationResource extends Resource
                         'no_show' => 'No Show',
                     ])
                     ->default('pending')
+                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->dehydrated()
                     ->required(),
 
                 Forms\Components\TextInput::make('confirmation_number')
                     ->label('Confirmation Number')
                     ->default(fn () => 'RES-'.strtoupper(uniqid()))
+                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->dehydrated()
                     ->required(),
             ]);
     }
