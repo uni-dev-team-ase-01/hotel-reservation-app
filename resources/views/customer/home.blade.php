@@ -655,10 +655,9 @@
                         <div class="card card-img-scale overflow-hidden bg-transparent">
                             <!-- Image and overlay -->
                             <div class="card-img-scale-wrapper rounded-3">
-                           
                                 <!-- Image -->
-                                <img src="{{ asset( ($hotel->images ?? null) ? ($hotel->images) : 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
-                                {{-- Note: If images are stored with Storage::put('public/...') then Storage::url($hotel->images) would be correct.
+                                <img src="{{ asset( ($hotel->images[0] ?? null) ? ($hotel->images[0]) : 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
+                                {{-- Note: If images are stored with Storage::put('public/...') then Storage::url($hotel->images[0]) would be correct.
                                      If they are already in public path directly, asset() is fine.
                                      The factory currently suggests simple names like 'placeholders/hotel_image_1.jpg',
                                      implying they might be directly under public/ or public/placeholders/.

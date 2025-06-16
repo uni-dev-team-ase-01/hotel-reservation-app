@@ -229,8 +229,31 @@ public function processPayment(Request $request)
 }
     public function success($reservationId)
     {
-        $reservation = Reservation::with('hotel', 'rooms')->findOrFail($reservationId);
+        $reservation = Reservation::with([
+            'user',          // To get guest details like name, email
+            'hotel',         // For hotel name, address
+            'rooms',         // For room types booked
+            'bill.payment'   // To get bill details (charges, total) and payment info (method, date)
+        ])->findOrFail($reservationId);
 
-        return view('reservation.success', ['reservation' => $reservation]);
+        // Calculate number of nights (if not stored directly on reservation model and needed)
+        // This was previously available in $bookingData from session, but that's cleared.
+        // So, recalculate if displaying it.
+        $nights = 0;
+        if ($reservation->check_in_date && $reservation->check_out_date) {
+            try {
+                $checkIn = \Carbon\Carbon::parse($reservation->check_in_date);
+                $checkOut = \Carbon\Carbon::parse($reservation->check_out_date);
+                $nights = $checkIn->diffInDays($checkOut);
+            } catch (\Exception $e) {
+                \Log::error("Error parsing dates for reservation ID {$reservationId}: " . $e->getMessage());
+                // $nights remains 0 or handle error as appropriate
+            }
+        }
+
+        return view('reservation.success', [
+            'reservation' => $reservation,
+            'nights' => $nights // Pass nights to the view
+        ]);
     }
 }

@@ -5,15 +5,15 @@
 @section("content")
     <main>
         <!-- =======================
-                                    Main Banner START -->
+                        Main Banner START -->
         <section class="pt-0">
             <div class="container">
                 <div class="rounded-3 p-3 p-sm-5" style="
-                                            background-image: url(assets/images/bg/05.jpg);
-                                            background-position: center center;
-                                            background-repeat: no-repeat;
-                                            background-size: cover;
-                                        ">
+                                background-image: url(assets/images/bg/05.jpg);
+                                background-position: center center;
+                                background-repeat: no-repeat;
+                                background-size: cover;
+                            ">
                     <div class="row my-2 my-xl-5">
                         <div class="col-md-8 mx-auto">
                             <h1 class="text-center text-white">
@@ -151,10 +151,10 @@
             </div>
         </section>
         <!-- =======================
-                                    Main Banner END -->
+                        Main Banner END -->
 
         <!-- =======================
-                                    Hotel list START -->
+                        Hotel list START -->
         <section class="pt-0">
             <div class="container">
                 <div class="row mb-4">
@@ -173,9 +173,9 @@
                                     </a>
                                 </li>
                                 <!-- <li class="nav-item">
-                                                                <a class="nav-link rounded-end rounded-0 mb-0" href="#"><i
-                                                                        class="bi fa-fw bi-grid-fill"></i></a>
-                                                            </li> -->
+                                                    <a class="nav-link rounded-end rounded-0 mb-0" href="#"><i
+                                                            class="bi fa-fw bi-grid-fill"></i></a>
+                                                </li> -->
                             </ul>
                         </div>
                     </div>
@@ -268,7 +268,6 @@
         let filteredHotels = [];
         let currentPage = 1;
         let allLocations = [];
-        let isInitialSearchFromUrl = false;
 
         async function populateLocationsDropdownFromApi(selectedValue = null) {
             const locationSelect = document.getElementById('location-select');
@@ -293,7 +292,7 @@
 
                 if (!result.success || !Array.isArray(result.data)) {
                     console.error("Location API did not return successful data:", result);
-                    if (window.Choices && locationSelect.choices) {
+                     if (window.Choices && locationSelect.choices) {
                         locationSelect.choices.setChoices([{ value: '', label: 'Error in location data' }], 'value', 'label', true);
                     } else {
                         locationSelect.innerHTML = `<option value="">Error in location data</option>`;
@@ -322,11 +321,11 @@
                         if (valueExists) {
                             locationSelect.choices.setValue([{ value: selectedValue, label: selectedValue }]);
                         } else {
-                            console.warn(`Selected value "${selectedValue}" not found in new choices for location (hotels/index page).`);
-                            // locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                           console.warn(`Selected value "${selectedValue}" not found in new choices for location (hotels/index page).`);
+                           // locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
                         }
                     } else {
-                        locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
+                         locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
                     }
                 } else {
                     locationSelect.innerHTML = choicesArray.map(choice => `<option value="${choice.value}" ${choice.disabled ? 'disabled' : ''} ${choice.selected ? 'selected' : ''}>${choice.label}</option>`).join('');
@@ -342,7 +341,7 @@
                 if (window.Choices && locationSelect.choices) {
                     locationSelect.choices.setChoices([{ value: '', label: 'Error loading locations' }], 'value', 'label', true);
                 } else {
-                    if (locationSelect) locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
+                    if(locationSelect) locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
                 }
             }
         }
@@ -447,17 +446,17 @@
             container.innerHTML = '';
             if (hotels.length === 0) {
                 container.innerHTML = `
-                                        <div class="card shadow p-2 mb-3">
-                                            <div class="row g-0">
-                                                <div class="col-md-5 position-relative"></div>
-                                                <div class="col-md-7">
-                                                    <div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
-                                                        <h5 class="card-title">No hotels available</h5>
-                                                        <p class="card-text">Sorry, we couldn't find any hotels at the moment.</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>`;
+                            <div class="card shadow p-2 mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-5 position-relative"></div>
+                                    <div class="col-md-7">
+                                        <div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
+                                            <h5 class="card-title">No hotels available</h5>
+                                            <p class="card-text">Sorry, we couldn't find any hotels at the moment.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
                 renderPagination(1, 1);
                 return;
             }
@@ -490,34 +489,34 @@
                 let imgSliderHTML = '';
                 if (imgs.length > 1) {
                     imgSliderHTML = `<div class="tiny-slider arrow-round arrow-xs arrow-dark overflow-hidden rounded-2" id="${sliderId}">
-                                            <div class="tiny-slider-inner">
-                                                ${imgs.map((img) => `<div><img src="${img.image_path || img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
-                                            </div>
-                                            </div>`;
+                                <div class="tiny-slider-inner">
+                                    ${imgs.map((img) => `<div><img src="${img.image_path || img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
+                                </div>
+                                </div>`;
                 } else {
                     imgSliderHTML = `<img src="${imgs[0].image_path || imgs[0]}" class="img-fluid rounded-start" alt="${hotel.name}">`;
                 }
 
                 const discountBadge = hotel.discount_percentage // Assuming discount_percentage from HotelResource
                     ? `
-                                        <div class="position-absolute top-0 start-0 z-index-1 m-2">
-                                            <div class="badge text-bg-danger">${hotel.discount_percentage}% Off</div>
-                                        </div>`
+                            <div class="position-absolute top-0 start-0 z-index-1 m-2">
+                                <div class="badge text-bg-danger">${hotel.discount_percentage}% Off</div>
+                            </div>`
                     : '';
 
                 // Amenities: Assuming hotel.amenities is an array of strings from HotelResource
                 let amenitiesHTML = '';
-                if (hotel.amenities && Array.isArray(hotel.amenities)) {
+                if(hotel.amenities && Array.isArray(hotel.amenities)) {
                     hotel.amenities.slice(0, 4).forEach(amenity => { // Show max 4 amenities
                         amenitiesHTML += `<li class="nav-item">${amenity}</li>`;
                     });
                 } else {
-                    amenitiesHTML = `
-                                        <li class="nav-item">Air Conditioning</li>
-                                        <li class="nav-item">Wifi</li>
-                                        <li class="nav-item">Kitchen</li>
-                                        <li class="nav-item">Pool</li>
-                                        `; // Fallback
+                     amenitiesHTML = `
+                            <li class="nav-item">Air Conditioning</li>
+                            <li class="nav-item">Wifi</li>
+                            <li class="nav-item">Kitchen</li>
+                            <li class="nav-item">Pool</li>
+                            `; // Fallback
                 }
 
 
@@ -531,11 +530,11 @@
                     listGroup += `<li class="list-group-item d-flex text-success p-0"><i class="bi bi-patch-check-fill me-2"></i>Free Breakfast</li>`;
 
                 const priceHTML = `
-                                        <div class="d-flex align-items-center">
-                                            ${hotel.price_per_night ? `<h5 class="fw-bold mb-0 me-1">$${hotel.price_per_night.toFixed(2)}</h5>` : ''}
-                                            ${hotel.original_price_per_night ? `<span class="text-decoration-line-through mb-0">$${hotel.original_price_per_night.toFixed(2)}</span>` : ''}
-                                        </div>
-                                        `;
+                            <div class="d-flex align-items-center">
+                                ${hotel.price_per_night ? `<h5 class="fw-bold mb-0 me-1">$${hotel.price_per_night.toFixed(2)}</h5>` : ''}
+                                ${hotel.original_price_per_night ? `<span class="text-decoration-line-through mb-0">$${hotel.original_price_per_night.toFixed(2)}</span>` : ''}
+                            </div>
+                            `;
 
                 const numAvailableRooms = item.rooms ? item.rooms.length : 0;
                 let roomAvailabilityMessage = '';
@@ -562,60 +561,60 @@
                 queryParams.set('num_rooms', mainSearchParams.get('rooms') || '1'); // Number of rooms requested
 
                 const cardHTML = `
-                                        <div class="card shadow p-2 mb-3">
-                                            <div class="row g-0">
-                                                <div class="col-md-5 position-relative">
-                                                    ${discountBadge}
-                                                    ${imgSliderHTML}
-                                                </div>
-                                                <div class="col-md-7">
-                                                    <div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <ul class="list-inline mb-0">${starsHTML}</ul>
-                                                            <ul class="list-inline mb-0 z-index-2">
-                                                                <li class="list-inline-item">
-                                                                    <a href="#" class="btn btn-sm btn-round btn-light">
-                                                                        <i class="fa-solid fa-fw fa-heart"></i>
-                                                                    </a>
-                                                                </li>
-                                                                <li class="list-inline-item dropdown">
-                                                                    <a href="#" class="btn btn-sm btn-round btn-light" role="button"
-                                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <i class="fa-solid fa-fw fa-share-alt"></i>
-                                                                    </a>
-                                                                    <ul class="dropdown-menu dropdown-menu-end min-w-auto shadow rounded">
-                                                                        <li><a class="dropdown-item" href="#"><i class="fab fa-twitter-square me-2"></i>Twitter</a></li>
-                                                                        <li><a class="dropdown-item" href="#"><i class="fab fa-facebook-square me-2"></i>Facebook</a></li>
-                                                                        <li><a class="dropdown-item" href="#"><i class="fab fa-linkedin me-2"></i>LinkedIn</a></li>
-                                                                        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-copy me-2"></i>Copy link</a></li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <h5 class="card-title mb-1">
-                                                            <a href="/hotel/${hotel.id}" target="_blank">${hotel.name}</a>
-                                                        </h5>
-                                                        <small><i class="bi bi-geo-alt me-2"></i>${hotel.address || 'Location not available'}</small>
-                                                        ${roomAvailabilityMessage}
-                                                        <ul class="nav nav-divider mt-3">
-                                                            ${amenitiesHTML}
+                            <div class="card shadow p-2 mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-5 position-relative">
+                                        ${discountBadge}
+                                        ${imgSliderHTML}
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="card-body py-md-2 d-flex flex-column h-100 position-relative">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <ul class="list-inline mb-0">${starsHTML}</ul>
+                                                <ul class="list-inline mb-0 z-index-2">
+                                                    <li class="list-inline-item">
+                                                        <a href="#" class="btn btn-sm btn-round btn-light">
+                                                            <i class="fa-solid fa-fw fa-heart"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li class="list-inline-item dropdown">
+                                                        <a href="#" class="btn btn-sm btn-round btn-light" role="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="fa-solid fa-fw fa-share-alt"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu dropdown-menu-end min-w-auto shadow rounded">
+                                                            <li><a class="dropdown-item" href="#"><i class="fab fa-twitter-square me-2"></i>Twitter</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i class="fab fa-facebook-square me-2"></i>Facebook</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i class="fab fa-linkedin me-2"></i>LinkedIn</a></li>
+                                                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-copy me-2"></i>Copy link</a></li>
                                                         </ul>
-                                                        <ul class="list-group list-group-borderless small mb-0 mt-2">
-                                                            ${listGroup}
-                                                        </ul>
-                                                        <div class="d-sm-flex justify-content-sm-between align-items-center mt-3 mt-md-auto">
-                                                            ${priceHTML}
-                                                            <div class="mt-3 mt-sm-0">
-                                                                <button class="btn btn-sm btn-dark mb-0 w-100 select-room-btn"
-                                                                        data-hotel-id="${hotel.id}"
-                                                                        data-query="${queryParams.toString()}">View Rooms</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <h5 class="card-title mb-1">
+                                                <a href="/hotel/${hotel.id}" target="_blank">${hotel.name}</a>
+                                            </h5>
+                                            <small><i class="bi bi-geo-alt me-2"></i>${hotel.address || 'Location not available'}</small>
+                                            ${roomAvailabilityMessage}
+                                            <ul class="nav nav-divider mt-3">
+                                                ${amenitiesHTML}
+                                            </ul>
+                                            <ul class="list-group list-group-borderless small mb-0 mt-2">
+                                                ${listGroup}
+                                            </ul>
+                                            <div class="d-sm-flex justify-content-sm-between align-items-center mt-3 mt-md-auto">
+                                                ${priceHTML}
+                                                <div class="mt-3 mt-sm-0">
+                                                    <button class="btn btn-sm btn-dark mb-0 w-100 select-room-btn"
+                                                            data-hotel-id="${hotel.id}"
+                                                            data-query="${queryParams.toString()}">View Rooms</button>
                                                 </div>
                                             </div>
                                         </div>
-                                        `;
+                                    </div>
+                                </div>
+                            </div>
+                            `;
                 container.insertAdjacentHTML('beforeend', cardHTML);
 
                 if (imgs.length > 1 && window.tns) {
@@ -736,16 +735,16 @@
             }
 
             // Also ensure location is present after cleaning for this specific search type
-            if (!cleanedParams.location) {
-                if (typeof Toastify !== 'undefined') {
-                    Toastify({ text: 'Location is required for this search.', duration: 3000, close: true, gravity: 'top', position: 'right', backgroundColor: '#d9534f' }).showToast();
-                } else {
-                    alert('Location is required for this search.');
-                }
-                const searchButton = document.getElementById('search-hotels');
-                if (searchButton) searchButton.disabled = false;
-                return;
-            }
+             if (!cleanedParams.location) {
+                 if (typeof Toastify !== 'undefined') {
+                     Toastify({ text: 'Location is required for this search.', duration: 3000, close: true, gravity: 'top', position: 'right', backgroundColor: '#d9534f' }).showToast();
+                 } else {
+                     alert('Location is required for this search.');
+                 }
+                 const searchButton = document.getElementById('search-hotels');
+                 if (searchButton) searchButton.disabled = false;
+                 return;
+             }
 
 
             const searchButton = document.getElementById('search-hotels');
@@ -938,7 +937,7 @@
                         if (childrenInput) childrenInput.value = '0';
                         if (roomsInput) roomsInput.value = '1';
                         const dropdownGuest = document.getElementById('dropdownGuest');
-                        if (dropdownGuest) dropdownGuest.value = "2 Guests 1 Room";
+                        if(dropdownGuest) dropdownGuest.value = "2 Guests 1 Room";
                     }
 
                     // 2. Clear query parameters from the URL
@@ -983,24 +982,14 @@
                 const dateRange = dateRangeEl ? dateRangeEl.value : '';
                 let check_in = '', check_out = '';
 
+                // Location is mandatory for a search action by this form.
+                // Date is also mandatory for this specific search form.
                 if (!locationValue) {
-                    if (!isInitialSearchFromUrl) {
-                        if (typeof Toastify !== 'undefined') {
-                            Toastify({
-                                text: 'Please select a location.',
-                                duration: 3000,
-                                close: true,
-                                gravity: 'top',
-                                position: 'right',
-                                backgroundColor: '#d9534f'
-                            }).showToast();
-                        } else {
-                            alert('Please select a location.');
-                        }
-                    }
+                    if (typeof Toastify !== 'undefined') {
+                        Toastify({ text: 'Please select a location.', duration: 3000, close: true, gravity: 'top', position: 'right', backgroundColor: '#d9534f' }).showToast();
+                    } else { alert('Please select a location.'); }
                     return false;
                 }
-
 
                 if (dateRange && dateRange.includes(' to ')) {
                     [check_in, check_out] = dateRange.split(' to ');
@@ -1062,11 +1051,11 @@
             // }
 
             if (typeof populateLocationsDropdownFromApi !== 'undefined') {
-                populateLocationsDropdownFromApi().then(() => {
+                 populateLocationsDropdownFromApi().then(() => {
                     if (typeof setupLocationTypeahead !== 'undefined') {
                         setupLocationTypeahead();
                     }
-                });
+                 });
             }
 
             // Initial flatpickr options
@@ -1087,33 +1076,11 @@
             // Condition for specific search: location, check-in, and check-out must be present
             if (paramLocation && paramCheckIn && paramCheckOut) {
                 performSpecificSearchViaUrl = true;
-                isInitialSearchFromUrl = true;
                 const checkInOutEl = document.getElementById('checkinout');
                 if (checkInOutEl) {
                     checkInOutEl.value = `${paramCheckIn} to ${paramCheckOut}`;
                     flatpickrOptions.defaultDate = [paramCheckIn, paramCheckOut];
                 }
-
-                // Populate other fields if needed
-                const locationInput = document.querySelector("input[name='location']");
-                if (locationInput) locationInput.value = paramLocation;
-
-                const adultsInput = document.querySelector("input[name='adults']");
-                if (adultsInput) adultsInput.value = paramAdults;
-
-                const childrenInput = document.querySelector("input[name='children']");
-                if (childrenInput) childrenInput.value = paramChildren;
-
-                const roomsInput = document.querySelector("input[name='rooms']");
-                if (roomsInput) roomsInput.value = paramRooms;
-
-                // Wait a moment for any DOM/UI setup like flatpickr
-                setTimeout(() => {
-                    const searchBtn = document.getElementById("search-hotels");
-                    if (searchBtn) {
-                        searchBtn.click(); // Trigger the search
-                    }
-                }, 300); // adjust delay if needed
             }
 
             if (window.flatpickr) {
@@ -1130,13 +1097,13 @@
                 const childEl = document.querySelector('.guest-selector-count.child');
                 if (childEl) childEl.textContent = paramChildren;
                 const childrenInputEl = document.getElementById('children-input');
-                if (childrenInputEl) childrenInputEl.value = paramChildren;
+                if(childrenInputEl) childrenInputEl.value = paramChildren;
             }
             if (paramRooms) {
                 const roomsEl = document.querySelector('.guest-selector-count.rooms');
                 if (roomsEl) roomsEl.textContent = paramRooms;
                 const roomsInputEl = document.getElementById('rooms-input');
-                if (roomsInputEl) roomsInputEl.value = paramRooms;
+                if(roomsInputEl) roomsInputEl.value = paramRooms;
             }
 
             if (paramAdults || paramChildren || paramRooms) { // only call if any guest param is present
@@ -1150,11 +1117,11 @@
                     if (locationSelect) {
                         // For Choices.js, setting value after options are populated is key.
                         // Check if Choices instance exists on the element.
-                        if (window.Choices && locationSelect.choices) {
-                            locationSelect.choices.setValue([{ value: paramLocation, label: paramLocation }]); // More robust way for choices
-                        } else {
+                         if (window.Choices && locationSelect.choices) {
+                             locationSelect.choices.setValue([{value: paramLocation, label: paramLocation}]); // More robust way for choices
+                         } else {
                             locationSelect.value = paramLocation; // Fallback
-                        }
+                         }
                     }
                 }
                 // if (typeof setupLocationTypeahead !== 'undefined') setupLocationTypeahead();
