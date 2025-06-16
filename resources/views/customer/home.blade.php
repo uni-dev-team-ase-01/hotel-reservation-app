@@ -3,6 +3,8 @@
 @section("title", "Booking Landing Page")
 
 @section("content")
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
     <section class="pt-3 pt-lg-5">
         <div class="container">
             <!-- Content and Image START -->
@@ -655,9 +657,10 @@
                         <div class="card card-img-scale overflow-hidden bg-transparent">
                             <!-- Image and overlay -->
                             <div class="card-img-scale-wrapper rounded-3">
+                           
                                 <!-- Image -->
-                                <img src="{{ asset( ($hotel->images[0] ?? null) ? ($hotel->images[0]) : 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
-                                {{-- Note: If images are stored with Storage::put('public/...') then Storage::url($hotel->images[0]) would be correct.
+                                <img src="{{ asset( ($hotel->images ?? null) ? ($hotel->images) : 'assets/images/category/hotel/01.jpg') }}" class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
+                                {{-- Note: If images are stored with Storage::put('public/...') then Storage::url($hotel->images) would be correct.
                                      If they are already in public path directly, asset() is fine.
                                      The factory currently suggests simple names like 'placeholders/hotel_image_1.jpg',
                                      implying they might be directly under public/ or public/placeholders/.
@@ -737,6 +740,9 @@
     </section>
 @endsection
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="/assets/js/functions.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
