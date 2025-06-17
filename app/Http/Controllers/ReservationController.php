@@ -12,7 +12,6 @@ use App\Models\Reservation;
 use Session;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
-use App\Services\StripeService;
 
 class ReservationController extends Controller
 {
@@ -109,56 +108,32 @@ class ReservationController extends Controller
     //     ]);
     // }
 
+    
     public function paymentForm(Request $request)
-    {
-        $bookingData = $request->session()->get('pending_booking');
-        if (!$bookingData) {
-            return redirect()->route('home')->with('error', 'No booking data found.');
-        }
-
-        $user = Auth::user(); // Fetch authenticated user
-
-        // Optional: Check if the user has a specific role, if applicable
-        // if (method_exists($user, 'hasRole') && !$user->hasRole('customer')) {
-        //     abort(403, 'Only customers can make reservations.');
-        // }
-
-        $hotel = Hotel::find($bookingData['hotel_id']);
-        if (!$hotel) {
-            return redirect()->route('home')->with('error', 'Hotel not found for this booking.');
-        }
-
-        $rooms = Room::whereIn('id', $bookingData['room_ids'])
-            ->where('hotel_id', $hotel->id)
-            ->get();
-
-        // Ensure the rooms fetched match the number of room IDs in bookingData
-        // This helps prevent issues if a room became unavailable or IDs are mismatched.
-        if ($rooms->count() !== count($bookingData['room_ids'])) {
-            // It might be better to redirect to a more specific error page or back with a detailed message.
-            return redirect()->route('home')->with('error', 'One or more selected rooms are no longer available or are invalid. Please try your booking again.');
-        }
-
-        $total = $bookingData['total_price'];
-        $stripeKey = config('services.stripe.public');
-        $savedPaymentMethods = [];
-
-        if ($user && $user->stripe_customer_id && $user->has_stripe_payment_method) {
-            $stripeService = new StripeService(); // Instantiate the service
-            $savedPaymentMethods = $stripeService->getSavedPaymentMethods($user->stripe_customer_id);
-        }
-
-        return view('reservation.payment', [
-            'booking' => $bookingData,
-            'hotel' => $hotel,
-            'rooms' => $rooms,
-            'roomsCount' => $rooms->count(),
-            'total' => $total,
-            'stripeKey' => $stripeKey,
-            'authUser' => $user, // Pass the authenticated user
-            'savedPaymentMethods' => $savedPaymentMethods // Pass saved payment methods
-        ]);
+{
+    $bookingData = $request->session()->get('pending_booking');
+    if (!$bookingData) {
+        return redirect()->route('home')->with('error', 'No booking data found.');
     }
+
+    $hotel = Hotel::find($bookingData['hotel_id']);
+    $rooms = Room::whereIn('id', $bookingData['room_ids'])
+        ->where('hotel_id', $hotel->id)
+        ->get();
+
+    $total = $bookingData['total_price'];
+
+    $stripeKey = config('services.stripe.public'); 
+
+    return view('reservation.payment', [
+        'booking' => $bookingData,
+        'hotel' => $hotel,
+        'rooms' => $rooms,
+        'roomsCount' => $rooms->count(),
+        'total' => $total,
+        'stripeKey' => $stripeKey,   
+    ]);
+}
     
     public function createStripeIntent(Request $request)
     {
@@ -229,31 +204,8 @@ public function processPayment(Request $request)
 }
     public function success($reservationId)
     {
-        $reservation = Reservation::with([
-            'user',          // To get guest details like name, email
-            'hotel',         // For hotel name, address
-            'rooms',         // For room types booked
-            'bill.payment'   // To get bill details (charges, total) and payment info (method, date)
-        ])->findOrFail($reservationId);
+        $reservation = Reservation::with('hotel', 'rooms')->findOrFail($reservationId);
 
-        // Calculate number of nights (if not stored directly on reservation model and needed)
-        // This was previously available in $bookingData from session, but that's cleared.
-        // So, recalculate if displaying it.
-        $nights = 0;
-        if ($reservation->check_in_date && $reservation->check_out_date) {
-            try {
-                $checkIn = \Carbon\Carbon::parse($reservation->check_in_date);
-                $checkOut = \Carbon\Carbon::parse($reservation->check_out_date);
-                $nights = $checkIn->diffInDays($checkOut);
-            } catch (\Exception $e) {
-                \Log::error("Error parsing dates for reservation ID {$reservationId}: " . $e->getMessage());
-                // $nights remains 0 or handle error as appropriate
-            }
-        }
-
-        return view('reservation.success', [
-            'reservation' => $reservation,
-            'nights' => $nights // Pass nights to the view
-        ]);
+        return view('reservation.success', ['reservation' => $reservation]);
     }
 }

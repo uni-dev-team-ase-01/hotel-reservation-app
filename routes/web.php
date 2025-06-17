@@ -7,6 +7,7 @@ use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\TravelCompanyController;
+use App\Http\Controllers\BookingSelectionController; // Add this
 use Illuminate\Support\Facades\Route;
 
 Auth::routes();
@@ -55,3 +56,9 @@ Route::post('/reservation/payment', [ReservationController::class, 'processPayme
 Route::post('/stripe/intent', [ReservationController::class, 'createStripeIntent'])->middleware('auth')->name('stripe.intent');
 
 Route::get('/reservation/success/{reservation?}', [ReservationController::class, 'success'])->middleware('auth')->name('reservation.success');
+
+// Route for displaying the new dynamic booking page
+Route::get('/booking/select', [BookingSelectionController::class, 'create'])->name('booking.select');
+
+// Route for handling the submission from the dynamic booking page
+Route::post('/booking/start', [BookingSelectionController::class, 'store'])->name('booking.start');

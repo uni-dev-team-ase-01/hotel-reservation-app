@@ -104,7 +104,7 @@
 						</div>
 						<div class="card-body p-4">
 							@php
-								$fullName = $authUser->name ?? '';
+								$fullName = Auth::user()->name ?? '';
 								$nameParts = explode(' ', $fullName, 2); // Split into max 2 parts
 								$firstName = $nameParts[0] ?? '';
 								$lastName = $nameParts[1] ?? '';
@@ -131,40 +131,21 @@
 									</div>
 									<div class="col-md-5">
 										<label class="form-label">First Name</label>
-										<input id="guest_name" name="guest_name" type="text" class="form-control" required value="{{ $firstName }}">
+										<input id="guest_name" name="guest_name" type="text" class="form-control" required value="{{ $firstName }}" readonly>
 									</div>
 									<div class="col-md-5">
 										<label class="form-label">Last Name</label>
-										<input id="guest_last_name" name="guest_last_name" type="text" class="form-control" value="{{ $lastName }}">
+										<input id="guest_last_name" name="guest_last_name" type="text" class="form-control" value="{{ $lastName }}" readonly>
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">Email</label>
-										<input id="guest_email" name="guest_email" type="email" class="form-control" required value="{{ $authUser->email ?? '' }}">
+										<input id="guest_email" name="guest_email" type="email" class="form-control" required value="{{ Auth::user()->email ?? '' }}" >
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">Mobile number</label>
-										<input id="guest_mobile" name="guest_mobile" type="text" class="form-control" value="{{ $authUser->phone ?? '' }}">
+										<input id="guest_mobile" name="guest_mobile" type="text" class="form-control" value="{{ Auth::user()->phone ?? '' }}" >
 									</div>
 								</div>
-
-								@if($authUser && $savedPaymentMethods && count($savedPaymentMethods) > 0)
-								<div class="my-4">
-									<h5 class="mb-3">Your Saved Payment Methods</h5>
-									<div class="list-group" id="saved-payment-methods-list">
-										@foreach($savedPaymentMethods as $pm)
-										<label class="list-group-item list-group-item-action">
-											<input class="form-check-input me-2" type="radio" name="payment_method_type" value="{{ $pm['id'] }}" id="pm_id_{{ $pm['id'] }}">
-											<i class="bi bi-credit-card-2-front"></i> {{ ucfirst($pm['brand']) }} ending in {{ $pm['last4'] }} (Expires {{ $pm['exp_month'] }}/{{ $pm['exp_year'] }})
-										</label>
-										@endforeach
-										<label class="list-group-item list-group-item-action">
-											<input class="form-check-input me-2" type="radio" name="payment_method_type" value="new_card" id="new_card_option" checked>
-											Use a new card
-										</label>
-									</div>
-								</div>
-								@endif
-
 								<div class="mt-4">
 									<div id="card-element" class="mb-3"></div>
 									<div id="card-errors" role="alert" class="text-danger"></div>
