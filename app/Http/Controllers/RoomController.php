@@ -30,6 +30,9 @@ class RoomController extends Controller
         $hotel = Hotel::findOrFail($hotelId);
         $checkIn = $request->check_in;
         $checkOut = $request->check_out;
+        $adults = (int) $request->input('adults', 1);
+        $children = (int) $request->input('children', 0);
+        $totalGuests = $adults + $children;
 
         // Get rooms that are NOT reserved for the selected dates, eager load daily rate
         $rooms = $hotel->rooms()
@@ -41,9 +44,11 @@ class RoomController extends Controller
             ->whereDoesntHave('reservations', function ($query) use ($checkIn, $checkOut) {
                 $query->where(function ($q) use ($checkIn, $checkOut) {
                     $q->where('check_in_date', '<', $checkOut)
-                        ->where('check_out_date', '>', $checkIn);
+                        ->where('check_out_date', '>', $checkIn)
+                        ->whereIn('status', ['confirmed', 'checked_in']); // Ensure only active reservations block rooms
                 });
             })
+            ->where('occupancy', '>=', $totalGuests) // Filter by occupancy
             ->get()
             ->map(function ($room) {
                 $dailyRate = optional($room->roomRates->first())->amount;
