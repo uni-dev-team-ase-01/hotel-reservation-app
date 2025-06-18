@@ -125,6 +125,7 @@
             rel="stylesheet"
             href="{{ asset("assets/vendor/bootstrap-icons/bootstrap-icons.css") }}"
         />
+        <link rel="stylesheet" href="{{ asset("assets/vendor/glightbox/css/glightbox.css") }}" />
 
         <!-- Theme CSS -->
         <link rel="stylesheet" href="{{ asset("assets/css/style.css") }}" />
@@ -172,6 +173,9 @@
 
         <!-- Bootstrap JS -->
         <script src="{{ asset("assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js") }}"></script>
+
+        <!-- GLightbox JS -->
+        <script src="{{ asset("assets/vendor/glightbox/js/glightbox.js") }}"></script>
 
         <!-- ThemeFunctions -->
         <script src="{{ asset("assets/js/functions.js") }}"></script>

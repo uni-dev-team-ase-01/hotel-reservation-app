@@ -103,6 +103,12 @@
 							<h4 class="card-title mb-0"><i class="bi bi-people-fill me-2"></i>Guest Details</h4>
 						</div>
 						<div class="card-body p-4">
+							@php
+								$fullName = Auth::user()->name ?? '';
+								$nameParts = explode(' ', $fullName, 2); // Split into max 2 parts
+								$firstName = $nameParts[0] ?? '';
+								$lastName = $nameParts[1] ?? '';
+							@endphp
 							<form id="payment-form" method="POST" action="{{ route('reservation.processPayment') }}">
 								@csrf
 								<input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
@@ -125,19 +131,19 @@
 									</div>
 									<div class="col-md-5">
 										<label class="form-label">First Name</label>
-										<input id="guest_name" name="guest_name" type="text" class="form-control" required>
+										<input id="guest_name" name="guest_name" type="text" class="form-control" required value="{{ $firstName }}" readonly>
 									</div>
 									<div class="col-md-5">
 										<label class="form-label">Last Name</label>
-										<input id="guest_last_name" name="guest_last_name" type="text" class="form-control">
+										<input id="guest_last_name" name="guest_last_name" type="text" class="form-control" value="{{ $lastName }}" readonly>
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">Email</label>
-										<input id="guest_email" name="guest_email" type="email" class="form-control" required>
+										<input id="guest_email" name="guest_email" type="email" class="form-control" required value="{{ Auth::user()->email ?? '' }}" >
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">Mobile number</label>
-										<input id="guest_mobile" name="guest_mobile" type="text" class="form-control">
+										<input id="guest_mobile" name="guest_mobile" type="text" class="form-control" value="{{ Auth::user()->phone ?? '' }}" >
 									</div>
 								</div>
 								<div class="mt-4">
@@ -188,72 +194,174 @@
     document.addEventListener('DOMContentLoaded', function () {
         const stripe = Stripe('{{ $stripeKey }}');
         const elements = stripe.elements();
-        const cardElement = elements.create('card');
-        cardElement.mount('#card-element');
+        const cardElement = elements.create('card', {
+            // Add any styling consistent with your site if needed
+            // style: { base: { fontSize: '16px', ... } }
+        });
+        const cardElementContainer = document.getElementById('card-element');
+
+        // Mount card element initially only if no saved cards or if "new card" is default
+        // This will be controlled by radio button logic later.
+        // cardElement.mount('#card-element'); // Mount it later based on selection
 
         const cardButton = document.getElementById('card-button');
-        cardButton.disabled = true;
+        const cardErrors = document.getElementById('card-errors');
+        const paymentForm = document.getElementById('payment-form');
+        const clientSecret = cardButton.dataset.secret; // Will be fetched
 
-        fetch("{{ route('stripe.intent') }}", {
-            method: "POST",
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                amount: {{ intval($total * 100) }}
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            cardButton.dataset.secret = data.clientSecret;
-            cardButton.disabled = false;
+        let selectedPaymentMethodType = 'new_card'; // Default to new card
 
-            cardButton.addEventListener('click', async (e) => {
-                e.preventDefault();
-                cardButton.disabled = true;
-                cardButton.textContent = 'Processing...';
+        // --- Saved Payment Methods Logic ---
+        const savedPmRadios = document.querySelectorAll('input[name="payment_method_type"]');
+        const newCardOptionRadio = document.getElementById('new_card_option');
 
-                const cardHolderName = document.getElementById('guest_name').value + ' ' + (document.getElementById('guest_last_name').value ?? '');
-                if (!cardHolderName.trim()) {
-                    document.getElementById('card-errors').textContent = 'Card holder name is required.';
-                    cardButton.disabled = false;
-                    cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
-                    return;
+        function toggleCardElementDisplay() {
+            const useNewCard = newCardOptionRadio ? newCardOptionRadio.checked : true;
+            if (useNewCard) {
+                if (cardElementContainer && !cardElement.container) { // Mount if not already and visible
+                    cardElement.mount('#card-element');
                 }
+                if (cardElementContainer) cardElementContainer.style.display = 'block';
+            } else {
+                if (cardElementContainer) cardElementContainer.style.display = 'none';
+                // cardElement.unmount(); // Optional: unmount when hidden
+            }
+        }
 
-                const { paymentIntent, error } = await stripe.confirmCardPayment(
-                    data.clientSecret, {
-                        payment_method: {
-                            card: cardElement,
-                            billing_details: {
-                                name: cardHolderName
-                            }
-                        }
-                    }
-                );
-                if (error) {
-                    document.getElementById('card-errors').textContent = error.message;
-                    cardButton.disabled = false;
-                    cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
-                } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                    document.getElementById('payment-form').submit();
-                    //   window.location.href = '/customer/reservations';
-                } else if (paymentIntent && paymentIntent.status === 'processing') {
-                    document.getElementById('card-errors').textContent = 'Your payment is processing. Please wait or check your email for confirmation.';
-                    cardButton.disabled = false;
-                    cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
-                } else {
-                    document.getElementById('card-errors').textContent = 'Payment could not be completed. Please try again.';
-                    cardButton.disabled = false;
-                    cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
-                }
+        // Initial display based on default checked radio (new_card or first saved if no new_card option)
+        const initiallySelectedRadio = document.querySelector('input[name="payment_method_type"]:checked');
+        if (initiallySelectedRadio) {
+            selectedPaymentMethodType = initiallySelectedRadio.value;
+        }
+        toggleCardElementDisplay(); // Call on load
+
+        savedPmRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                selectedPaymentMethodType = this.value;
+                toggleCardElementDisplay();
+                cardErrors.textContent = ''; // Clear previous errors
             });
-        })
-        .catch(error => {
-            document.getElementById('card-errors').textContent = 'Could not initialize payment. Please refresh and try again.';
-            cardButton.disabled = false;
         });
+
+
+        // --- Fetch Payment Intent Client Secret ---
+        if (cardButton) { // Ensure cardButton exists
+             cardButton.disabled = true; // Keep disabled until client secret is fetched
+
+             fetch("{{ route('stripe.intent') }}", {
+                 method: "POST",
+                 headers: {
+                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify({
+                     amount: {{ intval($total * 100) }} // Ensure $total is correctly passed and in cents
+                 })
+             })
+             .then(response => {
+                 if (!response.ok) {
+                     return response.json().then(err => Promise.reject(err));
+                 }
+                 return response.json();
+             })
+             .then(data => {
+                 if (data.clientSecret) {
+                     cardButton.dataset.secret = data.clientSecret;
+                     cardButton.disabled = false;
+                 } else {
+                     throw new Error('Client secret not received.');
+                 }
+             })
+             .catch(error => {
+                 console.error('Error fetching client secret:', error);
+                 cardErrors.textContent = error.message || 'Could not initialize payment. Please refresh and try again.';
+                 if (cardButton) cardButton.disabled = true; // Keep disabled on error
+             });
+        }
+
+
+        // --- Payment Button Click Handler ---
+        if (cardButton) {
+             cardButton.addEventListener('click', async (e) => {
+                 e.preventDefault();
+                 cardButton.disabled = true;
+                 cardButton.textContent = 'Processing...';
+                 cardErrors.textContent = ''; // Clear previous errors
+
+                 const currentClientSecret = cardButton.dataset.secret;
+                 if (!currentClientSecret) {
+                     cardErrors.textContent = 'Payment session expired or invalid. Please refresh.';
+                     cardButton.disabled = false;
+                     cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
+                     return;
+                 }
+
+                 let confirmPaymentData = {
+                     payment_method_options: {
+                         card: {
+                             setup_future_usage: 'on_session' // Or 'off_session' if not saving
+                         }
+                     }
+                     // We could add shipping/billing here if needed by the payment flow
+                 };
+                 let paymentPromise;
+
+                 if (selectedPaymentMethodType === 'new_card') {
+                     const guestNameInput = document.getElementById('guest_name');
+                     const guestLastNameInput = document.getElementById('guest_last_name');
+                     let cardHolderName = guestNameInput ? guestNameInput.value : '';
+                     if (guestLastNameInput && guestLastNameInput.value) {
+                          cardHolderName += ' ' + guestLastNameInput.value;
+                     }
+                     cardHolderName = cardHolderName.trim();
+
+                     if (!cardHolderName) {
+                         cardErrors.textContent = 'Card holder name is required.';
+                         cardButton.disabled = false;
+                         cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
+                         return;
+                     }
+                     if (!cardElement.container) { // If it was hidden and unmounted
+                         cardElement.mount('#card-element');
+                     }
+                     paymentPromise = stripe.confirmCardPayment(currentClientSecret, {
+                         payment_method: {
+                             card: cardElement,
+                             billing_details: { name: cardHolderName, email: document.getElementById('guest_email')?.value }
+                         }
+                     });
+                 } else { // Using a saved payment method
+                     paymentPromise = stripe.confirmCardPayment(currentClientSecret, {
+                         payment_method: selectedPaymentMethodType // This is the PM ID
+                     });
+                 }
+
+                 paymentPromise.then(function(result) {
+                     if (result.error) {
+                         cardErrors.textContent = result.error.message;
+                         cardButton.disabled = false;
+                         cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
+                     } else {
+                         if (result.paymentIntent.status === 'succeeded') {
+                             if (paymentForm) paymentForm.submit();
+                         } else if (result.paymentIntent.status === 'processing') {
+                             cardErrors.textContent = 'Your payment is processing. Please wait or check your email for confirmation.';
+                             cardButton.disabled = false; // Allow retry if needed or just inform
+                             cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
+                         } else {
+                             cardErrors.textContent = 'Payment could not be completed: ' + result.paymentIntent.status;
+                             cardButton.disabled = false;
+                             cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
+                         }
+                     }
+                 }).catch(error => {
+                     console.error('Error during payment confirmation:', error);
+                     cardErrors.textContent = 'An unexpected error occurred. Please try again.';
+                     cardButton.disabled = false;
+                     cardButton.textContent = 'Pay ${{ number_format($total, 2) }}';
+                 });
+             });
+        }
     });
 </script>
 @endpush
