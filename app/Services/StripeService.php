@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use Filament\Notifications\Notification;
+use Log;
 use Stripe\StripeClient;
 use Exception;
 
@@ -32,7 +33,7 @@ class StripeService
             ]);
 
             $user->update(['stripe_customer_id' => $customer->id]);
-            
+
             return $customer->id;
         } catch (Exception $e) {
             $this->sendErrorNotification('Failed to create Stripe customer', $e->getMessage());
@@ -46,7 +47,7 @@ class StripeService
     public function generateCustomerPortalUrl(User $user, string $returnUrl = null): ?string
     {
         $customerId = $this->ensureCustomer($user);
-        
+
         if (!$customerId) {
             return null;
         }
@@ -70,7 +71,7 @@ class StripeService
     public function updateCustomer(User $user, array $data = []): bool
     {
         $customerId = $user->stripe_customer_id;
-        
+
         if (!$customerId) {
             return false;
         }
@@ -96,7 +97,7 @@ class StripeService
     public function getCustomer(User $user): ?object
     {
         $customerId = $user->stripe_customer_id;
-        
+
         if (!$customerId) {
             return null;
         }
@@ -115,7 +116,7 @@ class StripeService
     public function createCheckoutSession(User $user, array $lineItems, string $successUrl, string $cancelUrl): ?string
     {
         $customerId = $this->ensureCustomer($user);
-        
+
         if (!$customerId) {
             return null;
         }
@@ -142,7 +143,7 @@ class StripeService
     public function createSubscriptionCheckoutSession(User $user, string $priceId, string $successUrl, string $cancelUrl): ?string
     {
         $customerId = $this->ensureCustomer($user);
-        
+
         if (!$customerId) {
             return null;
         }
@@ -150,10 +151,12 @@ class StripeService
         try {
             $session = $this->stripe->checkout->sessions->create([
                 'customer' => $customerId,
-                'line_items' => [[
-                    'price' => $priceId,
-                    'quantity' => 1,
-                ]],
+                'line_items' => [
+                    [
+                        'price' => $priceId,
+                        'quantity' => 1,
+                    ]
+                ],
                 'mode' => 'subscription',
                 'success_url' => $successUrl,
                 'cancel_url' => $cancelUrl,
@@ -172,7 +175,7 @@ class StripeService
     public function getActiveSubscriptions(User $user): array
     {
         $customerId = $user->stripe_customer_id;
-        
+
         if (!$customerId) {
             return [];
         }
@@ -222,5 +225,34 @@ class StripeService
     public function getStripeClient(): StripeClient
     {
         return $this->stripe;
+    }
+    public function getSavedPaymentMethods(string $stripeCustomerId): array
+    {
+        $savedPaymentMethods = [];
+        if (empty($stripeCustomerId)) {
+            return $savedPaymentMethods;
+        }
+
+        try {
+            $customerPaymentMethods = PaymentMethod::all([
+                'customer' => $stripeCustomerId,
+                'type' => 'card',
+            ]);
+
+            foreach ($customerPaymentMethods->data as $pm) {
+                if ($pm->card) { // Ensure card details exist
+                    $savedPaymentMethods[] = [
+                        'id' => $pm->id,
+                        'brand' => $pm->card->brand,
+                        'last4' => $pm->card->last4,
+                        'exp_month' => $pm->card->exp_month,
+                        'exp_year' => $pm->card->exp_year,
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error fetching Stripe payment methods for customer ' . $stripeCustomerId . ': ' . $e->getMessage());
+        }
+        return $savedPaymentMethods;
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -29,6 +30,7 @@ class LoginController extends Controller
      */
     protected function redirectTo()
     {
+        info(Session::get('pending_booking'));
         if (session()->has('pending_booking')) {
             return route('reservation.paymentForm');
         }
@@ -48,6 +50,9 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
+        if (session()->has('pending_booking')) {
+            return redirect($this->redirectTo());
+        }
         if (!$user->hasRole('customer')) {
             Auth::guard('web')->logout();
 
