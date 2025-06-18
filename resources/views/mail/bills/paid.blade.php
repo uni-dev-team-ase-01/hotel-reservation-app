@@ -1,35 +1,29 @@
 @extends('mail.layout.base')
 
-@section('title', 'Reservation Cancelled - ' . config('app.name'))
+@section('title', 'Reservation Bill Paid - ' . config('app.name'))
 
 @section('greeting')
     <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #333;">
-        Dear {{ $reservation->user->name }},
+        Dear {{ $bill->reservation->user->name }},
     </p>
 @endsection
 
 @section('content')
     <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #333;">
-        We regret to inform you that your reservation has been cancelled.
+        We are pleased to confirm that your reservation bill has been successfully paid.
     </p>
 
     @include('mail.components.info-table', [
-        'title' => 'Reservation Details',
+        'title' => 'Reservation Bill Details',
         'items' => [
-            'Reservation ID' => $reservation->confirmation_number,
-            'Check-in Date' => \Carbon\Carbon::parse($reservation->check_in_date)->format('F j, Y'),
-            'Check-out Date' => isset($reservation->check_out_date)
-                ? \Carbon\Carbon::parse($reservation->check_out_date)->format('F j, Y')
+            'Reservation ID' => $bill->reservation->confirmation_number,
+            'Check-in Date' => \Carbon\Carbon::parse($bill->reservation->check_in_date)->format('F j, Y'),
+            'Check-out Date' => isset($bill->reservation->check_out_date)
+                ? \Carbon\Carbon::parse($bill->reservation->check_out_date)->format('F j, Y')
                 : 'N/A',
-            'Guests' => $reservation->number_of_guests ?? 'N/A',
-            'Status' => ucfirst($reservation->status ?? 'cancelled'),
+            'Total Amount' => '$' . number_format($bill->total_amount, 2),
         ],
     ])
-
-    <p>
-        Your reservation is cancelled due to no payment method being provided.
-        If you would like to rebook, please visit our website or contact us directly.
-    </p>
 
     <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #333;">
         Thank you for choosing our service! We look forward to serving you.

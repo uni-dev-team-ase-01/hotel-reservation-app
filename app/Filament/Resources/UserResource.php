@@ -22,11 +22,14 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')->required(),
+                Forms\Components\TextInput::make('phone')
+                    ->tel()
+                    ->required(),
                 Forms\Components\TextInput::make('email')->email()->required(),
-                Forms\Components\TextInput::make('password')->password()->required()->dehydrateStateUsing(fn ($state) => bcrypt($state)),
-                Forms\Components\Select::make('roles')
-                    ->multiple()
-                    ->relationship('roles', 'name')
+                Forms\Components\Select::make('role')
+                    ->options(\Spatie\Permission\Models\Role::pluck('name', 'name'))
+                    ->required()
+                    ->visibleOn('create')
                     ->preload(),
             ]);
     }
@@ -39,8 +42,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email'),
                 Tables\Columns\TextColumn::make('roles.name')->label('Roles'),
             ])
-            ->filters([
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

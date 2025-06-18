@@ -100,4 +100,9 @@ class Room extends Model
     {
         return $this->hasMany(RoomRate::class);
     }
+
+    public function roomRevenueReports(): HasMany
+    {
+        return $this->hasMany(RoomRevenueReport::class, 'room_id');
+    }
 }

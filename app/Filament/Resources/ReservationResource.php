@@ -8,23 +8,19 @@ use App\Enum\UserRoleType;
 use App\Filament\Resources\ReservationResource\Pages;
 use App\Filament\Resources\ReservationResource\RelationManagers\BillsRelationManager;
 use App\Filament\Resources\ReservationResource\RelationManagers\ReservationRoomsRelationManager;
-use App\Mail\UserCreated;
 use App\Models\Hotel;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
+use App\Services\UserService;
 use Filament\Forms;
-use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
+
 
 class ReservationResource extends Resource
 {
@@ -120,52 +116,8 @@ class ReservationResource extends Resource
                             ->helperText('User will receive an email with their login details'),
                     ])
                     ->createOptionUsing(function (array $data) {
-                        $generatedPassword = Str::random(12);
-
-                        $user = User::create([
-                            'name' => $data['name'],
-                            'email' => $data['email'],
-                            'phone' => $data['phone'] ?? null,
-                            'password' => bcrypt($generatedPassword),
-                            'email_verified_at' => now(),
-                        ]);
-
-                        $customerRole = Role::where('name', UserRoleType::CUSTOMER->value)
-                            ->where('guard_name', 'web')
-                            ->first();
-
-                        $user->assignRole($customerRole);
-
-                        if ($data['send_welcome_email'] ?? true) {
-                            try {
-                                Mail::to($user->email)->send(new UserCreated($user, $generatedPassword));
-
-                                Notification::make()
-                                    ->title('User created successfully')
-                                    ->body('Welcome email sent to ' . $user->email)
-                                    ->success()
-                                    ->send();
-                            } catch (\Exception $e) {
-                                logger('Failed to send welcome email', [
-                                    'user_id' => $user->id,
-                                    'email' => $user->email,
-                                    'error' => $e->getMessage(),
-                                ]);
-                                Notification::make()
-                                    ->title('User created but email failed')
-                                    ->body('User created successfully, but welcome email could not be sent.')
-                                    ->warning()
-                                    ->send();
-                            }
-                        } else {
-                            Notification::make()
-                                ->title('User created successfully')
-                                ->body('Password: ' . $generatedPassword . ' (Please save this!)')
-                                ->success()
-                                ->persistent()
-                                ->send();
-                        }
-
+                        $userService = new UserService();
+                        $user = $userService->createUser($data, UserRoleType::CUSTOMER->value);
                         return $user->id;
                     })
                     ->createOptionAction(function (Action $action) {

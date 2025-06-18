@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\User;
+use App\Models\Reservation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -10,14 +10,14 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class UserCreated extends Mailable
+class ReservationCheckedIn extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user, public string $password, public string $userRole)
+    public function __construct(public Reservation $reservation)
     {
         //
     }
@@ -28,7 +28,7 @@ class UserCreated extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'User Created',
+            subject: 'Reservation Checked In',
         );
     }
 
@@ -38,7 +38,7 @@ class UserCreated extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.users.created',
+            view: 'mail.reservations.checked-in',
         );
     }
 

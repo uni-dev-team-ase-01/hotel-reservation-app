@@ -14,6 +14,9 @@
         the scheduled date.
     </p>
 
+    <p>
+        Please make the payment for the reservation as per our policy.
+    </p>
     @include('mail.components.info-table', [
         'title' => 'Reservation Details',
         'items' => [
@@ -24,6 +27,7 @@
                 : 'N/A',
             'Guests' => $reservation->number_of_guests ?? 'N/A',
             'Status' => ucfirst($reservation->status ?? 'no show'),
+            'Total Amount' => '$' . number_format($reservation->bills()->first()->total_amount, 2),
         ],
     ])
 

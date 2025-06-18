@@ -4,7 +4,10 @@ namespace App\Filament\Resources\HotelResource\RelationManagers;
 
 use App\Enum\UserRoleType;
 use App\Models\User;
+use App\Services\UserService;
 use Filament\Forms;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -19,13 +22,89 @@ class UserHotelsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
+        $user = auth()->user();
+
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->label('User')
-                    ->options(User::all()->pluck('email', 'id'))
+                    ->label('Customer')
+                    ->hidden(fn() => $user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value]))
+                    ->relationship('user', 'name', function (Builder $query) {
+                        $query->whereHas('roles', function (Builder $roleQuery) {
+                            $roleQuery->whereIn('name', [
+                                UserRoleType::HOTEL_CLERK->value,
+                                UserRoleType::HOTEL_MANAGER->value,
+                            ]);
+                        });
+                    })
                     ->searchable()
-                    ->required(),
+                    ->preload()
+                    ->default(function () {
+                        $user_id = request()->query('user_id');
+                        if (
+                            $user_id &&
+                            User::where('id', $user_id)
+                            ->whereHas('roles', function (Builder $roleQuery) {
+                                $roleQuery->whereIn('name', [
+                                    UserRoleType::HOTEL_CLERK->value,
+                                    UserRoleType::HOTEL_MANAGER->value,
+                                ]);
+                            })
+                            ->exists()
+                        ) {
+                            return $user_id;
+                        }
+
+                        return null;
+                    })
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(User::class, 'email'),
+
+                        Forms\Components\Select::make('role')
+                            ->options(
+                                \Spatie\Permission\Models\Role::whereIn('name', [
+                                    UserRoleType::HOTEL_CLERK->value,
+                                    UserRoleType::HOTEL_MANAGER->value,
+                                ])
+                                    ->pluck('name', 'name')
+                            )
+                            ->required()
+                            ->preload(),
+
+                        Forms\Components\TextInput::make('phone')
+                            ->tel()
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\Placeholder::make('password_info')
+                            ->label('Password')
+                            ->content('A secure password will be automatically generated and sent via email'),
+
+                        Forms\Components\Toggle::make('send_welcome_email')
+                            ->label('Send welcome email with login credentials')
+                            ->default(true)
+                            ->helperText('User will receive an email with their login details'),
+                    ])
+                    ->createOptionUsing(function (array $data) {
+                        $userService = new UserService();
+                        $user = $userService->createUser($data, $data['role']);
+                        return $user->id;
+                    })
+                    ->createOptionAction(function (Action $action) {
+                        return $action
+                            ->modalHeading('Create New User')
+                            ->modalSubmitActionLabel('Create User')
+                            ->modalWidth('lg');
+                    })
+                    ->required(!$user->hasRole(UserRoleType::HOTEL_CLERK->value)),
             ]);
     }
 

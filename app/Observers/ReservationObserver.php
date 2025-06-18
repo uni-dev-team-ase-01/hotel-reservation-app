@@ -4,11 +4,13 @@ namespace App\Observers;
 
 use App\Enum\ReservationStatus;
 use App\Mail\ReservationCanceled;
+use App\Mail\ReservationCheckedIn;
 use App\Mail\ReservationCheckedOut;
 use App\Mail\ReservationConfirmed;
 use App\Mail\ReservationNoShow;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Mail;
+use App\Services\BillService as BillServiceService;
 
 class ReservationObserver
 {
@@ -21,12 +23,12 @@ class ReservationObserver
             return;
         }
 
-        if (!$reservation->wasChanged('status')) {
-            return;
-        }
-
         if ($reservation->status === ReservationStatus::CONFIRMED->value) {
             Mail::to($reservation->user)->send(new ReservationConfirmed($reservation));
+        }
+
+        if (!$reservation->wasChanged('status')) {
+            return;
         }
 
         if ($reservation->status === ReservationStatus::CANCELLED->value) {
@@ -34,6 +36,23 @@ class ReservationObserver
         }
 
         if ($reservation->status === ReservationStatus::NO_SHOW->value) {
+            if ($reservation->bills()->count() === 0) {
+                logger()->info('Creating new bill for reservation ID: ' . $reservation->id);
+                $reservation->bills()->create([
+                    'room_charges' => $reservation->getRoomsPriceAttribute(),
+                    'discount' => 0,
+                    'service_charges' => 0,
+                    'taxes' => 0,
+                    'extra_charges' => 0,
+                    'total_amount' => $reservation->getRoomsPriceAttribute(),
+                    'status' => 'unpaid',
+                ]);
+            } else {
+                logger()->info('Recalculating bill for reservation ID: ' . $reservation->id);
+                $billServiceService = new BillServiceService();
+                $billServiceService->calculateTotalAmountOfBill($reservation->id);
+            }
+
             Mail::to($reservation->user)->send(new ReservationNoShow($reservation));
         }
 
@@ -42,6 +61,7 @@ class ReservationObserver
         }
 
         if ($reservation->status === ReservationStatus::CHECKED_IN->value) {
+            Mail::to($reservation->user)->send(new ReservationCheckedIn($reservation));
             if ($reservation->bills()->count() === 0) {
                 $reservation->bills()->create([
                     'room_charges' => $reservation->getRoomsPriceAttribute(),

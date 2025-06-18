@@ -53,4 +53,14 @@ class Hotel extends Model
     {
         return $this->hasMany(Reservation::class, 'hotel_id');
     }
+
+    public function dailyRevenueReports(): HasMany
+    {
+        return $this->hasMany(DailyRevenueReport::class, 'hotel_id');
+    }
+
+    public function roomRevenueReports(): HasMany
+    {
+        return $this->hasMany(RoomRevenueReport::class, 'hotel_id');
+    }
 }

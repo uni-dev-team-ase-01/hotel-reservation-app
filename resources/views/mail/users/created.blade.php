@@ -18,6 +18,7 @@
         'items' => [
             'Email' => $user->email,
             'Password' => $password,
+            'Role' => $userRole,
         ],
     ])
 

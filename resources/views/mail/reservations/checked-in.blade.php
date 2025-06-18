@@ -1,6 +1,6 @@
 @extends('mail.layout.base')
 
-@section('title', 'Reservation Cancelled - ' . config('app.name'))
+@section('title', 'Reservation Checked In - ' . config('app.name'))
 
 @section('greeting')
     <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #333;">
@@ -10,7 +10,7 @@
 
 @section('content')
     <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #333;">
-        We regret to inform you that your reservation has been cancelled.
+        We are pleased to confirm that your reservation has been successfully checked in.
     </p>
 
     @include('mail.components.info-table', [
@@ -22,14 +22,9 @@
                 ? \Carbon\Carbon::parse($reservation->check_out_date)->format('F j, Y')
                 : 'N/A',
             'Guests' => $reservation->number_of_guests ?? 'N/A',
-            'Status' => ucfirst($reservation->status ?? 'cancelled'),
+            'Status' => ucfirst($reservation->status ?? 'checked in'),
         ],
     ])
-
-    <p>
-        Your reservation is cancelled due to no payment method being provided.
-        If you would like to rebook, please visit our website or contact us directly.
-    </p>
 
     <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #333;">
         Thank you for choosing our service! We look forward to serving you.

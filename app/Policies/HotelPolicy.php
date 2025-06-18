@@ -36,7 +36,7 @@ class HotelPolicy
     public function create(User $user): bool
     {
         return $user->hasAnyRole([
-            UserRoleType::HOTEL_MANAGER->value,
+            // UserRoleType::HOTEL_MANAGER->value,
             UserRoleType::SUPER_ADMIN->value,
         ]);
     }

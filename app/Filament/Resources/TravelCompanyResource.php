@@ -33,6 +33,8 @@ class TravelCompanyResource extends Resource
                     ->tel()
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Textarea::make('message')
+                    ->required(),
                 Forms\Components\Toggle::make('status')
                     ->required(),
                 Forms\Components\Select::make('user_id')
@@ -40,7 +42,7 @@ class TravelCompanyResource extends Resource
                     ->relationship(
                         'user',
                         'name',
-                        fn ($query) => $query->whereHas('roles', function ($q) {
+                        fn($query) => $query->whereHas('roles', function ($q) {
                             $q->where('name', 'travel-company');
                         })
                     )
@@ -68,7 +70,7 @@ class TravelCompanyResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('user_id')
+                Tables\Columns\TextColumn::make('user.email')
                     ->numeric()
                     ->sortable(),
             ])

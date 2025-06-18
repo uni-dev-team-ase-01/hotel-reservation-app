@@ -2,14 +2,13 @@
 
 namespace App\Filament\Pages;
 
-use App\Enum\RateType;
 use App\Enum\ReservationStatus;
 use App\Enum\RoomType;
 use App\Enum\UserRoleType;
 use App\Models\Hotel;
 use App\Models\Room;
 use Carbon\Carbon;
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -87,25 +86,25 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->searchable()
                     ->disabled($isHotelStaff && $userHotels->count() === 1),
 
-                DateTimePicker::make('checkInDate')
+                DatePicker::make('checkInDate')
                     ->label('Check-in Date')
                     ->required()
                     ->minDate(now())
                     ->live()
                     ->seconds(false)
-                    ->displayFormat('M j, Y H:i')
-                    ->format('Y-m-d H:i:s')
+                    ->displayFormat('M j, Y')
+                    ->format('Y-m-d')
                     ->native(false)
                     ->afterStateUpdated(fn () => $this->showResults = false),
 
-                DateTimePicker::make('checkOutDate')
+                DatePicker::make('checkOutDate')
                     ->label('Check-out Date')
                     ->required()
                     ->after('checkInDate')
                     ->live()
                     ->seconds(false)
-                    ->displayFormat('M j, Y H:i')
-                    ->format('Y-m-d H:i:s')
+                    ->displayFormat('M j, Y')
+                    ->format('Y-m-d')
                     ->native(false)
                     ->afterStateUpdated(fn () => $this->showResults = false),
 
@@ -304,6 +303,9 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             'checkOutDate' => 'required|date|after:checkInDate',
             'numberOfGuests' => 'required|integer|min:1',
         ]);
+        
+        $this->checkInDate = Carbon::parse($this->checkInDate)->setTime(14, 0, 0)->format('Y-m-d H:i:s');
+        $this->checkOutDate = Carbon::parse($this->checkOutDate)->setTime(12, 0, 0)->format('Y-m-d H:i:s');
 
         $this->showResults = true;
         $this->selectedRooms = [];
@@ -326,8 +328,8 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             return 0;
         }
 
-        return Carbon::parse($this->checkInDate)
-            ->diffInDays(Carbon::parse($this->checkOutDate));
+        return round(Carbon::parse($this->checkInDate)
+            ->diffInDays(Carbon::parse($this->checkOutDate)));
     }
 
     public function getSelectedRoomsCount(): int
