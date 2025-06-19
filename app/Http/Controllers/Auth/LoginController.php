@@ -32,7 +32,12 @@ class LoginController extends Controller
         if (session()->has('pending_booking')) {
             return route('reservation.paymentForm');
         }
-        return '/';
+        if (Auth::check() && Auth::user()->hasRole('customer')) {
+            // Assuming 'filament.customer.pages.dashboard' is the correct route name (updated)
+            // for the customer Hotels Listing page based on FilamentPHP structure.
+            return route('filament.customer.pages.dashboard');
+        }
+        return '/'; // Fallback
     }
 
     /**
@@ -50,11 +55,15 @@ class LoginController extends Controller
     {
         if (!$user->hasRole('customer')) {
             Auth::guard('web')->logout();
-
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
             return redirect('/login')->withErrors(['email' => 'Access denied. Customers only.']);
         }
 
-        return redirect('/');
+        // If the user is a customer, the AuthenticatesUsers trait will call $this->redirectPath(),
+        // which internally calls the updated redirectTo() method. This handles both
+        // pending_booking and direct login scenarios correctly.
+        return redirect()->intended($this->redirectPath());
     }
 
     public function logout(Request $request)

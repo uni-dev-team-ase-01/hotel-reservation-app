@@ -30,9 +30,9 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => UserRoleType::CUSTOMER->value, // Default role
-            'phone_number' => fake()->unique()->phoneNumber(),
-            'address' => fake()->address(),
+            // 'role' => UserRoleType::CUSTOMER->value, // Default role -- Removed: Roles are assigned via spatie/laravel-permission
+            'phone' => fake()->unique()->phoneNumber(), // Changed from phone_number to phone
+            // 'address' => fake()->address(), // Temporarily removed to check if it's causing DB errors
             'stripe_customer_id' => 'cus_' . Str::random(14), // Example Stripe ID
             'has_stripe_payment_method' => fake()->boolean(75), // 75% chance of true
         ];
@@ -48,53 +48,6 @@ class UserFactory extends Factory
         ]);
     }
 
-    /**
-     * Indicate that the user is a customer.
-     */
-    public function customer(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoleType::CUSTOMER->value,
-        ]);
-    }
-
-    /**
-     * Indicate that the user is a hotel manager.
-     */
-    public function hotelManager(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoleType::HOTEL_MANAGER->value,
-        ]);
-    }
-
-    /**
-     * Indicate that the user is hotel staff.
-     */
-    public function hotelStaff(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoleType::HOTEL_STAFF->value,
-        ]);
-    }
-
-    /**
-     * Indicate that the user is a travel agent.
-     */
-    public function travelAgent(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoleType::TRAVEL_AGENT->value,
-        ]);
-    }
-
-    /**
-     * Indicate that the user is a system administrator.
-     */
-    public function systemAdministrator(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoleType::SYSTEM_ADMINISTRATOR->value,
-        ]);
-    }
+    // Removed role-specific state methods as roles are handled by spatie/laravel-permission
+    // and assigned in tests/seeders directly e.g. $user->assignRole('customer');
 }

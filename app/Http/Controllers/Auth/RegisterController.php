@@ -35,7 +35,11 @@ class RegisterController extends Controller
         if (session()->has('pending_booking')) {
             return route('reservation.paymentForm');
         }
-        return '/';
+        // Assuming new users are always 'customer' role as per current RegisterController logic
+        // and they should be redirected to the Hotels Listing page.
+        // Assuming 'filament.customer.pages.dashboard' is the correct route name (updated)
+        // for the customer Hotels Listing page based on FilamentPHP structure.
+        return route('filament.customer.pages.dashboard');
     }
 
     /**

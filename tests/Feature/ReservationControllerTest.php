@@ -14,6 +14,7 @@ use App\Enum\UserRoleType;
 use App\Enum\ReservationStatusType; // For checking status
 use App\Enum\PaymentStatusEnum;     // For checking bill payment status
 use Illuminate\Support\Facades\Session;
+use Spatie\Permission\Models\Role; // Added
 // use Stripe\PaymentIntent; // Mocking Stripe is complex, keeping basic test for now
 use Tests\TestCase;
 
@@ -29,7 +30,10 @@ class ReservationControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create(['role' => UserRoleType::CUSTOMER->value]);
+        Role::findOrCreate('customer', 'web');
+        Role::findOrCreate('admin', 'web');
+        $this->user = User::factory()->create();
+        $this->user->assignRole('customer'); // Assign customer role
         $this->hotel = Hotel::factory()->create();
 
         // Ensure rooms are distinct enough for tests
@@ -41,7 +45,7 @@ class ReservationControllerTest extends TestCase
     }
 
     /** @test */
-    public function start_booking_requires_authentication_and_redirects_to_payment_if_auth()
+    public function unauthenticated_user_initiating_booking_is_redirected_to_login_and_session_has_pending_booking()
     {
         $bookingParams = [
             'check_in' => now()->addDays(1)->toDateString(),
@@ -56,8 +60,17 @@ class ReservationControllerTest extends TestCase
         // Test unauthenticated
         $responseUnauth = $this->get($url);
         $responseUnauth->assertRedirect(route('login'));
+        $this->assertTrue(session()->has('pending_booking'));
+        $pendingBookingUnauth = session()->get('pending_booking');
+        $this->assertEquals($this->hotel->id, $pendingBookingUnauth['hotel_id']);
+        $this->assertEquals([$this->room1->id], $pendingBookingUnauth['room_ids']); // Ensure this matches controller logic for room_ids
+        $this->assertEquals(now()->addDays(1)->toDateString(), $pendingBookingUnauth['check_in']);
+        $this->assertEquals(now()->addDays(3)->toDateString(), $pendingBookingUnauth['check_out']);
+        $this->assertEquals(1, $pendingBookingUnauth['adults']);
+        $this->assertEquals(0, $pendingBookingUnauth['children']);
 
-        // Test authenticated
+
+        // Test authenticated (keeping this part from original test, might be redundant if a separate test covers it)
         $responseAuth = $this->actingAs($this->user)->get($url);
         $responseAuth->assertRedirect(route('reservation.paymentForm'));
         $responseAuth->assertSessionHas('pending_booking');
@@ -73,7 +86,7 @@ class ReservationControllerTest extends TestCase
     public function start_booking_validates_input()
     {
         // Missing check_in, check_out, adults
-        $invalidBookingParams = [ 'children' => 0 ];
+        $invalidBookingParams = [ 'children' => 0 ]; // Using existing invalid params for this test
         $roomIds = $this->room1->id;
         $url = "/hotel/{$this->hotel->id}/rooms/{$roomIds}/book?" . http_build_query($invalidBookingParams);
 
