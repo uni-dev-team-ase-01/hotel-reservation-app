@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\RateType;
+use App\Services\DurationService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -81,31 +82,36 @@ class Reservation extends Model
     {
         $totalPrice = 0;
         $duration = $this->getDuration();
-
+        
         foreach ($this->rooms as $room) {
             $roomRate = $room->getCurrentRate($this->rate_type);
             logger()->info("Room ID: {$room->id}, Rate Type: {$this->rate_type}, Room Rate: {$roomRate}, Duration: {$duration}");
             $totalPrice += $roomRate * $duration;
         }
 
+        logger()->info("Total Price for Reservation ID: {$this->id} is {$totalPrice}");
         return $totalPrice;
     }
 
     private function getDuration()
     {
-        $nights = round($this->check_in_date->diffInDays($this->check_out_date));
+        $nights = DurationService::getTotalNights(
+            $this->check_in_date,
+            $this->check_out_date,
+        );
+        // $nights = round($this->check_in_date->diffInDays($this->check_out_date));
 
-        if ($this->rate_type === RateType::DAILY->value) {
-            return $nights;
-        }
+        // if ($this->rate_type === RateType::DAILY->value) {
+        //     return $nights;
+        // }
 
-        if ($this->rate_type === RateType::WEEKLY->value) {
-            return ceil($nights / 7);
-        }
+        // if ($this->rate_type === RateType::WEEKLY->value) {
+        //     return ceil($nights / 7);
+        // }
 
-        if ($this->rate_type === RateType::MONTHLY->value) {
-            return ceil($nights / 30);
-        }
+        // if ($this->rate_type === RateType::MONTHLY->value) {
+        //     return ceil($nights / 30);
+        // }
 
         return $nights;
     }

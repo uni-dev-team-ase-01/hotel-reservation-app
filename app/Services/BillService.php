@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enum\DiscountRates;
+use App\Enum\UserRoleType;
 use App\Models\Reservation;
 
 class BillService
@@ -34,10 +36,25 @@ class BillService
 
         $bill = $reservation->bills->first();
 
-        $totalRoomCharges = $bill->room_charges ?? 0;
+        /*
+        * Discount
+        */
+        $discount = 0;
+        if ($reservation->rooms()->count() >= 3) {
+            $reservation->user->hasRole(UserRoleType::TRAVEL_COMPANY->value) ?
+                $discount = DiscountRates::TRAVEL_COMPANY_DISCOUNT->value :
+                $discount = 0;
+        }
+        logger()->info('Discount : ' . $discount);
+
+        /*
+        * Total room charges
+        */
+        $totalRoomCharges = $reservation->getRoomsPriceAttribute() ?? 0;
+
         $totalExtraCharges = (int) $bill->extra_charges ?? 0;
         $total = $totalRoomCharges + $totalExtraCharges;
-        $discount = (int) $bill->discount ?? 0;
+        $discount = (int) $discount ?? 0;
         $taxes = (int) $bill->taxes ?? 0;
         $finalAmount = $this->calculateFinalAmount($total, $discount, $taxes);
 
@@ -51,6 +68,10 @@ class BillService
         ]);
 
         $reservation->bills()->first()->update([
+            'room_charges' => $totalRoomCharges,
+            'extra_charges' => $totalExtraCharges,
+            'discount' => $discount,
+            'taxes' => $taxes,
             'total_amount' => $finalAmount,
         ]);
 

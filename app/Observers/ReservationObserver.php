@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enum\DiscountRates;
 use App\Enum\ReservationStatus;
+use App\Enum\UserRoleType;
 use App\Mail\ReservationCanceled;
 use App\Mail\ReservationCheckedIn;
 use App\Mail\ReservationCheckedOut;
@@ -11,6 +13,9 @@ use App\Mail\ReservationNoShow;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Mail;
 use App\Services\BillService as BillServiceService;
+use App\Services\DurationService;
+use Carbon\Carbon;
+use PHPUnit\Event\Telemetry\Duration;
 
 class ReservationObserver
 {
@@ -21,6 +26,19 @@ class ReservationObserver
     {
         if (!$reservation->user) {
             return;
+        }
+
+        if ($reservation->wasChanged('check_in_date') || $reservation->wasChanged('check_out_date')) {
+            logger("Recalculate bill due to date changes");
+            $this->reCalculateBill($reservation->id);
+        }
+
+        if ($reservation->wasChanged('user_id')) {
+            $this->reCalculateBill($reservation->id);
+        }
+        
+        if ($reservation->wasChanged('rate_type')){
+            $this->reCalculateBill($reservation->id);
         }
 
         if ($reservation->status === ReservationStatus::CONFIRMED->value) {
@@ -37,7 +55,6 @@ class ReservationObserver
 
         if ($reservation->status === ReservationStatus::NO_SHOW->value) {
             if ($reservation->bills()->count() === 0) {
-                logger()->info('Creating new bill for reservation ID: ' . $reservation->id);
                 $reservation->bills()->create([
                     'room_charges' => $reservation->getRoomsPriceAttribute(),
                     'discount' => 0,
@@ -47,11 +64,9 @@ class ReservationObserver
                     'total_amount' => $reservation->getRoomsPriceAttribute(),
                     'status' => 'unpaid',
                 ]);
-            } else {
-                logger()->info('Recalculating bill for reservation ID: ' . $reservation->id);
-                $billServiceService = new BillServiceService();
-                $billServiceService->calculateTotalAmountOfBill($reservation->id);
             }
+
+            $this->reCalculateBill($reservation->id);
 
             Mail::to($reservation->user)->send(new ReservationNoShow($reservation));
         }
@@ -72,7 +87,16 @@ class ReservationObserver
                     'total_amount' => $reservation->getRoomsPriceAttribute(),
                     'status' => 'unpaid',
                 ]);
+
+                $this->reCalculateBill($reservation->id);
             }
         }
+    }
+
+    private function reCalculateBill($reservationId)
+    {
+        logger()->info('Recalculating bill for reservation ID: ' . $reservationId);
+        $billServiceService = new BillServiceService();
+        $billServiceService->calculateTotalAmountOfBill($reservationId);
     }
 }

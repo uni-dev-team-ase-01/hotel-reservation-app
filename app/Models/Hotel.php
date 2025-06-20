@@ -109,10 +109,10 @@ class Hotel extends Model
     // This might be redundant if staffUsers() serves the purpose.
     // UserHotel is the pivot model, direct relation to it from Hotel might not be needed
     // if the BelongsToMany through User is preferred.
-    // public function userHotels()
-    // {
-    //     return $this->hasMany(UserHotel::class);
-    // }
+    public function userHotels()
+    {
+        return $this->hasMany(UserHotel::class);
+    }
 
     public function reservations(): HasMany
     {

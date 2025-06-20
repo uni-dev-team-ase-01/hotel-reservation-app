@@ -7,6 +7,7 @@ use App\Enum\RoomType;
 use App\Enum\UserRoleType;
 use App\Models\Hotel;
 use App\Models\Room;
+use App\Services\DurationService;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -95,7 +96,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->displayFormat('M j, Y')
                     ->format('Y-m-d')
                     ->native(false)
-                    ->afterStateUpdated(fn () => $this->showResults = false),
+                    ->afterStateUpdated(fn() => $this->showResults = false),
 
                 DatePicker::make('checkOutDate')
                     ->label('Check-out Date')
@@ -106,7 +107,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->displayFormat('M j, Y')
                     ->format('Y-m-d')
                     ->native(false)
-                    ->afterStateUpdated(fn () => $this->showResults = false),
+                    ->afterStateUpdated(fn() => $this->showResults = false),
 
                 TextInput::make('numberOfGuests')
                     ->label('Number of Guests')
@@ -117,7 +118,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
 
                 Select::make('roomType')
                     ->label('Room Type')
-                    ->options(collect(RoomType::cases())->mapWithKeys(fn ($case) => [
+                    ->options(collect(RoomType::cases())->mapWithKeys(fn($case) => [
                         $case->value => $case->getLabel(),
                     ]))
                     ->placeholder('Any room type'),
@@ -143,7 +144,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                 TextColumn::make('room_type')
                     ->label('Room Type')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'standard' => 'gray',
                         'deluxe' => 'info',
                         'suite' => 'success',
@@ -162,17 +163,31 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                 TextColumn::make('current_rate')
                     ->label('Rate/Night')
                     ->money('USD')
-                    ->getStateUsing(fn (Room $record) => $record->getCurrentRate()),
+                    ->getStateUsing(function (Room $record) {
+                        $durationInDays = DurationService::getDurationInDays(
+                            Carbon::parse($this->checkInDate),
+                            Carbon::parse($this->checkOutDate)
+                        );
+                        $rateType = DurationService::getRateTypeByDuration($durationInDays);
+                        return $record->getCurrentRate($rateType);
+                    }),
 
                 TextColumn::make('total_nights')
                     ->label('Total Nights')
-                    ->getStateUsing(fn () => $this->getTotalNights())
+                    ->getStateUsing(fn() => $this->getTotalNights())
                     ->alignCenter(),
 
                 TextColumn::make('total_cost')
                     ->label('Total Cost')
                     ->money('USD')
-                    ->getStateUsing(fn (Room $record) => $record->getCurrentRate() * $this->getTotalNights()),
+                    ->getStateUsing(function (Room $record) {
+                        $durationInDays = DurationService::getDurationInDays(
+                            Carbon::parse($this->checkInDate),
+                            Carbon::parse($this->checkOutDate)
+                        );
+                        $rateType = DurationService::getRateTypeByDuration($durationInDays);
+                        return $record->getCurrentRate($rateType) * $this->getTotalNights();
+                    }),
             ])
             ->actions([
                 Action::make('select')
@@ -195,11 +210,11 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->label('Remove')
                     ->icon('heroicon-o-minus')
                     ->color('danger')
-                    ->visible(fn (Room $record) => in_array($record->id, $this->selectedRooms))
+                    ->visible(fn(Room $record) => in_array($record->id, $this->selectedRooms))
                     ->action(function (Room $record) {
                         $this->selectedRooms = array_filter(
                             $this->selectedRooms,
-                            fn ($id) => $id !== $record->id
+                            fn($id) => $id !== $record->id
                         );
 
                         Notification::make()
@@ -222,7 +237,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
 
                         Notification::make()
                             ->title('Rooms Selected')
-                            ->body(count($records).' rooms have been added to your selection.')
+                            ->body(count($records) . ' rooms have been added to your selection.')
                             ->success()
                             ->send();
                     }),
@@ -232,14 +247,25 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->label('Create Reservation')
                     ->icon('heroicon-o-calendar')
                     ->color('success')
-                    ->visible(fn () => ! empty($this->selectedRooms))
-                    ->url(fn () => route('filament.dashboard.resources.reservations.create', [
-                        'rooms' => $this->selectedRooms,
-                        'check_in' => $this->checkInDate,
-                        'check_out' => $this->checkOutDate,
-                        'guests' => $this->numberOfGuests,
-                        'hotel_id' => $this->hotelId,
-                    ])),
+                    ->visible(fn() => ! empty($this->selectedRooms))
+                    ->url(function () {
+                        $durationInDays = DurationService::getDurationInDays(
+                            Carbon::parse($this->checkInDate),
+                            Carbon::parse($this->checkOutDate)
+                        );
+
+                        $rateType = DurationService::getRateTypeByDuration($durationInDays);
+                        $this->data['rate_type'] = $rateType;
+
+                        return route('filament.dashboard.resources.reservations.create', [
+                            'rooms' => $this->selectedRooms,
+                            'check_in' => $this->checkInDate,
+                            'check_out' => $this->checkOutDate,
+                            'guests' => $this->numberOfGuests,
+                            'hotel_id' => $this->hotelId,
+                            'rate_type' => $rateType,
+                        ]);
+                    }),
             ])
             ->emptyStateHeading('No Available Rooms')
             ->emptyStateDescription('No rooms are available for the selected dates and criteria.')
@@ -303,7 +329,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             'checkOutDate' => 'required|date|after:checkInDate',
             'numberOfGuests' => 'required|integer|min:1',
         ]);
-        
+
         $this->checkInDate = Carbon::parse($this->checkInDate)->setTime(14, 0, 0)->format('Y-m-d H:i:s');
         $this->checkOutDate = Carbon::parse($this->checkOutDate)->setTime(12, 0, 0)->format('Y-m-d H:i:s');
 
@@ -343,9 +369,13 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             return 0;
         }
 
+        $durationInDays =  $this->getTotalNights();
+
+        $rateType = DurationService::getRateTypeByDuration($durationInDays);
+
         return Room::whereIn('id', $this->selectedRooms)
             ->get()
-            ->sum(fn ($room) => $room->getCurrentRate() * $this->getTotalNights());
+            ->sum(fn($room) => $room->getCurrentRate($rateType) * $durationInDays);
     }
 
     // TODO: remove this method if not needed

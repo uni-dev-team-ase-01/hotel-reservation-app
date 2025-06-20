@@ -21,7 +21,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-
 class ReservationResource extends Resource
 {
     protected static ?string $model = Reservation::class;
@@ -61,7 +60,18 @@ class ReservationResource extends Resource
                     ->afterStateUpdated(fn(Forms\Set $set) => $set('rooms', [])),
 
                 Forms\Components\Select::make('user_id')
-                    ->label('Customer')
+                    ->label(function (Forms\Get $get) {
+                        $userId = $get('user_id');
+                        if ($userId && User::find($userId)?->hasRole(UserRoleType::TRAVEL_COMPANY->value)) {
+                            return 'Travel Company';
+                        }
+
+                        if ($userId && User::find($userId)?->hasRole(UserRoleType::CUSTOMER->value)) {
+                            return 'Customer';
+                        }
+
+                        return 'For';
+                    })
                     ->hidden(fn() => $user->hasAnyRole([UserRoleType::TRAVEL_COMPANY->value]))
                     ->relationship('user', 'name', function (Builder $query) {
                         $query->whereHas('roles', function (Builder $roleQuery) {
@@ -204,8 +214,16 @@ class ReservationResource extends Resource
                     ->options(collect(RateType::cases())->mapWithKeys(fn($case) => [
                         $case->value => $case->getLabel(),
                     ]))
-                    ->default('pending')
-                    ->disabled($user->hasRole(UserRoleType::TRAVEL_COMPANY->value))
+                    ->default(
+                        function () {
+                            $rateType = request()->query('rate_type');
+                            if ($rateType && RateType::tryFrom($rateType)) {
+                                return $rateType;
+                            }
+                            return RateType::DAILY->value;
+                        }
+                    )
+                    // ->disabled()
                     ->dehydrated()
                     ->required(),
 

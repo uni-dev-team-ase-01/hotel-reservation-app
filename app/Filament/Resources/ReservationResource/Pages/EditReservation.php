@@ -65,4 +65,11 @@ class EditReservation extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getTitle(): string
+    {
+        $record = $this->record;
+        $for = $record->user->hasRole(UserRoleType::TRAVEL_COMPANY) ? 'Travel Company' : 'Customer';
+        return "Edit Reservation for : {$for}";
+    }
 }

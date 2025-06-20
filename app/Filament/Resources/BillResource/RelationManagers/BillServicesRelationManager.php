@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BillResource\RelationManagers;
 
+use App\Models\HotelService;
 use App\Models\Service;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,16 +20,32 @@ class BillServicesRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('service_id')
                     ->label('Service')
-                    ->options(Service::all()->pluck('name', 'id'))
+                    ->options(function () {
+                        $hotelId = $this->getOwnerRecord()->reservation->hotel_id;
+                        return Service::whereHas('hotels', function ($query) use ($hotelId) {
+                            $query->where('hotel_id', $hotelId);
+                        })->pluck('name', 'id');
+                    })
+                    ->searchable()
                     ->required()
-                    ->searchable(),
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        if ($state) {
+                            $service = HotelService::where('services_id', $state)
+                                ->where('hotel_id', $this->getOwnerRecord()->reservation->hotel_id)
+                                ->first();
+                            $set('charge', $service ? $service->charge : null);
+                        } else {
+                            $set('charge', null);
+                        }
+                    }),
 
                 Forms\Components\TextInput::make('charge')
-                    ->label('Charge')
+                    ->label('Service Charge')
                     ->numeric()
-                    ->required()
                     ->step(0.01)
-                    ->prefix('$'),
+                    ->prefix('$')
+                    ->required(),
             ]);
     }
 
