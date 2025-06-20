@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\SriLankanDistrict;
+use App\Enum\StarRating;
 use App\Enum\UserRoleType;
 use App\Filament\Resources\HotelResource\Pages;
 use App\Filament\Resources\HotelResource\RelationManagers\HotelServicesRelationManager;
@@ -34,17 +36,24 @@ class HotelResource extends Resource
                 Forms\Components\Textarea::make('address')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('district')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Select::make('district')
+                    ->label('District')
+                    ->options(SriLankanDistrict::options())
+                    ->searchable()
+                    ->required(),
                 Forms\Components\TextInput::make('phone')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('star_rating')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('images')
-                    ->maxLength(255),
+                Forms\Components\Select::make('star_rating')
+                    ->label('Star Rating')
+                    ->options(StarRating::options())
+                    ->required(),
+                Forms\Components\FileUpload::make('images')
+                    ->disk('public')
+                    ->directory('uploads')
+                    ->acceptedFileTypes(['image/*'])
+                    ->maxSize(2048)
+                    ->multiple(false),
                 Forms\Components\TextInput::make('website')
                     ->maxLength(255),
                 Forms\Components\Toggle::make('active')

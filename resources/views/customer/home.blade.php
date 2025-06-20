@@ -655,7 +655,7 @@
                                 <!-- Image and overlay -->
                                 <div class="card-img-scale-wrapper rounded-3">
                                     <!-- Image -->
-                                    <img src="{{ asset(($hotel->images ?? null) ? ($hotel->images) : 'assets/images/category/hotel/01.jpg') }}"
+                                    <img src="{{ $hotel->images ?? null ? Storage::disk('public')->url($hotel->images) : asset('assets/images/category/hotel/01.jpg') }}"
                                         class="card-img" alt="{{ $hotel->name ?? 'Hotel' }} image" />
                                     {{-- Note: If images are stored with Storage::put('public/...') then
                                     Storage::url($hotel->images) would be correct.

@@ -528,17 +528,33 @@
 
                 let imgs = Array.isArray(hotel.images) && hotel.images.length > 0
                     ? hotel.images
-                    : (typeof hotel.images === 'string' && hotel.images ? [hotel.images] : ['assets/images/category/hotel/4by3/04.jpg']); // Default image
+                    : (typeof hotel.images === 'string' && hotel.images ? [hotel.images] : ['assets/images/category/hotel/4by3/04.jpg']);
+
                 let sliderId = `tiny-slider-${hotel.id}`;
                 let imgSliderHTML = '';
+
                 if (imgs.length > 1) {
                     imgSliderHTML = `<div class="tiny-slider arrow-round arrow-xs arrow-dark overflow-hidden rounded-2" id="${sliderId}">
-                                                <div class="tiny-slider-inner">
-                                                    ${imgs.map((img) => `<div><img src="${img.image_path || img}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`).join('')}
-                                                </div>
-                                                </div>`;
+                                        <div class="tiny-slider-inner">
+                                            ${imgs.map((img) => {
+                                                let imgSrc = img.image_path || img;
+                                                // Remove escaped slashes and prepend storage path
+                                                imgSrc = imgSrc.replace(/\\/g, '');
+                                                if (imgSrc.startsWith('uploads/')) {
+                                                    imgSrc = `/storage/${imgSrc}`;
+                                                }
+                                                return `<div><img src="${imgSrc}" class="img-fluid rounded-start" alt="${hotel.name}"></div>`;
+                                            }).join('')}
+                                        </div>
+                                    </div>`;
                 } else {
-                    imgSliderHTML = `<img src="${imgs[0].image_path || imgs[0]}" class="img-fluid rounded-start" alt="${hotel.name}">`;
+                    let imgSrc = imgs[0].image_path || imgs[0];
+                    // Remove escaped slashes and prepend storage path
+                    imgSrc = imgSrc.replace(/\\/g, '');
+                    if (imgSrc.startsWith('uploads/')) {
+                        imgSrc = `/storage/${imgSrc}`;
+                    }
+                    imgSliderHTML = `<img src="${imgSrc}" class="img-fluid rounded-start" alt="${hotel.name}">`;
                 }
 
                 const discountBadge = hotel.discount_percentage
