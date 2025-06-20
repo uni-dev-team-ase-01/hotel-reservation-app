@@ -126,7 +126,7 @@
 						</div>
 						<div class="card shadow">
 							<div class="card-header border-bottom p-4">
-								<h4 class="card-title mb-0"><i class="bi bi-people-fill me-2"></i>Guest Details</h4>
+								<h4 class="card-title mb-0"><i class="bi bi-people-fill me-2"></i>Customer Details</h4>
 							</div>
 							<div class="card-body p-4">
 								@php
@@ -177,12 +177,30 @@
 										</div>
 									</div>
 									@if ($checkInDate == $today)
+										<!-- Commented out the Stripe payment section for now -->
+										<!-- <div class="mt-4">
+															<div id="card-element" class="mb-3"></div>
+															<div id="card-errors" role="alert" class="text-danger"></div>
+															<button id="card-button" class="btn btn-primary" type="button" data-secret="">
+																Pay ${{ number_format($total, 2) }}
+															</button>
+														</div> -->
+										<div class="alert alert-info mt-4">
+											<h5 class="alert-heading">Payment Information</h5>
+											<p>This booking requires immediate payment. Your reservation will be confirmed once
+												payment is processed successfully.</p>
+											<p>Please ensure your payment details are correct and your mobile number is accurate
+												as it will be used for booking confirmation and communication.</p>
+										</div>
 										<div class="mt-4">
-											<div id="card-element" class="mb-3"></div>
-											<div id="card-errors" role="alert" class="text-danger"></div>
-											<button id="card-button" class="btn btn-primary" type="button" data-secret="">
-												Pay ${{ number_format($total, 2) }}
-											</button>
+											<input type="hidden" name="payment_status" value="pending">
+											<input type="hidden" name="room_charges" value="{{ $room_charges ?? $total }}">
+											<input type="hidden" name="extra_charges" value="{{ $extra_charges ?? 0 }}">
+											<input type="hidden" name="discount" value="{{ $discount ?? 0 }}">
+											<input type="hidden" name="taxes" value="{{ $taxes ?? 0 }}">
+											<input type="hidden" name="total_amount" value="{{ $total ?? 0 }}">
+											<button type="button" class="btn btn-primary confirm-reservation">Confirm
+												Reservation</button>
 										</div>
 									@elseif ($pastDay)
 										<div class="alert alert-warning mt-4">
@@ -312,7 +330,7 @@
 						},
 						body: JSON.stringify({
 							amount: {{ intval($total * 100) }}
-																														 })
+																																		 })
 					})
 						.then(response => {
 							if (!response.ok) {
