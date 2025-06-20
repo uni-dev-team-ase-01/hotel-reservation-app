@@ -485,9 +485,10 @@ var e = {
        var choice = e.select('.js-choice');
        
        if (e.isVariableDefined(choice)) {
-         var element = document.querySelectorAll('.js-choice');
+         var element = document.querySelectorAll('select');
 
          element.forEach(function (item) {
+           if (item._choices || item.classList.contains('tomselected')) return;
            var removeItemBtn = item.getAttribute('data-remove-item-button') == 'true' ? true : false;
            var placeHolder = item.getAttribute('data-placeholder') == 'false' ? false : true;
            var placeHolderVal = item.getAttribute('data-placeholder-val') ? item.getAttribute('data-placeholder-val') : 'Type and hit enter';
