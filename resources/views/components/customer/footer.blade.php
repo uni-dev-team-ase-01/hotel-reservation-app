@@ -147,15 +147,9 @@ Footer START -->
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="/policy" target="_blank">
                                     <i class="bi bi-chevron-right"></i>
                                     Terms & Conditions
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <i class="bi bi-chevron-right"></i>
-                                    Refund Policy
                                 </a>
                             </li>
                         </ul>

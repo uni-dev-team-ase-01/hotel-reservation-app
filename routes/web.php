@@ -60,3 +60,7 @@ Route::post('/stripe/intent', [ReservationController::class, 'createStripeIntent
 
 Route::get('/reservation/success/{reservation?}', [ReservationController::class, 'success'])->middleware('auth')->name('reservation.success');
 
+Route::get('policy', function () {
+    return view('policy.index');
+})->name('policy');
+
