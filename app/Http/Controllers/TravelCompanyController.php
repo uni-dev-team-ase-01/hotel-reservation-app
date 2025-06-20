@@ -17,6 +17,7 @@ class TravelCompanyController extends Controller
         try {
             $validated = $request->validate([
                 'company_name' => 'required|string|max:255',
+                'company_registration' => 'required|string|max:255',
                 'email' => 'required|email|unique:travel_companies,email',
                 'phone' => 'required|string|max:20',
                 'message' => 'required|string|max:1000',

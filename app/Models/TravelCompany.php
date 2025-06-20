@@ -8,6 +8,7 @@ class TravelCompany extends Model
 {
     protected $fillable = [
         'company_name',
+        'company_registration',
         'email',
         'phone',
         'status',

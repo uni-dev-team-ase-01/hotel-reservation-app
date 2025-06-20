@@ -25,6 +25,9 @@ class TravelCompanyResource extends Resource
                 Forms\Components\TextInput::make('company_name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('company_registration')
+                    ->required()
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
@@ -55,6 +58,8 @@ class TravelCompanyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('company_name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('company_registration')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
