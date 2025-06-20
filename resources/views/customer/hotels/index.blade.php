@@ -347,7 +347,7 @@
                     return;
                 }
 
-                let choicesArray = [{ value: '', label: 'Select location', selected: !selectedValue, disabled: true }];
+                let choicesArray = [{ value: '', label: '', selected: !selectedValue, disabled: true }];
                 let uniqueLocations = [];
 
                 result.data.forEach((item) => {
@@ -1076,7 +1076,6 @@
                 mode: 'range',
                 dateFormat: 'Y-m-d',
                 minDate: 'today',
-                maxDate: new Date().fp_incr(15),
             };
 
             const urlParams = new URLSearchParams(window.location.search);

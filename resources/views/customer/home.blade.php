@@ -907,7 +907,7 @@
                 altFormat: "d M Y",
                 defaultDate: flatpickrDefaultDates,
                 minDate: "today",               
-                maxDate: new Date().fp_incr(15),
+
             });
 
             function getQueryParams() {
