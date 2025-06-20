@@ -142,7 +142,6 @@
                                             Location
                                         </label>
                                         <select class="form-select js-choice" data-search-enabled="true" name="location">
-                                            <option value="">Select location</option>
                                         </select>
                                     </div>
                                 </div>
@@ -742,9 +741,73 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 
     <script>
-        let homeFlatpickrInstance;
+        // Global variable to store Choices instances
+        const choicesInstances = new Map();
+
+        // Function to initialize Choices.js on a select element
+        function initChoices(selectElement, options = {}) {
+            if (!selectElement || selectElement._choices) return; // Check _choices, which is set in this function
+
+            const defaultOptions = {
+                // removeItemButton: true, // User's version had this, let's see if it's needed or if Choices default is fine
+                searchEnabled: true,     // Usually a good default
+                shouldSort: false,
+                // classNames: { // These are often helpful for styling consistency if needed
+                //     containerInner: 'choices__inner',
+                //     input: 'choices__input',
+                //     item: 'choices__item',
+                //     button: 'choices__button'
+                // }
+            };
+            
+            // Let's respect data-attributes from the select element itself first
+            const dataSearchEnabled = selectElement.getAttribute('data-search-enabled');
+            const dataRemoveItemButton = selectElement.getAttribute('data-remove-item-button');
+
+            const elementConfig = {};
+            if (dataSearchEnabled !== null) {
+                elementConfig.searchEnabled = dataSearchEnabled === 'true';
+            }
+            if (dataRemoveItemButton !== null) {
+                elementConfig.removeItemButton = dataRemoveItemButton === 'true';
+            }
+            // Add other data attribute handling here if needed for placeholder, etc.
+
+            const mergedOptions = {...defaultOptions, ...elementConfig, ...options};
+            const choices = new Choices(selectElement, mergedOptions);
+
+            selectElement._choices = true; // Mark as initialized
+            choicesInstances.set(selectElement, choices);
+
+            return choices;
+        }
+
+        // Function to initialize all select elements with class 'js-choice'
+        function initAllChoices() {
+            document.querySelectorAll('select.js-choice').forEach(select => {
+                initChoices(select); // Pass no specific options, relies on data-attributes or defaults
+            });
+        }
+
+        // Function to destroy Choices instances to prevent memory leaks
+        function destroyAllChoices() {
+            choicesInstances.forEach((choices, selectElement) => {
+                if (choices && typeof choices.destroy === 'function') {
+                    choices.destroy();
+                }
+                // Clear the custom flag regardless of successful destruction
+                if (selectElement) { // Check if selectElement is not null/undefined
+                   selectElement._choices = false;
+                }
+            });
+            choicesInstances.clear();
+        }
+
+        let homeFlatpickrInstance; // Already declared in the original script for the page
 
         async function populateLocationsDropdownFromApi(selectedValue = null) {
             const locationSelect = document.querySelector('#home-search-form select[name="location"]');
@@ -754,11 +817,12 @@
             }
 
             try {
-                const response = await fetch('/hotels/select-options');
+                const response = await fetch('/hotels/select-options'); // Assuming this is the correct endpoint
                 if (!response.ok) {
                     console.error("Failed to fetch locations:", response.status);
-                    if (window.Choices && locationSelect.choices) {
-                        locationSelect.choices.setChoices([{ value: '', label: 'Could not load locations' }], 'value', 'label', true);
+                    const currentChoicesInstance = choicesInstances.get(locationSelect);
+                    if (currentChoicesInstance) {
+                        currentChoicesInstance.setChoices([{ value: '', label: 'Could not load locations' }], 'value', 'label', true);
                     } else {
                         locationSelect.innerHTML = `<option value="">Could not load locations</option>`;
                     }
@@ -766,59 +830,68 @@
                 }
                 const result = await response.json();
 
-                let choicesArray = [{ value: '', label: 'Select location', selected: false, disabled: true }];
+                let choicesArray = [{ value: '', label: 'Select location', selected: !selectedValue, disabled: true }];
                 let uniqueLocations = [];
 
                 if (result.data && Array.isArray(result.data)) {
                     result.data.forEach((item) => {
-                        const locationName = item.address;
+                        const locationName = item.address; // As per user's example
                         if (locationName && !uniqueLocations.includes(locationName)) {
                             uniqueLocations.push(locationName);
-                            choicesArray.push({ value: locationName, label: locationName, selected: false });
+                            // Ensure selectedValue is handled correctly here
+                            choicesArray.push({ value: locationName, label: locationName, selected: selectedValue === locationName });
                         }
                     });
                 }
-
-                if (window.Choices && locationSelect.choices) {
-                    locationSelect.choices.setChoices(choicesArray, 'value', 'label', true);
-                    if (selectedValue) {
-                        const valueExists = choicesArray.some(choice => choice.value === selectedValue);
-                        if (valueExists) {
-                            locationSelect.choices.setValue([{ value: selectedValue, label: selectedValue }]);
-                        } else {
-                            console.warn(`Selected value "${selectedValue}" not found in new choices for location (home page).`);
-                            // Optionally, select the placeholder if the value doesn't exist
-                            // locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
-                        }
-                    } else {
-                        // Ensure placeholder is selected if no selectedValue and choices were repopulated
-                        locationSelect.choices.setValue([{ value: '', label: 'Select location' }]);
-                    }
-                } else {
-                    locationSelect.innerHTML = choicesArray.map(choice => `<option value="${choice.value}" ${choice.disabled ? 'disabled' : ''} ${choice.selected ? 'selected' : ''}>${choice.label}</option>`).join('');
-                    if (selectedValue) {
-                        locationSelect.value = selectedValue;
-                    } else {
-                        locationSelect.value = "";
-                    }
+                
+                let currentChoicesInstance = choicesInstances.get(locationSelect);
+                if (!currentChoicesInstance && !locationSelect._choices) { // If not initialized by initAllChoices yet
+                    currentChoicesInstance = initChoices(locationSelect);
                 }
+
+                if (currentChoicesInstance) {
+                    currentChoicesInstance.setChoices(choicesArray, 'value', 'label', true); // replace all choices
+                    // If selectedValue was passed, ensure it's set.
+                    // setValue might be tricky if the exact label isn't in choicesArray for the value.
+                    // The 'selected' flag in choicesArray should handle it for setChoices.
+                    if (selectedValue) {
+                         const valueExists = choicesArray.some(choice => choice.value === selectedValue);
+                         if (valueExists) currentChoicesInstance.setValue([selectedValue]); // setValue expects an array of values
+                         else currentChoicesInstance.setValue(['']); // Fallback to placeholder if value not found
+                    } else {
+                        currentChoicesInstance.setValue(['']); // Select placeholder
+                    }
+                } else { // Fallback if initChoices failed or wasn't called
+                    locationSelect.innerHTML = choicesArray.map(choice => 
+                        `<option value="${choice.value}" ${choice.disabled ? 'disabled' : ''} ${choice.selected ? 'selected' : ''}>${choice.label}</option>`
+                    ).join('');
+                    if(selectedValue) locationSelect.value = selectedValue;
+                }
+
             } catch (error) {
                 console.error("Error in populateLocationsDropdownFromApi (home page):", error);
-                if (window.Choices && locationSelect.choices) {
-                    locationSelect.choices.setChoices([{ value: '', label: 'Error loading locations' }], 'value', 'label', true);
-                } else {
+                const currentChoicesInstance = choicesInstances.get(locationSelect);
+                if (currentChoicesInstance) {
+                    currentChoicesInstance.setChoices([{ value: '', label: 'Error loading locations' }], 'value', 'label', true);
+                } else if (locationSelect) { // Check if locationSelect is not null
                     locationSelect.innerHTML = `<option value="">Error loading locations</option>`;
                 }
             }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
+            initAllChoices(); // Initialize all selects with .js-choice on page load
 
             const bookingForm = document.getElementById('home-search-form');
             if (!bookingForm) {
                 console.error("Home page search form with ID 'home-search-form' not found.");
                 return;
             }
+
+            // ... (rest of the flatpickr, getQueryParams, setFormFromQuery, and form submission logic from user's script)
+            // This part is assumed to be the same as in the user's provided feedback script for home.blade.php
+            // For brevity, I am not repeating it here but it should be included in the final script.
+            // The important parts are initAllChoices and populateLocationsDropdownFromApi calls.
 
             let flatpickrDefaultDates = [];
             const query = getQueryParams();
@@ -849,29 +922,32 @@
             }
 
             function setFormFromQuery(formElement, queryParams) {
-                // Location is now set after populateLocationsDropdownFromApi promise resolves.
-                // Dates are handled by flatpickr's defaultDate.
-
-                // Set guests/rooms from query parameters
+                // Location is set by populateLocationsDropdownFromApi
                 if (queryParams.adults) {
                     let el = formElement.querySelector('.guest-selector-count.adults');
                     if (el) el.textContent = queryParams.adults;
                 }
-                if (query.children) {
-                    let el = bookingForm.querySelector('.guest-selector-count.child');
-                    if (el) el.textContent = query.children;
+                if (queryParams.children) { // Corrected from query.children to queryParams.children
+                    let el = formElement.querySelector('.guest-selector-count.child');
+                    if (el) el.textContent = queryParams.children;
                 }
-                if (query.rooms) {
-                    let el = bookingForm.querySelector('.guest-selector-count.rooms');
-                    if (el) el.textContent = query.rooms;
+                if (queryParams.rooms) {
+                    let el = formElement.querySelector('.guest-selector-count.rooms');
+                    if (el) el.textContent = queryParams.rooms;
                 }
             }
+            
+            // Call populateLocationsDropdownFromApi, then setFormFromQuery
+            populateLocationsDropdownFromApi(query.location).then(() => {
+                 setFormFromQuery(bookingForm, query);
+            });
+
+
             if (bookingForm) {
-                setFormFromQuery(bookingForm, getQueryParams());
+                // setFormFromQuery(bookingForm, getQueryParams()); // Moved into .then() of populateLocations
 
                 bookingForm.addEventListener('submit', function (e) {
                     e.preventDefault();
-
 
                     var locationSelect = bookingForm.querySelector('select[name="location"]');
                     var location = locationSelect ? locationSelect.value : '';
@@ -882,7 +958,11 @@
                         check_out = homeFlatpickrInstance.formatDate(homeFlatpickrInstance.selectedDates[1], "Y-m-d");
                     } else {
                         if (typeof Toastify !== 'undefined') {
-                            Toastify({ text: "Please select check-in and check-out dates.", duration: 3000, backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)" }).showToast();
+                            Toastify({ 
+                                text: "Please select check-in and check-out dates.", 
+                                duration: 3000, 
+                                backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)" 
+                            }).showToast();
                         } else {
                             alert("Please select check-in and check-out dates.");
                         }
@@ -904,22 +984,22 @@
                     window.location.href = '/hotels?' + params.toString();
                 });
 
-                var searchBtn = bookingForm.querySelector('.btn.btn-primary');
-                if (searchBtn && searchBtn.tagName.toLowerCase() === 'a') {
+                var searchBtn = bookingForm.querySelector('.btn.btn-primary'); // This was the <a> tag
+                if (searchBtn && searchBtn.tagName.toLowerCase() === 'a') { // Check if it's still an anchor
                     var btnParent = searchBtn.parentNode;
                     var newBtn = document.createElement('button');
-                    newBtn.type = 'submit';
-                    newBtn.className = searchBtn.className;
-                    newBtn.innerHTML = searchBtn.innerHTML;
+                    newBtn.type = 'submit'; // Make it a submit button
+                    newBtn.className = searchBtn.className; // Copy classes
+                    newBtn.innerHTML = searchBtn.innerHTML; // Copy content (icon)
                     btnParent.replaceChild(newBtn, searchBtn);
                 }
-
-
-                populateLocationsDropdownFromApi(query.location);
-
-                setFormFromQuery(bookingForm, query);
-
-            } // end if(bookingForm)
+            }
         });
+
+        // Clean up Choices instances when navigating away (Turbolinks/Livewire like behavior)
+        // These events might not be standard in all Laravel apps but good for robustness
+        document.addEventListener('turbolinks:before-render', destroyAllChoices); 
+        document.addEventListener('livewire:navigating', destroyAllChoices); // If using Livewire navigation
+
     </script>
 @endpush
