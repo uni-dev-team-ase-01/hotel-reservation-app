@@ -1,11 +1,21 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏨 Hotel Reservation System – Google Jules Dropdown Fix
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 👥 Team Members
+- Ramisha Gimhama
+- Pasindu Lakmal
+- Jithma Perera
+
+---
+
+## 🧩 Project Overview
+This hotel reservation system allows users to:
+- Search for hotels by location
+- Select room types dynamically
+- Book rooms seamlessly online with a user-friendly interface
+
+Our frontend uses interactive dropdowns powered by **Choices.js** to enhance user experience.
+During development, we encountered a technical issue related to the Google Jules integration affecting these dropdowns.
+This README explains the issue, how we resolved it, and demonstrates the working system.
 
 ## Hotel Reservation System
 
@@ -27,6 +37,9 @@
 
 #### Travel Company
 
+### Presentation Introduction Script
+> Hello everyone, I’m Ramisha. I’ll start by walking you through the homepage view of our hotel reservation system.
+> After that, I’d like to invite Pasindu to explain the dropdown features and the issue we faced with Google Jules integration.
 
 ## Installation
 
