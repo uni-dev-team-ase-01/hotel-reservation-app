@@ -16,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class OccupancyPredictionResource extends Resource
 {
@@ -149,6 +150,7 @@ class OccupancyPredictionResource extends Resource
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
+                ExportBulkAction::make(),
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
