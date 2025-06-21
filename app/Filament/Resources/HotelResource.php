@@ -41,6 +41,25 @@ class HotelResource extends Resource
                     ->options(SriLankanDistrict::options())
                     ->searchable()
                     ->required(),
+                Forms\Components\Select::make('type')
+                    ->label('Hotel Type')
+                    ->options(
+                        [
+                            'Hotel' => 'Hotel',
+                            'Apartment' => 'Apartment',
+                            'Resort' => 'Resort',
+                            'Villa' => 'Villa',
+                            'Lodge' => 'Lodge',
+                            'Guest House' => 'Guest House',
+                            'Cottage' => 'Cottage',
+                            'Beach Hut' => 'Beach Hut',
+                            'Farm House' => 'Farm House',
+                            'Luxury' => 'Luxury',
+                            'Budget' => 'Budget'
+                        ]
+                    )
+                    ->searchable()
+                    ->required(),
                 Forms\Components\TextInput::make('phone')
                     ->required()
                     ->maxLength(255),
@@ -80,6 +99,9 @@ class HotelResource extends Resource
                     ->searchable(),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
