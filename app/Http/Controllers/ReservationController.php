@@ -25,9 +25,9 @@ class ReservationController extends Controller
                 'date',
                 'after_or_equal:today',
                 function ($attribute, $value, $fail) {
-                    $maxDate = \Carbon\Carbon::today()->addDays(15)->format('Y-m-d');
+                    $maxDate = \Carbon\Carbon::today()->addDays(300)->format('Y-m-d');
                     if ($value > $maxDate) {
-                        $fail('Check-in date cannot be more than 15 days from today.');
+                        $fail('Check-in date cannot be more than 300 days from today.');
                     }
                 }
             ],
@@ -36,9 +36,9 @@ class ReservationController extends Controller
                 'date',
                 'after:check_in',
                 function ($attribute, $value, $fail) use ($request) {
-                    $maxDate = \Carbon\Carbon::today()->addDays(15)->format('Y-m-d');
+                    $maxDate = \Carbon\Carbon::today()->addDays(300)->format('Y-m-d');
                     if ($value > $maxDate) {
-                        $fail('Check-out date cannot be more than 15 days from today.');
+                        $fail('Check-out date cannot be more than 300 days from today.');
                     }
                 }
             ],
