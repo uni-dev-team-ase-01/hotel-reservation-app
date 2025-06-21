@@ -125,15 +125,15 @@ class ReservationController extends Controller
                 $reservation->rooms()->attach($roomId);
             }
 
-            $bill = Bill::create([
-                'reservation_id' => $reservation->id,
-                'room_charges' => $request->room_charges,
-                'extra_charges' => $request->extra_charges,
-                'discount' => $request->discount,
-                'taxes' => $request->taxes,
-                'total_amount' => $request->total_amount,
-                'payment_status' => $request->payment_status,
-            ]);
+            // $bill = Bill::create([
+            //     'reservation_id' => $reservation->id,
+            //     'room_charges' => $request->room_charges,
+            //     'extra_charges' => $request->extra_charges,
+            //     'discount' => $request->discount,
+            //     'taxes' => $request->taxes,
+            //     'total_amount' => $request->total_amount,
+            //     'payment_status' => $request->payment_status,
+            // ]);
 
             DB::commit();
 

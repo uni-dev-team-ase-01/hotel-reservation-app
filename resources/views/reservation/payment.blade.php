@@ -108,7 +108,7 @@
 											<h5 class="card-title mb-0">{{ $room->room_type ?? 'Room' }} -
 												{{ $room->room_number }}
 											</h5>
-											<a href="#" class="btn btn-link p-0 mb-0">View Cancellation Policy</a>
+											<a href="/policy" class="btn btn-link p-0 mb-0">View Cancellation Policy</a>
 										</div>
 										<div class="card-body">
 											<h6>Price Included</h6>
