@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->profile(EditProfile::class)
             ->login()
+            ->passwordReset()
             ->colors([
                 'primary' => Color::Purple,
             ])

@@ -295,12 +295,6 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bi bi-info-circle fa-fw me-2"></i>
-                                Help Center
-                            </a>
-                        </li>
-                        <li>
                             <form method="POST" action="{{ route("logout") }}">
                                 @csrf
                                 <button

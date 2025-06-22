@@ -10,6 +10,7 @@ use App\Filament\Resources\HotelResource\RelationManagers\HotelServicesRelationM
 use App\Filament\Resources\HotelResource\RelationManagers\RoomsRelationManager;
 use App\Filament\Resources\HotelResource\RelationManagers\UserHotelsRelationManager;
 use App\Models\Hotel;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -29,6 +30,14 @@ class HotelResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->rule(function () {
+                        return function (string $attribute, $value, Closure $fail) {
+                            if (is_numeric($value)) {
+                                $fail('The :attribute cannot be numbers only. Please include some text.');
+                            }
+                        };
+                    })
+                    ->helperText('Numbers only are not allowed. Text with numbers is OK.')
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->required()
