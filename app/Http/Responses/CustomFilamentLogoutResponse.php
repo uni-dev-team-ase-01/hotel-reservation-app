@@ -10,8 +10,22 @@ class CustomFilamentLogoutResponse implements LogoutResponseContract
 {
     public function toResponse($request): RedirectResponse
     {
-        Auth::guard('admin')->logout();
+        $panel = filament()->getCurrentPanel();
 
-        return redirect('/dashboard/login');
+        if ($panel) {
+            $panelId = $panel->getId();
+            $authGuard = $panel->getAuthGuard();
+
+            Auth::guard('admin')->logout();
+
+            return match ($panelId) {
+                'customer' => redirect('/login'),
+                'dashboard', 'admin' => redirect('/dashboard/login'),
+                default => redirect('/login')
+            };
+        }
+
+        Auth::logout();
+        return redirect('/login');
     }
 }

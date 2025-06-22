@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Resources\RoomRevenueReportResource\Widgets\RoomRevenueReportChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -44,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 \App\Filament\Resources\HotelResource\Widgets\BasicOverview::class,
                 Widgets\AccountWidget::class,
+                RoomRevenueReportChart::class,
             ])
             ->resources([
                 config('filament-logger.activity_resource'),
