@@ -82,6 +82,7 @@ class ReservationController extends Controller
             'check_out' => $request->input('check_out'),
             'adults' => $request->input('adults', 1),
             'children' => $request->input('children', 0),
+            'room_type' => $request->room_type ?? 'standard',
             'total_price' => $total,
             'nights' => $nights,
         ];
