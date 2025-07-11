@@ -47,10 +47,14 @@ class RoomAvailabilitySearchSettings extends Page
         }
 
         $endDate = null;
-        if ($this->bookingDuration === 'weekly')
-            $endDate = date('Y-m-d', strtotime($this->startDate . ' +' . (int) $this->bookingDurationUnits . ' week'));
-        else {
-            $endDate = date('Y-m-d', strtotime($this->startDate . ' +' . (int) $this->bookingDurationUnits . ' month'));
+        if ($this->bookingRoomType === 'residential' && $this->searchType === 'customer') {
+            if ($this->bookingDuration === 'weekly')
+                $endDate = date('Y-m-d', strtotime($this->startDate . ' +' . (int) $this->bookingDurationUnits . ' week'));
+            else {
+                $endDate = date('Y-m-d', strtotime($this->startDate . ' +' . (int) $this->bookingDurationUnits . ' month'));
+            }
+        } else {
+            $this->startDate = null;
         }
 
         $searchParams = [

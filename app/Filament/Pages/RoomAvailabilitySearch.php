@@ -375,6 +375,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             'checkInDate' => 'required|date|after_or_equal:today',
             'checkOutDate' => 'required|date|after:checkInDate',
             'numberOfGuests' => 'required|integer|min:1',
+            'hotelId' => 'required|integer',
         ]);
 
         $this->checkInDate = Carbon::parse($this->checkInDate)->setTime(14, 0, 0)->format('Y-m-d H:i:s');
