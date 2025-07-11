@@ -17,6 +17,9 @@ class RoomAvailabilitySearchSettings extends Page
 
     public $searchType = '';
     public $bookingRoomType = '';
+    public $bookingDuration;
+    public $bookingDurationUnits;
+    public $startDate;
 
     public function updatedSearchType()
     {
@@ -43,9 +46,18 @@ class RoomAvailabilitySearchSettings extends Page
             return;
         }
 
+        $endDate = null;
+        if ($this->bookingDuration === 'weekly')
+            $endDate = date('Y-m-d', strtotime($this->startDate . ' +' . (int) $this->bookingDurationUnits . ' week'));
+        else {
+            $endDate = date('Y-m-d', strtotime($this->startDate . ' +' . (int) $this->bookingDurationUnits . ' month'));
+        }
+
         $searchParams = [
             'search_type' => $this->searchType,
             'booking_room_type' => $this->bookingRoomType,
+            'checkin_date' => $this->startDate,
+            'checkout_date' => $endDate,
         ];
 
 

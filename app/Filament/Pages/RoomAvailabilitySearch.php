@@ -71,6 +71,14 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
         $this->roomCategory = request()->get('booking_room_type') === 'block_booking' ? 'standard' : request()->get('booking_room_type');
         $this->searchType = request()->get('search_type');
 
+        if (request()->has('checkin_date')) {
+            $this->data['checkInDate'] = request()->get('checkin_date');
+        }
+
+        if (request()->has('checkout_date')) {
+            $this->data['checkOutDate'] = request()->get('checkout_date');
+        }
+
         $this->form->fill($this->data);
     }
 

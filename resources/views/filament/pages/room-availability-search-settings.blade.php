@@ -82,6 +82,88 @@
                     </div>
                 @endif
 
+                @if ($bookingRoomType === 'residential')
+                    <div
+                        class="mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <h3 class="text-lg font-medium text-purple-900 dark:text-purple-100 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Residential Booking Period
+                        </h3>
+                        <p class="text-sm text-purple-700 dark:text-purple-300 mb-4">
+                            Select your preferred booking duration for residential rooms. Only weekly or monthly
+                            bookings are available.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Booking Duration
+                                </label>
+                                <select wire:model.live="bookingDuration"
+                                    class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:text-white">
+                                    <option value="">Select duration</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Booking Duration Units
+                                </label>
+                                <select wire:model.live="bookingDurationUnits"
+                                    class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:text-white">
+                                    @if ($bookingDuration === 'weekly')
+                                        <option value="">Select Weeks</option>
+                                        <option value="1">1 Week</option>
+                                        <option value="2">2 Weeks</option>
+                                        <option value="3">3 Weeks</option>
+                                    @endif
+
+                                    @if ($bookingDuration === 'monthly')
+                                        <option value="">Select Months</option>
+                                        <option value="1">1 Month</option>
+                                        <option value="2">2 Months</option>
+                                        <option value="3">3 Months</option>
+                                        <option value="4">4 Months</option>
+                                        <option value="5">5 Months</option>
+                                        <option value="6">6 Months</option>
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Start Date
+                                </label>
+                                <input type="date" wire:model.live="startDate"
+                                    min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                                    class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm shadow-sm placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:text-white">
+                            </div>
+                        </div>
+
+                        @if ($bookingDuration && $startDate)
+                            <div
+                                class="mt-4 p-3 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-600 dark:text-gray-400">Booking Period:</span>
+                                    <span class="font-medium text-gray-900 dark:text-white">
+                                        {{ $startDate }} -
+                                        @if ($bookingDuration === 'weekly')
+                                            {{ date('Y-m-d', strtotime($startDate . ' +' . (int) $bookingDurationUnits . ' week')) }}
+                                        @else
+                                            {{ date('Y-m-d', strtotime($startDate . ' +' . (int) $bookingDurationUnits . ' month')) }}
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 @if ($this->canSearch())
                     <div class="flex justify-center">
                         <x-filament::button wire:click="search" size="lg">
