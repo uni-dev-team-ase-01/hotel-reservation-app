@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enum\RateType;
 use App\Enum\ReservationStatus;
 use App\Enum\RoomType;
 use App\Enum\UserRoleType;
@@ -42,11 +43,15 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
 
     public $roomType;
 
+    public $roomCategory;
+
     public $selectedRooms = [];
 
     public $showResults = false;
 
     public $data = [];
+
+    public $searchType; // customer or travel company
 
     public function mount(): void
     {
@@ -62,6 +67,9 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                 $this->data['hotelId'] = $userHotels->first();
             }
         }
+
+        $this->roomCategory = request()->get('booking_room_type') === 'block_booking' ? 'standard' : request()->get('booking_room_type');
+        $this->searchType = request()->get('search_type');
 
         $this->form->fill($this->data);
     }
@@ -116,6 +124,25 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->minValue(1)
                     ->maxValue(20),
 
+                Select::make('roomCategory')
+                    ->label('Room Category')
+                    ->options([
+                        'standard' => 'Standard Rooms',
+                        'residential' => 'Residential Rooms',
+                    ])
+                    ->required()
+                    ->default('standard')
+                    ->placeholder('Any room Category')
+                    ->afterStateHydrated(function ($state, $set) {
+                        if (is_null($state)) {
+                            $set('roomCategory', 'standard');
+                        }
+
+                        if ($this->roomCategory) {
+                            $set('roomCategory', $this->roomCategory);
+                        }
+                    }),
+
                 Select::make('roomType')
                     ->label('Room Type')
                     ->options(collect(RoomType::cases())->mapWithKeys(fn($case) => [
@@ -123,7 +150,7 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ]))
                     ->placeholder('Any room type'),
             ])
-            ->columns(5);
+            ->columns(6);
     }
 
     public function table(Table $table): Table
@@ -145,10 +172,18 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
                     ->label('Room Type')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                        'standard' => 'gray',
-                        'deluxe' => 'info',
-                        'suite' => 'success',
-                        'presidential' => 'warning',
+                        RoomType::SINGLE->value => 'gray',
+                        RoomType::DOUBLE->value => 'info',
+                        RoomType::FAMILY->value => 'success',
+                        default => 'gray',
+                    }),
+
+                TextColumn::make('room_category')
+                    ->label('Room Category')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'standard' => 'info',
+                        'residential' => 'success',
                         default => 'gray',
                     }),
 
@@ -310,6 +345,10 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
             $query->where('room_type', $this->roomType);
         }
 
+        if ($this->roomCategory) {
+            $query->where('room_category', $this->roomCategory);
+        }
+
         // TODO: need test this logic
         $query->whereDoesntHave('reservations', function ($reservationQuery) {
             $reservationQuery->whereNotIn('status', [ReservationStatus::CANCELLED, ReservationStatus::NO_SHOW, ReservationStatus::CHECKED_OUT])
@@ -363,7 +402,26 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
         return count($this->selectedRooms);
     }
 
-    public function getTotalSelectedCost(): float
+    public function getInfoMessage()
+    {
+
+        $message = null;
+        if ($this->searchType === 'travel_company') {
+            $message = 'You will received 10% discount for selecting three or more rooms (Special for Travel Company).';
+        }
+
+        if ($this->searchType === 'customer' && $this->roomCategory === 'standard') {
+            $message = 'For Standard Room, you will charge for daily rates.';
+        }
+
+        if ($this->searchType === 'customer' && $this->roomCategory === 'residential') {
+            $message = 'For Residential Room, you will charge for weekly and monthly rates.';
+        }
+
+        return $message;
+    }
+
+    public function getTotalSelectedCost(): array | float
     {
         if (empty($this->selectedRooms)) {
             return 0;
@@ -371,11 +429,27 @@ class RoomAvailabilitySearch extends Page implements Tables\Contracts\HasTable
 
         $durationInDays =  $this->getTotalNights();
 
-        $rateType = DurationService::getRateTypeByDuration($durationInDays);
+        $rateType = RateType::DAILY->value;
 
-        return Room::whereIn('id', $this->selectedRooms)
+        if ($this->roomCategory === 'residential') {
+            $rateType = DurationService::getRateTypeByDuration($durationInDays);
+        }
+
+        $total =  Room::whereIn('id', $this->selectedRooms)
             ->get()
             ->sum(fn($room) => $room->getCurrentRate($rateType) * $durationInDays);
+
+        $discount = 0;
+
+        if ($this->searchType === 'travel_company' && $this->getSelectedRoomsCount() >= 2) {
+            $discount = $total * 0.1;
+        }
+
+        return [
+            'netTotal' => number_format($total, 0),
+            'discount' => number_format($discount, 2),
+            'total' => number_format($total - $discount, 2),
+        ];
     }
 
     // TODO: remove this method if not needed

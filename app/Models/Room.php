@@ -16,6 +16,7 @@ class Room extends Model
         'occupancy',
         'location',
         'images',
+        'room_category',
     ];
 
     protected $casts = [

@@ -14,7 +14,7 @@ class RoomRevenueReportChart extends ChartWidget
 
     public static function canView(): bool
     {
-        return auth()->user()->hasAnyRole([UserRoleType::HOTEL_MANAGER, UserRoleType::HOTEL_CLERK]);
+        return auth()->user()->hasAnyRole([UserRoleType::HOTEL_MANAGER]);
     }
 
     protected function getData(): array
